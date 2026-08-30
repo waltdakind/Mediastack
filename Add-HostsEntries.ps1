@@ -1,11 +1,12 @@
 # ==============================================================================
 # Add-HostsEntries.ps1 - Intelligent Windows Hosts File Provisioner & Domain Resolver
-# Adds voltairedeux.local, ordinateur.local & mediaserver.local domain mappings
+# Adds voltairedeux.local, voltaireun.local, ordinateur.local & mediaserver.local domain mappings
 # ==============================================================================
 param(
     [string]$HostsPath = "$env:SystemRoot\System32\drivers\etc\hosts",
     [string]$TargetIp = "127.0.0.1",
-    [string]$LanIp = "192.168.4.30"
+    [string]$VoltaireUnIp = "192.168.4.21",
+    [string]$VoltaireDeuxIp = "192.168.4.30"
 )
 
 $ErrorActionPreference = "Continue"
@@ -36,6 +37,26 @@ try {
 
 # 2. Define Full Matrix of Local Domain Mappings
 $domainsToAdd = @(
+    # Cluster Peer Host Resolution
+    @{ IP=$VoltaireUnIp;   Domain="voltaireun.lan" },
+    @{ IP=$VoltaireDeuxIp; Domain="voltairedeux.lan" },
+
+    # VoltaireUn Local Domains
+    @{ IP="127.0.0.1"; Domain="voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="jellyfin.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="sonarr.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="radarr.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="prowlarr.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="bazarr.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="jellyseerr.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="transmission.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="tvheadend.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="musicbrainz.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="db.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="api.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="homepage.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="hdhomerun.voltaireun.local" },
+
     # VoltaireDeux Local Domains
     @{ IP="127.0.0.1"; Domain="voltairedeux.local" },
     @{ IP="127.0.0.1"; Domain="jellyfin.voltairedeux.local" },
@@ -81,7 +102,7 @@ $currentContent = Get-Content -Path $HostsPath -Raw -ErrorAction Stop
 $newEntriesAdded = 0
 $linesToAppend = [System.Collections.ArrayList]::new()
 
-[void]$linesToAppend.Add("`r`n# --- MediaStack Multi-Domain Local Routing (Added $timestamp) ---")
+[void]$linesToAppend.Add("`r`n# --- MediaStack Multi-Domain Cluster Routing (Added $timestamp) ---")
 
 foreach ($item in $domainsToAdd) {
     $ip = $item.IP

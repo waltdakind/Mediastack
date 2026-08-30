@@ -4,24 +4,31 @@
 # Logs in as Jellyfin user "walter" and generates passwordless magic login URLs.
 # =============================================================================
 
+[CmdletBinding()]
 param (
-    [string]$Password = ""
+    [Parameter(Mandatory=$false)][SecureString]$Password
 )
+
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+[System.Console]::InputEncoding  = [System.Text.Encoding]::UTF8
 
 Write-Host "====================================================" -ForegroundColor Cyan
 Write-Host "         MEDIASTACK ADMIN LOGIN GENERATOR           " -ForegroundColor Cyan
 Write-Host "====================================================`n" -ForegroundColor Cyan
 
 # 1. Prompt for password if not provided
-if ([string]::IsNullOrEmpty($Password)) {
+$plainPassword = ""
+if (-not $Password) {
     $securePw = Read-Host -Prompt "Enter password for Jellyfin user 'walter'" -AsSecureString
     if (-not $securePw) {
         Write-Host "Password cannot be empty. Exiting." -ForegroundColor Red
         Exit
     }
-    # Decrypt SecureString to plain text
     $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($securePw)
-    $Password = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+    $plainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+} else {
+    $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password)
+    $plainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
 }
 
 # 2. Authenticate against local Jellyfin API
@@ -32,7 +39,7 @@ $authHeader = 'MediaBrowser Client="MediaStackPlayer", Device="WebBrowser", Devi
 
 $body = @{
     Username = "walter"
-    Pw = $Password
+    Pw = $plainPassword
 } | ConvertTo-Json
 
 try {
@@ -45,7 +52,7 @@ try {
     $userId = $response.User.Id
     $username = $response.User.Name
     
-    Write-Host "✔ Authentication Successful!" -ForegroundColor Green
+    Write-Host "[OK] Authentication Successful!" -ForegroundColor Green
     Write-Host "  User Name : $username"
     Write-Host "  User ID   : $userId"
     Write-Host "  Token     : $token" -ForegroundColor DarkGray
@@ -56,15 +63,15 @@ try {
     Write-Host "              MAGIC LOGIN LINKS                     " -ForegroundColor Cyan
     Write-Host "====================================================`n" -ForegroundColor Cyan
     
-    $localLink1 = "http://ordinateur.local/player/?token=$token&userId=$userId&username=$username"
-    $localLink2 = "http://mediaserver.local/player/?token=$token&userId=$userId&username=$username"
-    $externalLink = "https://waltdakind.xubi.org/?token=$token&userId=$userId&username=$username"
+    $localLink1 = "http://voltaireun.local/player/?token=$token" + "&userId=$userId" + "&username=$username"
+    $localLink2 = "http://voltairedeux.local/player/?token=$token" + "&userId=$userId" + "&username=$username"
+    $externalLink = "https://waltdakind.xubi.org/?token=$token" + "&userId=$userId" + "&username=$username"
     
-    Write-Host "Local Link (Ordinateur):" -ForegroundColor Yellow
+    Write-Host "Local Link (VoltaireUn Main):" -ForegroundColor Yellow
     Write-Host "  $localLink1" -ForegroundColor Green
     Write-Host ""
     
-    Write-Host "Local Link (Mediaserver Failover):" -ForegroundColor Yellow
+    Write-Host "Local Link (VoltaireDeux AI Node):" -ForegroundColor Yellow
     Write-Host "  $localLink2" -ForegroundColor Green
     Write-Host ""
     
@@ -77,7 +84,7 @@ try {
     Write-Host "              SAMPLE ADMIN API COMMAND              " -ForegroundColor Cyan
     Write-Host "====================================================`n" -ForegroundColor Cyan
     Write-Host "Query player settings from backend API using the token:"
-    Write-Host "  Invoke-RestMethod -Uri `"http://localhost:3000/api/player/settings`" -Headers @{`"X-Emby-Token`"=`"$token`"}" -ForegroundColor Green
+    Write-Host "  Invoke-RestMethod -Uri 'http://localhost:3000/api/player/settings' -Headers @{'X-Emby-Token'='$token'}" -ForegroundColor Green
     Write-Host ""
     
     # 5. Launch default browser
@@ -85,7 +92,7 @@ try {
     Start-Process $localLink1
     
 } catch {
-    Write-Host "✖ Authentication Failed!" -ForegroundColor Red
+    Write-Host "[FAIL] Authentication Failed!" -ForegroundColor Red
     if ($_.Exception.Response) {
         $stream = $_.Exception.Response.GetResponseStream()
         $reader = New-Object System.IO.StreamReader($stream)

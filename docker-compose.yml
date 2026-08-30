@@ -40,6 +40,11 @@ services:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-America/New_York}
+      - JELLYFIN_DATA_DIR=/config/data
+      - JELLYFIN_CONFIG_DIR=/config
+      - JELLYFIN_LOG_DIR=/config/log
+      - JELLYFIN_CACHE_DIR=/config/cache
+      - JELLYFIN_WEB_DIR=/usr/share/jellyfin/web
     volumes:
       - ./config/jellyfin:/config
       - ${MEDIA_DIR}:/data

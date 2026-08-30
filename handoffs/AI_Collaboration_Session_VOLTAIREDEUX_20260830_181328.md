@@ -1,0 +1,234 @@
+﻿# MediaStack AI Collaboration & Self-Healing Session
+
+- **Session Host:** VOLTAIREDEUX (VoltaireDeux (AI Acceleration & Push Node))
+- **Host Local IP:** 192.168.4.30
+- **Collaborator Peer:** VOLTAIREUN (VoltaireUn (Main 24/7 Server Node))
+- **Peer LAN IP:** 192.168.4.21
+- **Execution Time:** 2026-08-30 18:13:28
+- **Mode:** Autonomous Self-Healing (AutoRepair)
+
+---
+
+## 1. Dual-Node Topology & Resource Roles
+
+| Node Name | Role | LAN IP | Ollama AI | Media Services | Primary Duty |
+| :--- | :--- | :--- | :---: | :---: | :--- |
+| **VOLTAIREDEUX** (Local) | VoltaireDeux (AI Acceleration & Push Node) | 192.168.4.30 | Standby | Standby | AI Code Synthesis, LLM Offloading, Metadata Tagging |
+| **VOLTAIREUN** (Peer) | VoltaireUn (Main 24/7 Server Node) | 192.168.4.21 | Standby | Active | 24/7 Media Streaming, Servarr, Storage |
+
+---
+
+## 2. SQLite Database Health & Concurrency Audit
+
+| Database File | Size (KB) | WAL Active | WAL Size (KB) | Status |
+| :--- | :---: | :---: | :---: | :---: |
+| `sonarr.db` | 2868 | Yes | 213.3 | PRISTINE |
+| `radarr.db` | 2636 | Yes | 0 | PRISTINE |
+| `prowlarr.db` | 336 | Yes | 217.3 | PRISTINE |
+| `bazarr.db` | 316 | Yes | 120.7 | PRISTINE |
+| `db.sqlite3` | 220 | Yes | 221.3 | PRISTINE |
+| `jellyfin.db` | 46764 | Yes | 0 | PRISTINE |
+| `backup.db` | 116 | No | 0 | PRISTINE |
+
+---
+
+## 3. Discovered Anomalies & Remediation Log
+
+### File Naming & Sync Conflict Anomalies:
+- File: `logs-VoltaireDeux.db` (60 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-VoltaireDeux.db` (224 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `radarr-VoltaireDeux.db` (624 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `sonarr-VoltaireDeux.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-VoltaireDeux.db` (60 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-VoltaireDeux.db` (224 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `radarr-VoltaireDeux.db` (624 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `sonarr-VoltaireDeux.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `bazarr-VoltaireDeux.db` (316 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `diun-VoltaireDeux.db` (256 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `jellyfin-VoltaireDeux.db` (43260 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-VoltaireDeux.db` (60 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `main-VoltaireDeux.db` (32 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-VoltaireDeux.db` (224 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `radarr-VoltaireDeux.db` (632 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `sonarr-VoltaireDeux.db` (392 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `bazarr-VoltaireDeux.db` (316 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `diun-VoltaireDeux.db` (256 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-VoltaireDeux.db` (60 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `main-VoltaireDeux.db` (32 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-VoltaireDeux.db` (224 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `radarr-VoltaireDeux.db` (632 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `sonarr-VoltaireDeux.db` (392 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-VoltaireDeux.db` (60 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-VoltaireDeux.db` (224 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `radarr-VoltaireDeux.db` (624 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `sonarr-VoltaireDeux.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-VoltaireDeux.db` (60 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-VoltaireDeux.db` (224 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `radarr-VoltaireDeux.db` (624 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `sonarr-VoltaireDeux.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `bazarr-VoltaireDeux.db` (316 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `diun-VoltaireDeux.db` (256 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `jellyfin-VoltaireDeux.db` (43260 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-VoltaireDeux.db` (60 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `main-VoltaireDeux.db` (32 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-VoltaireDeux.db` (224 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `radarr-VoltaireDeux.db` (632 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `sonarr-VoltaireDeux.db` (392 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `bazarr-VoltaireDeux.db` (316 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `diun-VoltaireDeux.db` (256 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-VoltaireDeux.db` (60 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `main-VoltaireDeux.db` (32 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-VoltaireDeux.db` (224 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `radarr-VoltaireDeux.db` (632 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `sonarr-VoltaireDeux.db` (392 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `bazarr-VoltaireDeux.db` (316 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `diun-VoltaireDeux.db` (256 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `jellyfin-VoltaireDeux.db` (43260 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-VoltaireDeux.db` (60 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `main-VoltaireDeux.db` (32 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-VoltaireDeux.db` (224 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `radarr-VoltaireDeux.db` (632 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `sonarr-VoltaireDeux.db` (392 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `bazarr-VoltaireDeux.db` (316 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `diun-VoltaireDeux.db` (256 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `jellyfin-VoltaireDeux.db` (43260 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-VoltaireDeux.db` (60 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `main-VoltaireDeux.db` (32 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-VoltaireDeux.db` (224 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `radarr-VoltaireDeux.db` (632 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `sonarr-VoltaireDeux.db` (392 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `bazarr-VoltaireDeux.db` (316 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `diun-VoltaireDeux.db` (256 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `jellyfin-VoltaireDeux.db` (43260 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-VoltaireDeux.db` (60 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `main-VoltaireDeux.db` (32 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `mediastack_backup-VoltaireDeux.db` (132 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-VoltaireDeux.db` (224 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `radarr-VoltaireDeux.db` (632 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `sonarr-VoltaireDeux.db` (392 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `jellyfin-ordinateurdevoltaire.db-wal` (0 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-ordinateurdevoltaire.db` (368 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-ordinateurdevoltaire.db-wal` (370.19 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-ordinateurdevoltaire.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-ordinateurdevoltaire.db-wal` (0 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-ordinateurdevoltaire.db` (424 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-ordinateurdevoltaire.db-wal` (144.88 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-ordinateurdevoltaire.db` (560 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-ordinateurdevoltaire.db-wal` (84.52 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `sonarr-ordinateurdevoltaire.db-wal` (442.61 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-ordinateurdevoltaire.db` (560 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-ordinateurdevoltaire.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-ordinateurdevoltaire.db` (560 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-ordinateurdevoltaire.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-ordinateurdevoltaire.db` (560 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-ordinateurdevoltaire.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
+
+### Remediations Executed:
+- [FIXED] Quarantined and removed stale conflict file `logs-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `radarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `sonarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `radarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `sonarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `bazarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `diun-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `jellyfin-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `main-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `radarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `sonarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `bazarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `diun-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `main-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `radarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `sonarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `radarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `sonarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `radarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `sonarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `bazarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `diun-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `jellyfin-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `main-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `radarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `sonarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `bazarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `diun-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `main-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `radarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `sonarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `bazarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `diun-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `jellyfin-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `main-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `radarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `sonarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `bazarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `diun-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `jellyfin-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `main-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `radarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `sonarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `bazarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `diun-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `jellyfin-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `main-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `mediastack_backup-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `radarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `sonarr-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `jellyfin-ordinateurdevoltaire.db-wal`
+- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db-wal`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-ordinateurdevoltaire.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-ordinateurdevoltaire.db-wal`
+- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db-wal`
+- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db-wal`
+- [FIXED] Quarantined and removed stale conflict file `sonarr-ordinateurdevoltaire.db-wal`
+- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-ordinateurdevoltaire.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-ordinateurdevoltaire.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-ordinateurdevoltaire.db`
+
+### Recent System Incidents Analyzed:
+- [Api_Verification_Report_20260830_181023.md] | Jellyfin API | http://localhost:8096/System/Info/Public | FAIL | FAIL | 319ms | The remote server returned an error: (500) Internal Server Error. |
+- [Api_Verification_Report_20260830_181023.md] | MusicBrainz WS2 | http://localhost:80/ws/2/artist/5b11f4ce-a62d-471e-81fc-a69a8278c7da?fmt=json | STANDBY | FAIL | 231ms | STANDBY (Database dump import pending on port 5001) |
+- [Api_Verification_Report_20260830_181023.md] | HDHomeRun Tuner | http://localhost:80/discover.json | STANDBY | FAIL | 3004ms | STANDBY (Hardware Tuner Standby / 192.168.4.45) |
+- [Proxy_Port_Diagnostic_Report_20260830_180634.md] - **Critical Failures Remaining:** 0
+- [Proxy_Port_Diagnostic_Report_20260830_180634.md] | **Jellyfin Subdomain** | http://jellyfin.voltaireun.local | 0 WARN | 806 ms | HTTP 0 via curl |
+- [Proxy_Port_Diagnostic_Report_20260830_180513.md] - **Critical Failures Remaining:** 0
+- [Proxy_Port_Diagnostic_Report_20260830_180513.md] | **Jellyfin Subdomain** | http://jellyfin.voltaireun.local | 0 WARN | 285 ms | HTTP 0 via curl |
+- [Proxy_Port_Diagnostic_Report_20260830_180513.md] | **Bazarr Subdomain** | http://bazarr.voltaireun.local | 0 WARN | 623 ms | HTTP 0 via curl |
+
+---
+
+## 4. AI-Directed Self-Healing & Peer Recommendations
+
+1. **VoltaireUn (Main Server) Database IO Optimization:** Keep PRAGMA synchronous=NORMAL; and PRAGMA wal_autocheckpoint=1000; on sonarr.db and radarr.db to prevent I/O wait during streaming peaks.
+2. **MusicBrainz Proxy Partitioning:** Use local Picard mirror on VoltaireDeux (http://127.0.0.1:5001) for batch tagging tasks to leave VoltaireUn 5000 port free for automated Servarr lookups.
+3. **Automated Handoff Exchange:** Continue running the daily update poller on VoltaireUn to ingest fixes authored on VoltaireDeux.
+
+---
+*Report generated by MediaStack AI Collaboration Nexus Engine.*

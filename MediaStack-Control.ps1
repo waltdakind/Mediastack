@@ -391,6 +391,34 @@ function Invoke-PortPublishSentinel {
     Pause-Console
 }
 
+function Invoke-ClusterUpdateAndHandoff {
+    Show-Header
+    Write-Host "[11] CHECK FOR CLUSTER UPDATES & EXCHANGE HANDOFF REPORT..." -ForegroundColor Yellow
+    Write-Host ""
+    $script = Join-Path $BaseDir "Invoke-MediaStackClusterHandoff.ps1"
+    if (Test-Path $script) {
+        & $script
+    } else {
+        $opsModule = Join-Path $BaseDir "MediaStackOps.psm1"
+        if (Test-Path $opsModule) { Import-Module $opsModule -Force }
+        Invoke-MediaStackClusterUpdateCheck -Interactive $true
+    }
+    Pause-Console
+}
+
+function Invoke-ClusterAiCollaboration {
+    Show-Header
+    Write-Host "[12] LAUNCHING AI COLLABORATION & AUTONOMOUS SELF-HEALING NEXUS..." -ForegroundColor Yellow
+    Write-Host ""
+    $script = Join-Path $BaseDir "Invoke-MediaStackAiCollaboration.ps1"
+    if (Test-Path $script) {
+        & $script -AutoRepair -Interactive $true
+    } else {
+        Write-Host "AI collaboration script not found: $script" -ForegroundColor Red
+    }
+    Pause-Console
+}
+
 # -----------------------------------------------------------------------------
 # MAIN INTERACTIVE MENU LOOP
 # -----------------------------------------------------------------------------
@@ -409,10 +437,12 @@ while ($true) {
     Write-Host "  [8]  Deep Docker Cleanup and Storage Optimization" -ForegroundColor White
     Write-Host "  [9]  Graceful Multi-Stack Shutdown (Stop All)" -ForegroundColor White
     Write-Host "  [10] Published Port Verification & Health Matrix (8096, 8989, 7878...)" -ForegroundColor Cyan
+    Write-Host "  [11] Check for Cluster Updates & Exchange Handoff Report [U]" -ForegroundColor Cyan
+    Write-Host "  [12] AI Collaboration & Autonomous Self-Healing Nexus [A]" -ForegroundColor Magenta
     Write-Host "  [0]  Exit Console" -ForegroundColor DarkGray
 
     Write-Host ""
-    $choice = Read-Host -Prompt "Enter selection [0-10]"
+    $choice = Read-Host -Prompt "Enter selection [0-12]"
 
     switch ($choice) {
         "1"  { Start-FullStackSafe }
@@ -427,12 +457,18 @@ while ($true) {
         "10" { Invoke-PortPublishSentinel }
         "p"  { Invoke-PortPublishSentinel }
         "P"  { Invoke-PortPublishSentinel }
+        "11" { Invoke-ClusterUpdateAndHandoff }
+        "u"  { Invoke-ClusterUpdateAndHandoff }
+        "U"  { Invoke-ClusterUpdateAndHandoff }
+        "12" { Invoke-ClusterAiCollaboration }
+        "a"  { Invoke-ClusterAiCollaboration }
+        "A"  { Invoke-ClusterAiCollaboration }
         "0"  { 
             Write-Host "`nExiting MediaStack Control Console. Goodbye!`n" -ForegroundColor Green
             exit 0 
         }
         default {
-            Write-Host "Invalid selection. Please choose an option between 0 and 10." -ForegroundColor Red
+            Write-Host "Invalid selection. Please choose an option between 0 and 12." -ForegroundColor Red
             Start-Sleep -Seconds 1
         }
     }

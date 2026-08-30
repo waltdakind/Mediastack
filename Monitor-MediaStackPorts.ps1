@@ -291,7 +291,7 @@ function Render-Dashboard {
 
     # Controls Bar
     Write-Host "`n====================================================================================================" -ForegroundColor DarkCyan
-    Write-Host "  [KEYBOARD CONTROLS]  [Q] Quit Monitor  |  [R] Force Refresh  |  [F] Auto-Repair  |  [Ctrl+C] Exit" -ForegroundColor DarkGray
+    Write-Host "  [KEYBOARD CONTROLS] [Q] Quit  |  [R] Refresh  |  [F] Auto-Repair  |  [U] Check Updates & Handoff  |  [Ctrl+C] Exit" -ForegroundColor DarkGray
     Write-Host "====================================================================================================" -ForegroundColor DarkCyan
 }
 
@@ -306,6 +306,20 @@ function Invoke-AutoRepairFailingPorts {
             docker restart $cName 2>&1 | Out-Null
             Add-PortEvent -PortKey $k -ServiceName $st.Def.Name -EventType "AUTO_REPAIR" -Message "Restarted container $cName"
         }
+    }
+    Start-Sleep -Seconds 2
+}
+
+# --- CLUSTER UPDATE & HANDOFF DISPATCHER ---
+function Invoke-MonitorClusterHandoff {
+    Write-Host "`n[CLUSTER UPDATES] Triggering cluster update check and generating system status handoff..." -ForegroundColor Cyan
+    $handoffScript = Join-Path $PSScriptRoot "Invoke-MediaStackClusterHandoff.ps1"
+    if (Test-Path $handoffScript) {
+        & $handoffScript -NonInteractive
+    } else {
+        $ops = Join-Path $PSScriptRoot "MediaStackOps.psm1"
+        if (Test-Path $ops) { Import-Module $ops -Force }
+        Invoke-MediaStackClusterUpdateCheck -Interactive $false
     }
     Start-Sleep -Seconds 2
 }
@@ -345,6 +359,9 @@ try {
                         break
                     } elseif ($key -eq [ConsoleKey]::F) {
                         Invoke-AutoRepairFailingPorts
+                        break
+                    } elseif ($key -eq [ConsoleKey]::U) {
+                        Invoke-MonitorClusterHandoff
                         break
                     }
                 }

@@ -1,36 +1,45 @@
 <#
 .SYNOPSIS
-    Sync-MediaStackDatabases.ps1 - Autonomous Background Database Replication & Instant Hot-Restore Sentinel.
+    Sync-MediaStackDatabases.ps1 - Dual-Node Cluster Database Replication, Pre-Sync Backup & Hot-Restore Sentinel.
 
 .DESCRIPTION
-    Continuously monitors all databases in the MediaStack fleet, performs zero-downtime
-    non-blocking point-in-time snapshots, records cryptographic SHA-256 hashes into the audit registry,
-    prunes historical snapshots based on retention policies, and triggers instant hot-restore
-    if corruption or data loss is detected on any running node.
+    Autonomous database synchronization engine for the VoltaireUn (Main Server) <---> VoltaireDeux (AI Node) cluster:
+    1. Node & Cluster IP Awareness (dynamically resolves local and peer nodes).
+    2. Mandatory Pre-Sync Atomic Snapshots: Creates immutable SQLite snapshots with SHA-256 integrity verification
+       BEFORE any synchronization or replication is performed.
+    3. Passive zero-downtime WAL Checkpoint: Flushes active WAL logs safely without blocking live readers.
+    4. Two-Way Cluster Sync: Reconciles databases between node local storage and shared cluster storage while
+       preventing OneDrive lock/conflict files (*.db-shm, *-VoltaireDeux.db).
+    5. Instant Hot-Restore: Auto-heals and restores from verified snapshots if any corruption is detected.
+    6. Structured Telemetry: Logs all actions to SQLite registry and writes audit summaries.
 
 .PARAMETER IntervalSeconds
-    Replication cycle interval in seconds. Defaults to 300 (5 minutes).
+    Replication cycle interval in seconds when running in continuous loop. Defaults to 300 (5 minutes).
 
 .PARAMETER RunOnce
-    If specified, executes a single backup and validation pass then terminates.
+    Executes a single pre-sync backup and replication cycle then terminates.
+
+.PARAMETER PreSyncBackupOnly
+    Executes mandatory pre-sync database backup snapshots and validates integrity without syncing.
 
 .PARAMETER ConfigDir
-    Host root directory for MediaStack configurations. Defaults to C:\MediastackConfig.
+    Host root directory for MediaStack configurations.
 
 .PARAMETER BackupRoot
-    Destination directory for snapshot repositories. Defaults to C:\MediastackConfig\db-backup\snapshots.
+    Destination directory for snapshot repositories.
 
 .EXAMPLE
     .\Sync-MediaStackDatabases.ps1 -RunOnce
-    .\Sync-MediaStackDatabases.ps1 -IntervalSeconds 60
+    .\Sync-MediaStackDatabases.ps1 -PreSyncBackupOnly
 #>
 
 [CmdletBinding()]
 param(
     [int]$IntervalSeconds = 300,
     [switch]$RunOnce,
+    [switch]$PreSyncBackupOnly,
     [string]$ConfigDir = "$env:SystemDrive\MediastackConfig",
-    [string]$BackupRoot = "$env:SystemDrive\MediastackConfig\db-backup\snapshots"
+    [string]$BackupRoot = ""
 )
 
 $ErrorActionPreference = "Continue"
@@ -39,11 +48,16 @@ $ErrorActionPreference = "Continue"
 
 # Import Operations Module
 $modulePath = Join-Path $PSScriptRoot "MediaStackOps.psm1"
-if (Test-Path $modulePath) { Import-Module $modulePath -Force }
+if (Test-Path $modulePath) { 
+    Import-Module $modulePath -Force 
+} elseif (Test-Path "$PSScriptRoot\MediaStackOps.ps1") {
+    . "$PSScriptRoot\MediaStackOps.ps1"
+}
 
-# Auto-resolve active host config directory
+# Dynamic Node Discovery
+$nodeInfo = Get-MediaStackClusterNodeInfo
 $ActiveConfig = if (Test-Path "$PSScriptRoot\config") { "$PSScriptRoot\config" } elseif (Test-Path $ConfigDir) { $ConfigDir } else { "$PSScriptRoot\config" }
-if (-not $PSBoundParameters.ContainsKey('BackupRoot')) {
+if (-not $BackupRoot) {
     $BackupRoot = Join-Path $ActiveConfig "db-backup\snapshots"
 }
 
@@ -63,26 +77,29 @@ $DatabaseInventory = @(
 )
 
 function Invoke-ReplicationCycle {
+    param([switch]$BackupOnly)
+
     $cycleStart = Get-Date
     $tsString = $cycleStart.ToString("yyyy-MM-dd HH:mm:ss")
     $fileTag = $cycleStart.ToString("yyyyMMdd_HHmmss")
     
-    Write-Host ("`n[{0}] === EXECUTING ZERO-DOWNTIME DATABASE REPLICATION PASS ===" -f (Get-Date -Format "HH:mm:ss")) -ForegroundColor DarkCyan
+    Write-Host ("`n[{0}] === EXECUTING PRE-SYNC ATOMIC SNAPSHOT & BACKUP PASS ===" -f (Get-Date -Format "HH:mm:ss")) -ForegroundColor DarkCyan
     
-    # Initialize Registry Table
-    $initRegistrySql = @"
-CREATE TABLE IF NOT EXISTS fleet_snapshot_registry (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    snapshot_timestamp TEXT NOT NULL,
-    service_name TEXT NOT NULL,
-    database_name TEXT NOT NULL,
-    snapshot_path TEXT NOT NULL,
-    size_bytes INTEGER NOT NULL,
-    sha256_hash TEXT NOT NULL,
-    integrity_status TEXT NOT NULL
-);
-"@
-    docker exec mediastack-db sqlite3 /config/mediastack_backup.db "$initRegistrySql" 2>$null
+    # 1. Mandatory Pre-Sync Atomic Snapshot
+    $preSyncResult = Backup-MediaStackDatabasesPreSync -ConfigDir $ActiveConfig -BackupRoot $BackupRoot -OperationTag "PRE_SYNC"
+    
+    if ($preSyncResult.AllPassed) {
+        Write-Host "  [OK] All database pre-sync safety snapshots verified and registered." -ForegroundColor Green
+    } else {
+        Write-Host "  [WARN] Some database snapshots encountered warnings during pre-sync pass." -ForegroundColor Yellow
+    }
+
+    if ($BackupOnly) {
+        Write-Host "`n[PRE-SYNC BACKUP COMPLETED] Snapshots stored in: $($preSyncResult.BatchDir)" -ForegroundColor Cyan
+        return
+    }
+
+    Write-Host ("`n[{0}] === EXECUTING ZERO-DOWNTIME DATABASE REPLICATION & HEALTH CHECK ===" -f (Get-Date -Format "HH:mm:ss")) -ForegroundColor DarkCyan
 
     $successCount = 0
     $failCount = 0
@@ -117,10 +134,9 @@ CREATE TABLE IF NOT EXISTS fleet_snapshot_registry (
         # Step 2: Atomic Online Snapshot via SQLite Vacuum / Copy
         $snapFileName = "$($svc)_snapshot_${fileTag}.db"
         $snapHostPath = Join-Path $BackupRoot $snapFileName
-        $snapInternal = "/config/snapshots/$snapFileName"
 
         try {
-            # Checkpoint WAL passively without blocking
+            # Passive WAL checkpoint
             docker exec mediastack-db sqlite3 "$inPath" "PRAGMA wal_checkpoint(PASSIVE);" 2>$null | Out-Null
             
             # Create online atomic binary snapshot
@@ -131,7 +147,7 @@ CREATE TABLE IF NOT EXISTS fleet_snapshot_registry (
             $snapSize = (Get-Item $snapHostPath).Length
 
             # Ingest to SQLite Registry
-            $insSql = "INSERT INTO fleet_snapshot_registry (snapshot_timestamp, service_name, database_name, snapshot_path, size_bytes, sha256_hash, integrity_status) VALUES ('$tsString', '$svc', '$dbName', '$snapHostPath', $snapSize, '$sha256', 'VERIFIED_PRISTINE');"
+            $insSql = "INSERT INTO fleet_snapshot_registry (snapshot_timestamp, operation_tag, service_name, database_name, snapshot_path, size_bytes, sha256_hash, integrity_status) VALUES ('$tsString', 'REPLICATION', '$svc', '$dbName', '$snapHostPath', $snapSize, '$sha256', 'VERIFIED_PRISTINE');"
             docker exec mediastack-db sqlite3 /config/mediastack_backup.db "$insSql" 2>$null
 
             Write-Host ("  [SNAPSHOT OK] {0,-18} | Size: {1,6} KB | Hash: {2}..." -f $dbName, [math]::Round($snapSize/1KB, 1), $sha256.Substring(0, 12)) -ForegroundColor Green
@@ -145,9 +161,9 @@ CREATE TABLE IF NOT EXISTS fleet_snapshot_registry (
     # Step 3: Snapshot Retention Rotation (Keep last 24 per service)
     foreach ($db in $DatabaseInventory) {
         $svc = $db.Service
-        $svcSnaps = Get-ChildItem -Path $BackupRoot -Filter "$($svc)_snapshot_*.db" | Sort-Object LastWriteTime -Descending
-        if ($svcSnaps.Count -gt 24) {
-            $toPrune = $svcSnaps | Select-Object -Skip 24
+        $svcSnaps = Get-ChildItem -Path $BackupRoot -Filter "$($svc)_*.db" | Sort-Object LastWriteTime -Descending
+        if ($svcSnaps.Count -gt 36) {
+            $toPrune = $svcSnaps | Select-Object -Skip 36
             foreach ($p in $toPrune) {
                 Remove-Item -Path $p.FullName -Force -ErrorAction SilentlyContinue
             }
@@ -162,9 +178,16 @@ CREATE TABLE IF NOT EXISTS fleet_snapshot_registry (
 # MAIN EXECUTION CONTROLLER
 # ==============================================================================
 Write-Host "====================================================================================================" -ForegroundColor DarkCyan
-Write-Host "   M E D I A S T A C K   D A T A B A S E   R E P L I C A T I O N   S E N T I N E L" -ForegroundColor Cyan
-Write-Host ("   Host: {0,-15} | Snapshot Store: {1}" -f $env:COMPUTERNAME, $BackupRoot) -ForegroundColor DarkGray
+Write-Host "   M E D I A S T A C K   D A T A B A S E   R E P L I C A T I O N   &   B A C K U P   S U I T E" -ForegroundColor Cyan
+Write-Host ("   Node: {0} ({1}) | IP: {2}" -f $nodeInfo.LocalHostName, $nodeInfo.LocalRole, $nodeInfo.LocalIP) -ForegroundColor DarkGray
+Write-Host ("   Peer: {0} ({1}) | Peer IP: {2}" -f $nodeInfo.PeerHostName, $nodeInfo.PeerRole, $nodeInfo.PeerIP) -ForegroundColor DarkGray
+Write-Host ("   Snapshot Store: {0}" -f $BackupRoot) -ForegroundColor DarkGray
 Write-Host "====================================================================================================" -ForegroundColor DarkCyan
+
+if ($PreSyncBackupOnly) {
+    Invoke-ReplicationCycle -BackupOnly
+    exit 0
+}
 
 if ($RunOnce) {
     Invoke-ReplicationCycle

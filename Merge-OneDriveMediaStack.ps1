@@ -1,11 +1,12 @@
 # ==============================================================================
 # Merge-OneDriveMediaStack.ps1 - OneDrive & Local Configuration Merger & Reconciliation Engine
 # ==============================================================================
+[CmdletBinding()]
 param(
-    [string]$OneDrivePath = "C:\Users\waltd\OneDrive\Mediastack",
-    [string]$LocalConfigPath = "$env:SystemDrive\MediastackConfig",
-    [switch]$PurgeStaleConflictFiles = $true,
-    [switch]$CreateBackupArchive = $true
+    [Parameter(Mandatory=$false)][string]$OneDrivePath = "C:\Users\waltd\OneDrive\Mediastack",
+    [Parameter(Mandatory=$false)][string]$LocalConfigPath = "$env:SystemDrive\MediastackConfig",
+    [Parameter(Mandatory=$false)][bool]$PurgeStaleConflictFiles = $true,
+    [Parameter(Mandatory=$false)][bool]$CreateBackupArchive = $true
 )
 
 $ErrorActionPreference = "Continue"
@@ -43,7 +44,6 @@ Write-Host "`n[2/4] Merging Root Service & Ingress Configurations..." -Foregroun
 
 # A. Reconcile Caddyfile
 $mainCaddy = Join-Path $OneDrivePath "Caddyfile"
-$vdCaddy   = Join-Path $OneDrivePath "Caddyfile-VoltaireDeux"
 if (Test-Path $mainCaddy) {
     Write-Host "  [OK] Master Caddyfile verified as unified cross-node proxy with HA upstream failover" -ForegroundColor Green
     if (Test-Path $LocalConfigPath) {
@@ -60,8 +60,21 @@ if (Test-Path $mainDc) {
     }
 }
 
-# C. Sync Newly Created Scripts across local & OneDrive
+# C. Sync Core Scripts across local & OneDrive
 $scripts = @(
+    "MediaStackOps.psm1",
+    "MediaStackOps.ps1",
+    "Sync-MediaStackDatabases.ps1",
+    "Test-MediaStackProxyAndPorts.ps1",
+    "Publish-VoltaireDeuxUpdates.ps1",
+    "Invoke-VoltaireDeuxAiAdvisor.ps1",
+    "Invoke-VoltaireUnDailyPoller.ps1",
+    "Invoke-VoltaireUn24hrSentinel.ps1",
+    "Install-VoltaireUnDailySchedule.ps1",
+    "Invoke-MediaStackCleanStart.ps1",
+    "Invoke-MediaStackCleanShutdown.ps1",
+    "Invoke-MediaStackClusterHandoff.ps1",
+    "Invoke-MediaStackAiCollaboration.ps1",
     "PrimarySentinelSuite.ps1",
     "Start-MediaStackAutohealer.ps1",
     "Invoke-MediaStackSuite.ps1",
@@ -85,60 +98,64 @@ foreach ($s in $scripts) {
     }
 }
 
-# --- 3. RECONCILE SERVICE CONFIGS & API KEYS ---
+# --- 3. MERGE SERVARR & APPLICATION DIRECTORIES ---
 Write-Host "`n[3/4] Reconciling Application Configs (Sonarr, Radarr, Prowlarr, Bazarr, Jellyseerr)..." -ForegroundColor Yellow
+$appDirs = @("sonarr", "radarr", "prowlarr", "bazarr", "jellyseerr", "jellyfin", "caddy", "db-backup", "musicbrainz")
 
-$appFolders = @("sonarr", "radarr", "prowlarr", "bazarr", "jellyseerr", "jellyfin", "transmission", "tvheadend")
-foreach ($app in $appFolders) {
-    $localAppPath = Join-Path $LocalConfigPath $app
-    $oneDriveAppPath = Join-Path $OneDrivePath "config\$app"
-
-    if (Test-Path $localAppPath) {
-        # Ensure target dir in OneDrive
-        if (-not (Test-Path $oneDriveAppPath)) { New-Item -ItemType Directory -Force -Path $oneDriveAppPath | Out-Null }
+foreach ($app in $appDirs) {
+    $srcDir = Join-Path $OneDrivePath "config\$app"
+    $dstDir = Join-Path $LocalConfigPath $app
+    
+    if (Test-Path $srcDir) {
+        if (-not (Test-Path $dstDir)) {
+            New-Item -ItemType Directory -Force -Path $dstDir | Out-Null
+        }
         
-        # Copy critical xml/yaml/json configs
-        Get-ChildItem -Path $localAppPath -File -Include "*.xml","*.yaml","*.json","*.ini" -ErrorAction SilentlyContinue | ForEach-Object {
-            $dest = Join-Path $oneDriveAppPath $_.Name
-            Copy-Item $_.FullName $dest -Force -ErrorAction SilentlyContinue
-            Write-Host ("  [SYNC] {0} -> {1}" -f $app, $_.Name) -ForegroundColor Green
+        # Copy non-db config xmls/jsons
+        Get-ChildItem -Path $srcDir -Filter "*.xml" -ErrorAction SilentlyContinue | ForEach-Object {
+            Copy-Item $_.FullName (Join-Path $dstDir $_.Name) -Force -ErrorAction SilentlyContinue
+        }
+        Get-ChildItem -Path $srcDir -Filter "*.json" -ErrorAction SilentlyContinue | ForEach-Object {
+            Copy-Item $_.FullName (Join-Path $dstDir $_.Name) -Force -ErrorAction SilentlyContinue
+        }
+        Get-ChildItem -Path $srcDir -Filter "*.yaml" -ErrorAction SilentlyContinue | ForEach-Object {
+            Copy-Item $_.FullName (Join-Path $dstDir $_.Name) -Force -ErrorAction SilentlyContinue
         }
     }
 }
 
-# --- 4. CLEAN UP STALE CONFLICT & DANGLING LOCK FILES ---
+# --- 4. PURGE STALE ONEDRIVE CONFLICT LOCKS ---
 if ($PurgeStaleConflictFiles) {
     Write-Host "`n[4/4] Purging Stale OneDrive Sync Conflict Artifacts & Dead Temp Locks..." -ForegroundColor Yellow
-
     $conflictPatterns = @(
-        "*VoltaireDeux-2.db*",
-        "*VoltaireDeux-3.db*",
-        "*ordinateurdevoltaire.db-shm",
-        "*.pid-VoltaireDeux",
-        "*.db-journal"
+        "*-VoltaireDeux.db*",
+        "*-ordinateurdevoltaire.db*",
+        "* - Copy.*",
+        "*.db-wal.tmp*",
+        "*.db-shm.tmp*"
     )
-
+    
     $purgedCount = 0
     foreach ($pat in $conflictPatterns) {
-        Get-ChildItem -Path (Join-Path $OneDrivePath "config") -Recurse -File -Include $pat -ErrorAction SilentlyContinue | ForEach-Object {
-            try {
-                Remove-Item $_.FullName -Force -ErrorAction Stop
-                Write-Host ("  [PURGED] Stale conflict file: {0}" -f $_.Name) -ForegroundColor DarkGray
-                $purgedCount++
-            } catch {
-                # In-use file
+        $targets = @($OneDrivePath, $LocalConfigPath) | Where-Object { Test-Path $_ }
+        foreach ($t in $targets) {
+            $conflicts = Get-ChildItem -Path $t -Recurse -Filter $pat -ErrorAction SilentlyContinue |
+                Where-Object { -not $_.PSIsContainer }
+            foreach ($c in $conflicts) {
+                try {
+                    Remove-Item -Path $c.FullName -Force -ErrorAction SilentlyContinue
+                    Write-Host ("  [PURGED] Stale conflict file: {0}" -f $c.Name) -ForegroundColor Green
+                    $purgedCount++
+                } catch { }
             }
         }
     }
-    Write-Host ("  [OK] Cleaned up {0} stale conflict / temporary lock files" -f $purgedCount) -ForegroundColor Green
+    if ($purgedCount -eq 0) {
+        Write-Host "  [OK] Zero stale conflict files found." -ForegroundColor Green
+    } else {
+        Write-Host ("  [OK] Cleaned up {0} stale conflict / temporary lock files" -f $purgedCount) -ForegroundColor Green
+    }
 }
-
-# Log to SQLite DB
-try {
-    $sqlInit = "CREATE TABLE IF NOT EXISTS onedrive_sync_log (id INTEGER PRIMARY KEY AUTOINCREMENT, sync_timestamp TEXT NOT NULL, status TEXT, message TEXT); "
-    $sqlInsert = "INSERT INTO onedrive_sync_log (sync_timestamp, status, message) VALUES ('$timestamp', 'MERGED', 'Reconciled configs and purged $purgedCount conflict files'); "
-    docker exec mediastack-db sqlite3 /config/mediastack_backup.db "$sqlInit $sqlInsert" 2>$null
-} catch { }
 
 Write-Host "`n================================================================================" -ForegroundColor DarkCyan
 Write-Host "     O N E D R I V E   M E R G E   &   S Y N C   C O M P L E T E" -ForegroundColor Cyan

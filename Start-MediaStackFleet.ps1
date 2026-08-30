@@ -1010,6 +1010,33 @@ function Stop-MediaStackGraceful {
     Pause-Console
 }
 
+function Invoke-ClusterUpdateAndHandoff {
+    Show-HeroBanner
+    Write-Host "[*] CHECKING FOR CLUSTER UPDATES & GENERATING SYSTEM STATUS HANDOFF..." -ForegroundColor Yellow
+    Write-Host ""
+    $script = Join-Path $BaseDir "Invoke-MediaStackClusterHandoff.ps1"
+    if (Test-Path $script) {
+        & $script
+    } else {
+        $opsModule = Join-Path $BaseDir "MediaStackOps.psm1"
+        if (Test-Path $opsModule) { Import-Module $opsModule -Force }
+        Invoke-MediaStackClusterUpdateCheck -Interactive $true
+    }
+}
+
+function Invoke-ClusterAiCollaboration {
+    Show-HeroBanner
+    Write-Host "[*] LAUNCHING AI COLLABORATION & AUTONOMOUS SELF-HEALING NEXUS..." -ForegroundColor Yellow
+    Write-Host ""
+    $script = Join-Path $BaseDir "Invoke-MediaStackAiCollaboration.ps1"
+    if (Test-Path $script) {
+        & $script -AutoRepair -Interactive $true
+    } else {
+        Write-Host "AI collaboration script not found: $script" -ForegroundColor Red
+        Pause-Console
+    }
+}
+
 # ==================================================================================================
 # Command Line Switch Handlers
 # ==================================================================================================
@@ -1073,10 +1100,12 @@ while ($true) {
         Write-Host "  [9]  Real-Time Auto-Healing Sentinel Monitor (Continuous)" -ForegroundColor White
         Write-Host "  [10] Docker Resource Deep Clean & Storage Optimization" -ForegroundColor White
         Write-Host "  [11] Graceful Multi-Stack Shutdown (Stop All)" -ForegroundColor White
+        Write-Host "  [12] Check for Cluster Updates & Exchange Handoff Report [U]" -ForegroundColor Cyan
+        Write-Host "  [13] AI Collaboration & Autonomous Self-Healing Nexus [A]" -ForegroundColor Magenta
         Write-Host "  [0]  Exit Operations Console" -ForegroundColor DarkGray
 
         Write-Host ""
-        $choice = Read-Host -Prompt "Enter selection [0-11]"
+        $choice = Read-Host -Prompt "Enter selection [0-13]"
 
         switch ($choice) {
             "1"  { Test-AndPublishStackPorts -Enforce $true -Interactive $true }
@@ -1090,12 +1119,18 @@ while ($true) {
             "9"  { Run-ContinuousSentinel }
             "10" { Invoke-DockerClean }
             "11" { Stop-MediaStackGraceful }
+            "12" { Invoke-ClusterUpdateAndHandoff }
+            "u"  { Invoke-ClusterUpdateAndHandoff }
+            "U"  { Invoke-ClusterUpdateAndHandoff }
+            "13" { Invoke-ClusterAiCollaboration }
+            "a"  { Invoke-ClusterAiCollaboration }
+            "A"  { Invoke-ClusterAiCollaboration }
             "0"  { 
                 Write-Host "`nExiting MediaStack Fleet Operations Center. Goodbye!`n" -ForegroundColor Green
                 exit 0 
             }
             default {
-                Write-Host "Invalid selection. Please enter a choice between 0 and 11." -ForegroundColor Red
+                Write-Host "Invalid selection. Please enter a choice between 0 and 12." -ForegroundColor Red
                 Start-Sleep -Seconds 1
             }
         }
