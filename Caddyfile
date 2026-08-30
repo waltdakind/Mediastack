@@ -13,6 +13,10 @@
     }
 }
 
+(custom_tls) {
+    tls /etc/caddy/certs/cert.pem /etc/caddy/certs/key.pem
+}
+
 # --- Multi-Server Jellyfin Cluster with Auto-Failover & Read-Only Listener Autologin ---
 (jellyfin_cluster) {
     import security_headers
@@ -149,9 +153,42 @@ http://musicbrainz.waltdakind.xubi.org, https://musicbrainz.waltdakind.xubi.org 
     reverse_proxy 192.168.4.21:5000
 }
 
-# --- Local LAN Control Dashboard & NOC Access ---
+# --- Local LAN Control Dashboard & NOC Access (HTTP & HTTPS) ---
 http://ordinateur.local, http://voltairedeux.local, http://mediaserver.local, http://192.168.4.30, http://localhost {
     import security_headers
+    encode gzip zstd
+
+    handle /api/* {
+        reverse_proxy api-gateway:3000
+    }
+
+    handle /autologin* {
+        rewrite * /autologin.html
+        root * /var/www/dashboard
+        file_server
+    }
+
+    handle /guest* {
+        rewrite * /autologin.html
+        root * /var/www/dashboard
+        file_server
+    }
+
+    handle /listen* {
+        rewrite * /autologin.html
+        root * /var/www/dashboard
+        file_server
+    }
+
+    handle {
+        root * /var/www/dashboard
+        file_server
+    }
+}
+
+https://ordinateur.local, https://voltairedeux.local, https://mediaserver.local, https://192.168.4.30, https://localhost {
+    import security_headers
+    import custom_tls
     encode gzip zstd
 
     handle /api/* {
