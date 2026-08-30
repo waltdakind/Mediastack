@@ -304,7 +304,6 @@ CREATE TABLE IF NOT EXISTS crud_sentinel_lifecycle (
     }
 }
 
-# Safely export module members only if loaded as a module
 try {
     if (Get-Command Export-ModuleMember -ErrorAction SilentlyContinue) {
         Export-ModuleMember -Function Write-MediaStackLog, Test-MediaStackPort, Test-MediaStackDatabaseHealth, Invoke-DatabaseHotRestore, Test-MediaStackCrudLifecycle -ErrorAction SilentlyContinue

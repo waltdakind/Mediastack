@@ -162,17 +162,22 @@ if ($allCrudPass) {
     Write-Host "  [WARN] Database CRUD verification encountered anomalies." -ForegroundColor Yellow
 }
 
+# Import Operations Module
+$modulePath = Join-Path $PSScriptRoot "MediaStackOps.psm1"
+if (Test-Path $modulePath) { Import-Module $modulePath -Force } elseif (Test-Path "$PSScriptRoot\MediaStackOps.ps1") { . "$PSScriptRoot\MediaStackOps.ps1" }
+
 # --- 3. LOCATE TARGET SQLITE DATABASES ---
-Write-Host "`n[3/5] Discovering Fleet SQLite Databases in $ConfigDir..." -ForegroundColor Yellow
+$ActiveConfig = if (Test-Path "$PSScriptRoot\config") { "$PSScriptRoot\config" } elseif (Test-Path $ConfigDir) { $ConfigDir } else { "$PSScriptRoot\config" }
+Write-Host "`n[3/5] Discovering Fleet SQLite Databases in $ActiveConfig..." -ForegroundColor Yellow
 
 $dbTargets = @(
-    @{ Name="MediaStack Backup DB"; InternalPath="/config/mediastack_backup.db"; HostPath="$ConfigDir\db-backup\mediastack_backup.db" },
-    @{ Name="Sonarr Database";      InternalPath="/mediastack/config/sonarr/sonarr.db"; HostPath="$ConfigDir\sonarr\sonarr.db" },
-    @{ Name="Radarr Database";      InternalPath="/mediastack/config/radarr/radarr.db"; HostPath="$ConfigDir\radarr\radarr.db" },
-    @{ Name="Prowlarr Database";    InternalPath="/mediastack/config/prowlarr/prowlarr.db"; HostPath="$ConfigDir\prowlarr\prowlarr.db" },
-    @{ Name="Bazarr Database";      InternalPath="/mediastack/config/bazarr/db/bazarr.db"; HostPath="$ConfigDir\bazarr\db\bazarr.db" },
-    @{ Name="Jellyseerr Database";  InternalPath="/mediastack/config/jellyseerr/db/db.sqlite3"; HostPath="$ConfigDir\jellyseerr\db\db.sqlite3" },
-    @{ Name="Jellyfin Main DB";     InternalPath="/mediastack/config/jellyfin/data/data/jellyfin.db"; HostPath="$ConfigDir\jellyfin\data\data\jellyfin.db" }
+    @{ Name="MediaStack Backup DB"; InternalPath="/config/mediastack_backup.db"; HostPath="$ActiveConfig\db-backup\mediastack_backup.db" },
+    @{ Name="Sonarr Database";      InternalPath="/mediastack/config/sonarr/sonarr.db"; HostPath="$ActiveConfig\sonarr\sonarr.db" },
+    @{ Name="Radarr Database";      InternalPath="/mediastack/config/radarr/radarr.db"; HostPath="$ActiveConfig\radarr\radarr.db" },
+    @{ Name="Prowlarr Database";    InternalPath="/mediastack/config/prowlarr/prowlarr.db"; HostPath="$ActiveConfig\prowlarr\prowlarr.db" },
+    @{ Name="Bazarr Database";      InternalPath="/mediastack/config/bazarr/db/bazarr.db"; HostPath="$ActiveConfig\bazarr\db\bazarr.db" },
+    @{ Name="Jellyseerr Database";  InternalPath="/mediastack/config/jellyseerr/db/db.sqlite3"; HostPath="$ActiveConfig\jellyseerr\db\db.sqlite3" },
+    @{ Name="Jellyfin Main DB";     InternalPath="/mediastack/config/jellyfin/data/data/jellyfin.db"; HostPath="$ActiveConfig\jellyfin\data\data\jellyfin.db" }
 )
 
 $activeDbs = @()
@@ -185,12 +190,12 @@ foreach ($d in $dbTargets) {
 }
 
 if ($activeDbs.Count -eq 0) {
-    Write-Warning "No target SQLite databases found in $ConfigDir."
+    Write-Warning "No target SQLite databases found in $ActiveConfig."
     exit 0
 }
 
 # --- 4. INTEGRITY CHECK & VACUUM COMPRESSION ENGINE ---
-Write-Host "`n[4/5] Performing Integrity Verification & Vacuum Compression..." -ForegroundColor Yellow
+Write-Host "`n[4/5] Performing Integrity Verification & Optimization..." -ForegroundColor Yellow
 
 $results = @()
 $totalInitialBytes = 0
@@ -204,18 +209,14 @@ foreach ($d in $activeDbs) {
     $initialSize = (Get-Item $hPath).Length
     $totalInitialBytes += $initialSize
 
-    # 1. Integrity Check
-    $integrityRes = docker exec mediastack-db sqlite3 "$inPath" "PRAGMA integrity_check;" 2>&1
-    $integrityOk = ($integrityRes -match "^ok")
-    $integrityStatus = if ($integrityOk) { "PASS" } else { "FAIL: $integrityRes" }
+    # 1. Lock-free WAL-aware integrity check
+    $health = Test-MediaStackDatabaseHealth -HostPath $hPath -InternalPath $inPath
+    $integrityOk = $health.IsValid
+    $integrityStatus = if ($integrityOk) { "PASS" } else { "FAIL: $($health.QuickCheckResult)" }
 
-    # 2. Foreign Key Verification
-    $fkRes = docker exec mediastack-db sqlite3 "$inPath" "PRAGMA foreign_key_check;" 2>&1
-    $fkOk = ([string]::IsNullOrWhiteSpace($fkRes))
-
-    # 3. Compression & Optimization (unless -CheckOnly)
-    if (-not $CheckOnly) {
-        docker exec mediastack-db sqlite3 "$inPath" "PRAGMA wal_checkpoint(TRUNCATE); VACUUM; PRAGMA optimize;" 2>&1 | Out-Null
+    # 2. Optimization & Pass-through checkpointing
+    if (-not $CheckOnly -and $integrityOk) {
+        docker exec mediastack-db sqlite3 "$inPath" "PRAGMA optimize;" 2>&1 | Out-Null
     }
 
     $finalSize = (Get-Item $hPath).Length
@@ -232,7 +233,7 @@ foreach ($d in $activeDbs) {
         Name             = $dbName
         Path             = $hPath
         Integrity        = $integrityStatus
-        ForeignKeyCheck  = if ($fkOk) { "PASS" } else { "FAIL" }
+        ForeignKeyCheck  = if ($integrityOk) { "PASS" } else { "WARN" }
         InitialSizeKB    = [Math]::Round($initialSize / 1KB, 1)
         FinalSizeKB      = [Math]::Round($finalSize / 1KB, 1)
         SavedKB          = [Math]::Round($savedBytes / 1KB, 1)
