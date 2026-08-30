@@ -123,11 +123,14 @@
 }
 
 # --- External DDNS Domain (waltdakind.xubi.org) ---
-http://waltdakind.xubi.org, https://waltdakind.xubi.org {
-    import jellyfin_cluster
+http://waltdakind.xubi.org, http://jellyfin.waltdakind.xubi.org {
+    import security_headers
+    encode gzip zstd
+    redir https://{host}{uri} permanent
 }
 
-http://jellyfin.waltdakind.xubi.org, https://jellyfin.waltdakind.xubi.org {
+https://waltdakind.xubi.org, https://jellyfin.waltdakind.xubi.org {
+    import custom_tls
     import jellyfin_cluster
 }
 
@@ -219,7 +222,12 @@ https://ordinateur.local, https://voltairedeux.local, https://mediaserver.local,
     }
 }
 
-http://jellyfin.ordinateur.local {
+http://jellyfin.ordinateur.local, http://jellyfin.voltairedeux.local, http://jellyfin.mediaserver.local {
+    import jellyfin_cluster
+}
+
+https://jellyfin.ordinateur.local, https://jellyfin.voltairedeux.local, https://jellyfin.mediaserver.local {
+    import custom_tls
     import jellyfin_cluster
 }
 
