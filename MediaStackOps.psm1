@@ -157,11 +157,19 @@ function Test-MediaStackDatabaseHealth {
         }
     }
 
-    # Copy snapshot to container tmpfs to guarantee 100% lock-free integrity verification across running WAL databases
-    $tmpDb = "/tmp/chk_$([System.Guid]::NewGuid().ToString('N')).db"
-    docker exec mediastack-db cp "$InternalPath" "$tmpDb" 2>$null | Out-Null
-    $res = docker exec mediastack-db sqlite3 "$tmpDb" "PRAGMA quick_check;" 2>&1
-    docker exec mediastack-db rm -f "$tmpDb" 2>$null | Out-Null
+    # Copy DB and companion WAL/SHM journal files to container tmpfs to guarantee 100% lock-free integrity verification across running WAL databases
+    $guid = [System.Guid]::NewGuid().ToString('N')
+    $tmpDir = "/tmp/chk_$guid"
+    docker exec mediastack-db mkdir -p "$tmpDir" 2>$null | Out-Null
+
+    $parentDir = Split-Path -Path $InternalPath -Parent
+    $fileName  = Split-Path -Path $InternalPath -Leaf
+
+    # Copy DB and WAL journal files into the isolated tmp folder
+    docker exec mediastack-db sh -c "cp $parentDir/$fileName* $tmpDir/ 2>/dev/null" 2>$null | Out-Null
+
+    $res = docker exec mediastack-db sqlite3 "$tmpDir/$fileName" "PRAGMA quick_check;" 2>&1
+    docker exec mediastack-db rm -rf "$tmpDir" 2>$null | Out-Null
     $isValid = ($res -match "ok")
 
     return [PSCustomObject]@{

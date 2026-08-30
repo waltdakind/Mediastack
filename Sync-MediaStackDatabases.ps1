@@ -41,19 +41,25 @@ $ErrorActionPreference = "Continue"
 $modulePath = Join-Path $PSScriptRoot "MediaStackOps.psm1"
 if (Test-Path $modulePath) { Import-Module $modulePath -Force }
 
+# Auto-resolve active host config directory
+$ActiveConfig = if (Test-Path "$PSScriptRoot\config") { "$PSScriptRoot\config" } elseif (Test-Path $ConfigDir) { $ConfigDir } else { "$PSScriptRoot\config" }
+if (-not $PSBoundParameters.ContainsKey('BackupRoot')) {
+    $BackupRoot = Join-Path $ActiveConfig "db-backup\snapshots"
+}
+
 $HandoffsDir = Join-Path $PSScriptRoot "handoffs"
 if (-not (Test-Path $HandoffsDir)) { New-Item -ItemType Directory -Force -Path $HandoffsDir | Out-Null }
 if (-not (Test-Path $BackupRoot)) { New-Item -ItemType Directory -Force -Path $BackupRoot | Out-Null }
 
 # Database Inventory Definition
 $DatabaseInventory = @(
-    @{ Name="MediaStack Backup DB"; InternalPath="/config/mediastack_backup.db"; HostPath="$ConfigDir\db-backup\mediastack_backup.db"; Service="mediastack-db" },
-    @{ Name="Sonarr DB";            InternalPath="/mediastack/config/sonarr/sonarr.db"; HostPath="$ConfigDir\sonarr\sonarr.db"; Service="sonarr" },
-    @{ Name="Radarr DB";            InternalPath="/mediastack/config/radarr/radarr.db"; HostPath="$ConfigDir\radarr\radarr.db"; Service="radarr" },
-    @{ Name="Prowlarr DB";          InternalPath="/mediastack/config/prowlarr/prowlarr.db"; HostPath="$ConfigDir\prowlarr\prowlarr.db"; Service="prowlarr" },
-    @{ Name="Bazarr DB";            InternalPath="/mediastack/config/bazarr/db/bazarr.db"; HostPath="$ConfigDir\bazarr\db\bazarr.db"; Service="bazarr" },
-    @{ Name="Jellyseerr DB";        InternalPath="/mediastack/config/jellyseerr/db/db.sqlite3"; HostPath="$ConfigDir\jellyseerr\db\db.sqlite3"; Service="jellyseerr" },
-    @{ Name="Jellyfin Main DB";     InternalPath="/mediastack/config/jellyfin/data/data/jellyfin.db"; HostPath="$ConfigDir\jellyfin\data\data\jellyfin.db"; Service="jellyfin" }
+    @{ Name="MediaStack Backup DB"; InternalPath="/config/mediastack_backup.db"; HostPath="$ActiveConfig\db-backup\mediastack_backup.db"; Service="mediastack-db" },
+    @{ Name="Sonarr DB";            InternalPath="/mediastack/config/sonarr/sonarr.db"; HostPath="$ActiveConfig\sonarr\sonarr.db"; Service="sonarr" },
+    @{ Name="Radarr DB";            InternalPath="/mediastack/config/radarr/radarr.db"; HostPath="$ActiveConfig\radarr\radarr.db"; Service="radarr" },
+    @{ Name="Prowlarr DB";          InternalPath="/mediastack/config/prowlarr/prowlarr.db"; HostPath="$ActiveConfig\prowlarr\prowlarr.db"; Service="prowlarr" },
+    @{ Name="Bazarr DB";            InternalPath="/mediastack/config/bazarr/db/bazarr.db"; HostPath="$ActiveConfig\bazarr\db\bazarr.db"; Service="bazarr" },
+    @{ Name="Jellyseerr DB";        InternalPath="/mediastack/config/jellyseerr/db/db.sqlite3"; HostPath="$ActiveConfig\jellyseerr\db\db.sqlite3"; Service="jellyseerr" },
+    @{ Name="Jellyfin Main DB";     InternalPath="/mediastack/config/jellyfin/data/data/jellyfin.db"; HostPath="$ActiveConfig\jellyfin\data\data\jellyfin.db"; Service="jellyfin" }
 )
 
 function Invoke-ReplicationCycle {
