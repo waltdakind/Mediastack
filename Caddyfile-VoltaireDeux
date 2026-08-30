@@ -1,0 +1,148 @@
+# ==============================================================================
+# MediaStack High-Performance & External WAN Gateway Caddyfile
+# Node: ORDINATEURDEVOLT (192.168.4.21)
+# Features: Dual-Domain Routing, Cross-Node Failover, Zero-Latency Streaming
+# ==============================================================================
+
+{
+    admin off
+    auto_https off
+}
+
+# 1. Main Dashboard & Portal
+http://ordinateur.local, http://mediaserver.local, http://192.168.4.21 {
+    handle /api/* {
+        reverse_proxy api-gateway:3000 192.168.4.30:3000 {
+            lb_policy first
+            fail_duration 10s
+        }
+    }
+
+    handle /mcp/* {
+        reverse_proxy api-gateway:3000 192.168.4.30:3000 {
+            lb_policy first
+            fail_duration 10s
+        }
+    }
+
+    handle /autologin {
+        rewrite * /autologin.html
+        root * /var/www/dashboard
+        file_server
+    }
+
+    handle /guest {
+        rewrite * /autologin.html
+        root * /var/www/dashboard
+        file_server
+    }
+
+    handle {
+        root * /var/www/dashboard
+        file_server
+    }
+}
+
+# 2. Standalone API Gateway Service
+http://api.ordinateur.local, http://api.mediaserver.local {
+    reverse_proxy api-gateway:3000 192.168.4.30:3000 {
+        lb_policy first
+        fail_duration 10s
+    }
+}
+
+# 3. Homepage Service
+http://homepage.ordinateur.local, http://homepage.mediaserver.local {
+    reverse_proxy homepage:3000 {
+        header_up Host {upstream_hostport}
+    }
+}
+
+# 4. Jellyfin Media & Music Streaming (Primary Local -> Fallback to Satellite)
+http://jellyfin.ordinateur.local, http://jellyfin.mediaserver.local {
+    reverse_proxy jellyfin:8096 192.168.4.30:8096 {
+        lb_policy first
+        fail_duration 10s
+        flush_interval -1
+
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+        header_up Upgrade {http.request.header.Upgrade}
+        header_up Connection {http.request.header.Connection}
+    }
+}
+
+# 5. MusicBrainz & Picard WebService API (Primary Port 5000 -> Fallback Port 5001)
+http://musicbrainz.ordinateur.local, http://musicbrainz.mediaserver.local {
+    @options {
+        method OPTIONS
+    }
+    handle @options {
+        header Access-Control-Allow-Origin "*"
+        header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        header Access-Control-Allow-Headers "*"
+        respond "" 204
+    }
+
+    reverse_proxy host.docker.internal:5000 192.168.4.30:5001 {
+        lb_policy first
+        fail_duration 10s
+        flush_interval -1
+
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_down Access-Control-Allow-Origin "*"
+    }
+}
+
+# 6. Radarr Movie Management
+http://radarr.ordinateur.local, http://radarr.mediaserver.local {
+    reverse_proxy radarr:7878
+}
+
+# 7. Sonarr TV Show Management
+http://sonarr.ordinateur.local, http://sonarr.mediaserver.local {
+    reverse_proxy sonarr:8989
+}
+
+# 8. Jellyseerr Media Requests
+http://jellyseerr.ordinateur.local, http://jellyseerr.mediaserver.local {
+    reverse_proxy jellyseerr:5055
+}
+
+# 9. Prowlarr Indexer Management
+http://prowlarr.ordinateur.local, http://prowlarr.mediaserver.local {
+    reverse_proxy prowlarr:9696
+}
+
+# 10. Bazarr Subtitles Management
+http://bazarr.ordinateur.local, http://bazarr.mediaserver.local {
+    reverse_proxy bazarr:6767
+}
+
+# 11. Transmission Torrent Client
+http://transmission.ordinateur.local, http://transmission.mediaserver.local {
+    @root path /
+    redir @root /transmission/web/ 302
+
+    reverse_proxy transmission:9091 {
+        header_up X-Transmission-Session-Id {http.request.header.X-Transmission-Session-Id}
+    }
+}
+
+# 12. TVHeadend Live TV & DVR Backend
+http://tvheadend.ordinateur.local, http://tvheadend.mediaserver.local {
+    reverse_proxy tvheadend:9981
+}
+
+# 13. HDHomeRun Physical Tuner Gateway
+http://hdhomerun.ordinateur.local, http://hdhomerun.mediaserver.local {
+    reverse_proxy 192.168.4.45:80
+}
+
+# 14. Mediastack Database Web GUI
+http://db.ordinateur.local, http://db.mediaserver.local {
+    reverse_proxy mediastack-db:8080
+}

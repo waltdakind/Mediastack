@@ -1,0 +1,82 @@
+# =============================================================================
+# Caddyfile.arm — MediaStack ARM Satellite Reverse Proxy
+# =============================================================================
+# LAN-only configuration — no ACME, no external domain required.
+# Access from any device on your local network:
+#   http://<pi-ip>             → Jellyfin (music)
+#   http://<pi-ip>:8384        → Syncthing (direct port, no proxy needed)
+#   http://<pi-ip>/syncthing/  → Syncthing (via Caddy)
+#
+# To find your Pi / ARM laptop IP:
+#   Pi:    hostname -I
+#   Linux: ip addr show
+# =============================================================================
+
+{
+    # Disable automatic HTTPS — LAN use only
+    auto_https off
+    # Disable admin API on ARM (not needed)
+    admin off
+}
+
+# ---------------------------------------------------------------------------
+# Security headers snippet — same as x64 for consistency
+# ---------------------------------------------------------------------------
+(security_headers) {
+    header {
+        X-Content-Type-Options        nosniff
+        X-Frame-Options               SAMEORIGIN
+        Referrer-Policy               strict-origin-when-cross-origin
+        Permissions-Policy            "geolocation=(), microphone=(), camera=()"
+        -Server
+    }
+}
+
+# ---------------------------------------------------------------------------
+# Real IP forwarding snippet
+# ---------------------------------------------------------------------------
+(trusted_proxy) {
+    trusted_proxies private_ranges
+    header_up X-Real-IP {remote_host}
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Forwarded-Proto {scheme}
+}
+
+# ---------------------------------------------------------------------------
+# Main catch-all: serve Jellyfin on port 80 (any hostname / IP)
+# This makes http://<pi-ip> go straight to Jellyfin.
+# ---------------------------------------------------------------------------
+:80 {
+    log {
+        output stdout
+        format console
+    }
+
+    # ── Syncthing admin — path prefix /syncthing/ ──────────────────────────
+    handle_path /syncthing/* {
+        import security_headers
+        reverse_proxy syncthing:8384 {
+            import trusted_proxy
+        }
+    }
+
+    # ── Jellyfin — everything else ─────────────────────────────────────────
+    handle {
+        import security_headers
+        reverse_proxy jellyfin:8096 {
+            import trusted_proxy
+            # WebSocket support (required by Jellyfin):
+            header_up Connection {>Connection}
+            header_up Upgrade {>Upgrade}
+        }
+        encode gzip zstd
+    }
+}
+
+# ---------------------------------------------------------------------------
+# Optional: named LAN host (requires LAN_DOMAIN set in .env and local DNS)
+# e.g. add  192.168.1.x  mediastack.local  to your router's DNS or /etc/hosts
+# ---------------------------------------------------------------------------
+# http://{$LAN_DOMAIN} {
+#     redir http://{$LAN_DOMAIN}:80{uri}
+# }

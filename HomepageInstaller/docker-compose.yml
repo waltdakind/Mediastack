@@ -1,0 +1,12 @@
+version: '3.3'
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    environment:
+      - HOMEPAGE_ALLOWED_HOSTS=mediaserver.local,localhost
+    ports:
+      - 3000:3000
+    volumes:
+      - ./config:/app/config
+    restart: unless-stopped

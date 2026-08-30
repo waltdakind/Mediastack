@@ -1,0 +1,312 @@
+services:
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    labels:
+      - "autoheal=true"
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ${CONFIG_DIR}/caddy_data:/data
+      - ${CONFIG_DIR}/caddy_config:/config
+      - ./dashboard:/var/www/dashboard
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "autoheal=true"
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - ${CONFIG_DIR}/jellyfin:/config
+      - ${MEDIA_DIR}:/data
+      - ${MEDIA_DIR}/Videos:/data/movies
+      - ${MEDIA_DIR}/Music:/music
+    ports:
+      - "8096:8096"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "autoheal=true"
+
+  jellyseerr:
+    image: ghcr.io/seerr-team/seerr:v3.4.1
+    container_name: jellyseerr
+    environment:
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - ${CONFIG_DIR}/jellyseerr:/app/config
+    ports:
+      - "5055:5055"
+    restart: unless-stopped
+    labels:
+      - "autoheal=true"
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - ${CONFIG_DIR}/sonarr:/config
+      - ${MEDIA_DIR}:/data
+    ports:
+      - "8989:8989"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8989/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "autoheal=true"
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - ${CONFIG_DIR}/radarr:/config
+      - ${MEDIA_DIR}:/data
+    ports:
+      - "7878:7878"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7878/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "autoheal=true"
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - ${CONFIG_DIR}/prowlarr:/config
+    ports:
+      - "9696:9696"
+    restart: unless-stopped
+    labels:
+      - "autoheal=true"
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - ${CONFIG_DIR}/bazarr:/config
+      - ${MEDIA_DIR}:/data
+    ports:
+      - "6767:6767"
+    restart: unless-stopped
+    labels:
+      - "autoheal=true"
+
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - ./transmission/config:/config
+      - ${MEDIA_DIR}:/data
+    ports:
+      - "9091:9091"
+      - 51413:51413
+      - 51413:51413/udp
+    restart: unless-stopped
+    labels:
+      - "autoheal=true"
+
+  mediastack-db:
+    image: coleifer/sqlite-web
+    container_name: mediastack-db
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+      - SQLITE_DATABASE=mediastack_backup.db
+    volumes:
+      - ./db-backup:/config
+      - ${CONFIG_DIR}:/mediastack/config:ro
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  tvheadend:
+    image: lscr.io/linuxserver/tvheadend:latest
+    container_name: tvheadend
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - ${CONFIG_DIR}/tvheadend:/config
+      - ${MEDIA_DIR}:/data
+    ports:
+      - "9981:9981"
+      - "9982:9982"
+    restart: unless-stopped
+    labels:
+      - "autoheal=true"
+
+  diun:
+    image: crazymax/diun:latest
+    container_name: diun
+    command: serve
+    volumes:
+      - ${CONFIG_DIR}/diun:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=${TZ:-America/New_York}
+      - LOG_LEVEL=info
+      - LOG_JSON=false
+      - DIUN_WATCH_WORKERS=20
+      - DIUN_WATCH_SCHEDULE=0 0 * * *
+      - DIUN_PROVIDERS_DOCKER=true
+      - DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=true
+    restart: unless-stopped
+
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - ${CONFIG_DIR}/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    labels:
+      - "autoheal=true"
+
+  # -----------------------------------------------------------------------------
+  # MusicBrainz Server & Metadata Mirror Stack
+  # Ports: 5000 (Default Standard Web & REST API), 5001 (Secondary / Mirror Port)
+  # -----------------------------------------------------------------------------
+  musicbrainz:
+    image: musicbrainz-docker-musicbrainz
+    container_name: musicbrainz-docker-musicbrainz-1
+    ports:
+      - "5000:5000"
+      - "5001:5000"
+    volumes:
+      - musicbrainz_dbdump:/media/dbdump
+      - musicbrainz_solrdump:/var/cache/musicbrainz/solr-backups:ro
+    restart: unless-stopped
+    env_file:
+      - ./musicbrainz-docker/default/postgres.env
+    environment:
+      - MUSICBRAINZ_BASE_FTP_URL=${MUSICBRAINZ_BASE_FTP_URL:-}
+      - MUSICBRAINZ_BASE_DOWNLOAD_URL=${MUSICBRAINZ_BASE_DOWNLOAD_URL:-https://data.metabrainz.org/pub/musicbrainz}
+      - MUSICBRAINZ_SERVER_PROCESSES=${MUSICBRAINZ_SERVER_PROCESSES:-10}
+      - MUSICBRAINZ_USE_PROXY=1
+      - MUSICBRAINZ_WEB_SERVER_HOST=${MUSICBRAINZ_WEB_SERVER_HOST:-localhost}
+      - MUSICBRAINZ_WEB_SERVER_PORT=5000
+    depends_on:
+      - musicbrainz-db
+      - musicbrainz-search
+      - musicbrainz-valkey
+
+  musicbrainz-db:
+    image: musicbrainz-docker_db:18
+    container_name: musicbrainz-docker-db-1
+    restart: unless-stopped
+    command: postgres -c "shared_buffers=2048MB"
+    env_file:
+      - ./musicbrainz-docker/default/postgres.env
+    shm_size: "2GB"
+    volumes:
+      - musicbrainz_pgdata:/var/lib/postgresql
+    expose:
+      - "5432"
+
+  musicbrainz-search:
+    image: musicbrainz-docker_search:4.1.0
+    container_name: musicbrainz-docker-search-1
+    restart: unless-stopped
+    environment:
+      - SOLR_HEAP=2g
+      - LOG4J_FORMAT_MSG_NO_LOOKUPS=true
+    mem_swappiness: 1
+    expose:
+      - "8983"
+    volumes:
+      - musicbrainz_dbdump:/media/dbdump:ro
+      - musicbrainz_solrdata:/var/solr
+      - musicbrainz_solrdump:/var/cache/musicbrainz/solr-backups
+
+  musicbrainz-indexer:
+    image: musicbrainz-docker-indexer
+    container_name: musicbrainz-docker-indexer-1
+    env_file:
+      - ./musicbrainz-docker/default/postgres.env
+    volumes:
+      - ./musicbrainz-docker/default/indexer.ini:/code/config.ini
+    restart: unless-stopped
+    depends_on:
+      - musicbrainz-db
+      - musicbrainz-search
+
+  musicbrainz-valkey:
+    image: valkey/valkey:9-alpine
+    container_name: musicbrainz-docker-valkey-1
+    restart: unless-stopped
+    expose:
+      - "6379"
+
+volumes:
+  musicbrainz_pgdata:
+    name: musicbrainz-docker_pgdata
+    external: true
+  musicbrainz_solrdata:
+    name: musicbrainz-docker_solrdata
+    external: true
+  musicbrainz_dbdump:
+    name: musicbrainz-docker_dbdump
+    external: true
+  musicbrainz_solrdump:
+    name: musicbrainz-docker_solrdump
+    external: true
+

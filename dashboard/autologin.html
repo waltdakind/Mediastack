@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaStack Read-Only Listener Authenticator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #06080f radial-gradient(circle at center, rgba(14, 22, 48, 0.9) 0%, #06080f 100%);
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .ambient-glow {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.15), rgba(168, 85, 247, 0.15), transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            animation: pulseGlow 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(0.9); opacity: 0.5; }
+            100% { transform: scale(1.15); opacity: 0.8; }
+        }
+
+        .auth-card {
+            position: relative;
+            z-index: 1;
+            background: rgba(18, 25, 48, 0.65);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 28px;
+            padding: 48px 40px;
+            text-align: center;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 240, 255, 0.1);
+            animation: cardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(16px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .logo-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #00f0ff, #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #ffffff;
+            margin: 0 auto 24px;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 3px solid rgba(0, 240, 255, 0.15);
+            border-top: 3px solid #00f0ff;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 0.9s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ffffff 60%, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .badge-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-cyan {
+            background: rgba(0, 240, 255, 0.12);
+            color: #00f0ff;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+        }
+
+        .badge-emerald {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .policy-box {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-size: 0.8rem;
+            color: #64748b;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .policy-box strong { color: #94a3b8; }
+
+        .manual-btn {
+            display: inline-block;
+            color: #00f0ff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+        .manual-btn:hover { opacity: 0.8; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <div class="auth-card">
+        <div class="logo-icon">
+            <i class="ph ph-waveform"></i>
+        </div>
+        <div class="spinner" id="auth-spinner"></div>
+        <h2>MediaStack Listener</h2>
+        <p id="status-text">Establishing zero-friction read-only listener session...</p>
+        
+        <div class="badge-row">
+            <div class="badge badge-emerald" id="auth-badge">
+                <i class="ph ph-shield-check"></i> Read-Only Listener
+            </div>
+            <div class="badge badge-cyan">
+                <i class="ph ph-music-notes"></i> High-Fi Audio
+            </div>
+        </div>
+
+        <div class="policy-box">
+            <i class="ph ph-info" style="color: #00f0ff; margin-right: 4px;"></i>
+            <strong>Guest Listener Policy:</strong> You have instant streaming access to music, podcasts, and media. Server configuration and library management are locked in read-only mode.
+        </div>
+
+        <a href="/web/index.html" class="manual-btn" id="manual-link" style="display: none;">Click here if not redirected automatically →</a>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetUrl = urlParams.get('target') || '/web/index.html';
+        const skip = urlParams.get('skip') === 'true';
+
+        async function authenticateGuestListener() {
+            if (skip) {
+                window.location.href = targetUrl;
+                return;
+            }
+
+            // 1. Check existing cached Jellyfin session
+            try {
+                const storedCreds = localStorage.getItem("jellyfin_credentials");
+                if (storedCreds) {
+                    const parsed = JSON.parse(storedCreds);
+                    if (parsed.Servers && parsed.Servers.length > 0 && parsed.Servers[0].AccessToken) {
+                        document.getElementById('status-text').innerText = "Session recognized. Launching player...";
+                        setTimeout(() => { window.location.href = targetUrl; }, 300);
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn("Could not read local session:", e);
+            }
+
+            // 2. Authenticate as Read-Only Listener 'bobby' / 'weir'
+            document.getElementById('status-text').innerText = "Handshaking credentials for 'bobby'...";
+            
+            try {
+                const res = await fetch('/Users/AuthenticateByName', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Emby-Authorization': 'MediaBrowser Client="Jellyfin Web", Device="MediaStack Web Player", DeviceId="mediastack-guest-player", Version="10.9.0"'
+                    },
+                    body: JSON.stringify({
+                        Username: 'bobby',
+                        Pw: 'weir'
+                    })
+                });
+
+                if (!res.ok) {
+                    throw new Error(`Authentication returned status ${res.status}`);
+                }
+
+                const data = await res.json();
+                if (data.AccessToken) {
+                    const creds = {
+                        Servers: [{
+                            Id: data.ServerId,
+                            UserId: data.User.Id,
+                            AccessToken: data.AccessToken,
+                            DateLastAccessed: Date.now()
+                        }]
+                    };
+                    localStorage.setItem("jellyfin_credentials", JSON.stringify(creds));
+                    document.getElementById('status-text').innerText = "Access granted! Redirecting to player...";
+                    document.getElementById('auth-spinner').style.borderColor = '#10b981';
+                    setTimeout(() => { window.location.href = targetUrl; }, 400);
+                } else {
+                    window.location.href = targetUrl;
+                }
+            } catch (err) {
+                console.warn("Guest autologin direct fallback:", err);
+                document.getElementById('status-text').innerText = "Redirecting directly to media portal...";
+                document.getElementById('manual-link').style.display = 'inline-block';
+                setTimeout(() => { window.location.href = targetUrl; }, 600);
+            }
+        }
+
+        authenticateGuestListener();
+    </script>
+</body>
+</html>

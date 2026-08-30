@@ -1,0 +1,49 @@
+$noop(
+================================================================================
+  MusicBrainz Picard - Master Production Tagging & File Naming Script
+  Architecture: High-Fidelity Audiophile Library Organization & Jellyfin Standard
+  Documentation Reference: https://picard-docs.musicbrainz.org/en/latest/functions/list_by_type.html
+================================================================================
+)
+
+$noop(--- 1. SANITIZE & CLEAN MULTI-VALUE TAGS ---)
+$setmulti(genre,$clean_multi(%genre%))
+$setmulti(genre,$unique(%genre%))
+$setmulti(artists,$clean_multi(%artists%))
+$setmulti(artists,$unique(%artists%))
+
+$noop(--- 2. STANDARDIZE ARTIST & ALBUM VARIABLES ---)
+$set(_albumartist,$if2(%albumartist%,%artist%,Various Artists))
+$set(_albumartist_sort,$if2(%albumartistsort%,%artistsort%,$delprefix(%_albumartist%)))
+$set(_album_title,$if2(%album%,Unknown Album))
+$set(_year,$if2($left(%originaldate%,4),$left(%date%,4),0000))
+$set(_tracknum,$num(%tracknumber%,2))
+$set(_discnum,$num(%discnumber%,2))
+$set(_totaldiscs,$num(%totaldiscs%,1))
+
+$noop(--- 3. DETECT RELEASE TYPE & MEDIA FORMAT ---)
+$set(_releasetype,$if(%releasetype%, [$title(%releasetype%)],))
+$set(_mediaformat,$if(%media%, [%media%],))
+$set(_is_multidisc,$if($gt(%_totaldiscs%,1),1,0))
+
+$noop(--- 4. ENFORCE AUDIO VS VIDEO ROUTING ($is_audio) ---)
+$if($is_audio(),
+    $noop(--- AUDIO DIRECTORY STRUCTURE ---)
+    $noop(Alphabetical Bucket: A-Z, 0-9, or Non-Latin)
+    $firstalphachar($delprefix(%_albumartist%),#)/
+    
+    $noop(Album Artist Directory)
+    $replace($replace(%_albumartist%,/,-),:, -)/
+    
+    $noop(Album Directory: [YYYY] Album Title [Format / Type])
+    [%_year%] $replace($replace(%_album_title%,/,-),:, -)%_mediaformat%%_releasetype%/
+    
+    $noop(Multi-Disc Subdirectory: Disc 01, Disc 02 if applicable)
+    $if($eq(%_is_multidisc%,1),Disc %_discnum%/, )
+    
+    $noop(Track Filename: 01 - Track Title.ext)
+    %_tracknum% - $replace($replace(%title%,/,-),:, -)
+,
+    $noop(--- NON-AUDIO / VIDEO ROUTING ---)
+    Video/%_albumartist%/[%_year%] %_album_title%/%_tracknum% - %title%
+)

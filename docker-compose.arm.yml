@@ -1,0 +1,187 @@
+# =============================================================================
+# docker-compose.arm.yml - MediaStack ARM Satellite Services
+# =============================================================================
+#
+# Lightweight satellite for Raspberry Pi and ARM laptops:
+#   Caddy        - LAN-only HTTP reverse proxy (no ACME/TLS)
+#   Jellyfin     - Music-only media server (same music share as x64)
+#   Syncthing    - Receives Jellyfin theme updates from x64 main server
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.arm.yml up -d
+#   - OR - .\start-arm.ps1   (Windows ARM laptop)
+#   - OR - ./start-arm.sh    (Raspberry Pi / Linux)
+#
+# ARM notes:
+#   - All linuxserver.io images publish multi-arch manifests (arm64 + arm/v7).
+#     The same :latest tag works on Pi 4 (arm64) and Pi 3 (arm/v7) alike.
+#   - shm_size is reduced to 64 MB (Pi RAM is limited).
+#   - No transcoding devices (/dev/dri unavailable on Pi).
+#   - Music library is the SAME network share as x64 - content is consistent.
+#   - Theme is synced FROM x64 via Syncthing (jellyfin-theme share).
+#     After ARM Syncthing pairs with x64, theme changes propagate automatically.
+#
+# Connecting to the x64 main server:
+#   Set MAIN_SERVER_HOST in .env so Jellyfin's login page can link to main.
+# =============================================================================
+
+# Re-declare anchors (YAML anchors are per-document)
+x-common: &common
+  restart: unless-stopped
+  networks:
+    - default
+
+x-env-ls: &env-ls
+  PUID: ${PUID:-1000}
+  PGID: ${PGID:-1000}
+  TZ: ${TZ:-America/New_York}
+
+x-no-ipv6: &no-ipv6
+  sysctls:
+    net.ipv6.conf.all.disable_ipv6: 1
+    net.ipv6.conf.default.disable_ipv6: 1
+    net.ipv6.conf.lo.disable_ipv6: 1
+
+services:
+
+  # -----------------------------------------------------------------------------
+  # Caddy - LAN-only reverse proxy (ARM: no ACME, no external domain)
+  #
+  # Listens on port 80 only. Access Jellyfin at:
+  #   http://<pi-ip>/        or   http://<laptop-hostname>/
+  # Syncthing admin at:
+  #   http://<pi-ip>/syncthing/
+  #
+  # Uses Caddyfile.arm (auto_https off, local domain from LAN_DOMAIN env var).
+  # -----------------------------------------------------------------------------
+  caddy:
+    <<: [*common, *no-ipv6]
+    image: caddy:2-alpine
+    container_name: caddy
+    ports:
+      - "80:80"
+    volumes:
+      - ./Caddyfile.arm:/etc/caddy/Caddyfile:ro   # LAN-only config
+      - caddy_data:/data
+      - caddy_config:/config
+      - ${MEDIASTACK_ROOT:-C:/Users/Public/Mediastack}:/mediastack
+    environment:
+      LAN_DOMAIN: ${LAN_DOMAIN:-mediastack.local}
+      MAIN_SERVER_HOST: ${MAIN_SERVER_HOST:-}
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # -----------------------------------------------------------------------------
+  # Jellyfin - Music-only satellite (ARM)
+  #
+  # Mounts ONLY the music share - same network path as x64 so the library
+  # content is identical. Movies, TV, and photos are NOT mounted (saves RAM
+  # and scan time on Pi hardware).
+  #
+  # Theme sync:
+  #   Syncthing (below) pulls the jellyfin-theme share from the x64 main
+  #   server and writes it into /config/web/. Jellyfin serves those files
+  #   automatically - no restart required for theme updates.
+  #
+  # Reduced shm_size: 64 MB (Pi 4 has 4 GB total but headroom matters).
+  # No /dev/shm cache: use a standard bind mount instead for transcoding.
+  # -----------------------------------------------------------------------------
+  jellyfin:
+    <<: [*common, *no-ipv6]
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      <<: *env-ls
+      # Let Jellyfin know where the main server is (used in custom branding):
+      JELLYFIN_MAIN_SERVER: ${MAIN_SERVER_HOST:-}
+    volumes:
+      - ${CONFIG_ROOT:-./config}/jellyfin:/config
+      - ${CONFIG_ROOT:-./config}/jellyfin-arm-cache:/cache   # bind mount, not shm
+      # Music only - same network share as x64 (content is consistent):
+      - ${MUSIC_ROOT:-C:/Users/Public/Music}:/data/music:ro
+      # Theme files are synced here by Syncthing from the x64 main server:
+      - ${CONFIG_ROOT:-./config}/jellyfin/web:/config/web
+      - ${MEDIASTACK_ROOT:-C:/Users/Public/Mediastack}:/mediastack
+    ports:
+      - "8096:8096"
+    shm_size: "64mb"              # reduced for Pi hardware
+    healthcheck:
+      test: ["CMD", "curl", "-fSs", "http://localhost:8096/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # -----------------------------------------------------------------------------
+  # Syncthing - Theme sync receiver (ARM)
+  #
+  # Pairs with the x64 main server's Syncthing instance to receive the
+  # "jellyfin-theme" folder share. Once paired, theme changes on x64
+  # propagate to all ARM satellites automatically.
+  #
+  # Setup (one-time, after first ARM start):
+  #   1. Open Syncthing on ARM:  http://<pi-ip>:8384
+  #   2. Copy this device's ID (top right -> Actions -> Show ID)
+  #   3. On x64 Syncthing: Add Device -> paste ARM device ID
+  #   4. Share the "jellyfin-theme" folder to the new ARM device
+  #   5. Accept the share on the ARM Syncthing UI
+  #   Theme files will sync to CONFIG_ROOT/jellyfin/web/ automatically.
+  #
+  # Hostname is set per-device so the x64 Syncthing UI shows clear names.
+  # -----------------------------------------------------------------------------
+  syncthing:
+    <<: [*common, *no-ipv6]
+    image: syncthing/syncthing:latest
+    container_name: syncthing
+    hostname: ${ARM_DEVICE_NAME:-mediastack-arm}   # set per device in .env
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+    volumes:
+      - ${CONFIG_ROOT:-./config}/syncthing:/var/syncthing/config
+      # Destination for the synced jellyfin theme files:
+      - ${CONFIG_ROOT:-./config}/jellyfin/web:/data/jellyfin-theme
+      - ${MEDIASTACK_ROOT:-C:/Users/Public/Mediastack}:/mediastack
+    ports:
+      - "8384:8384"
+      - "22000:22000"
+      - "22000:22000/udp"
+      - "21027:21027/udp"
+    healthcheck:
+      test: ["CMD", "curl", "-fSs", "http://localhost:8384/rest/noauth/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # Disabled services on ARM satellite
+  radarr:
+    profiles: [disabled]
+  sonarr:
+    profiles: [disabled]
+  bazarr:
+    profiles: [disabled]
+  prowlarr:
+    profiles: [disabled]
+  jellyseerr:
+    profiles: [disabled]
+  transmission:
+    profiles: [disabled]
+  tvheadend:
+    profiles: [disabled]
+  api-gateway:
+    profiles: [disabled]
+  mediastack-db:
+    profiles: [disabled]
+  homepage:
+    profiles: [disabled]
+  diun:
+    profiles: [disabled]
+
+volumes:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,929 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-08-28T18:35:00Z",
+  "description": "Artist metadata, image links, aliases, and intelligent artwork resolution rules for the MediaStack music collection.",
+  "default_fallback": {
+    "image_url": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop",
+    "thumbnail_url": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=300&auto=format&fit=crop",
+    "banner_url": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600&auto=format&fit=crop",
+    "genre_fallbacks": {
+      "Rock": "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?q=80&w=800&auto=format&fit=crop",
+      "Jam Band": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=800&auto=format&fit=crop",
+      "Folk / Blues": "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=800&auto=format&fit=crop",
+      "Progressive Rock": "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?q=80&w=800&auto=format&fit=crop",
+      "Electronic": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800&auto=format&fit=crop",
+      "Jazz": "https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=800&auto=format&fit=crop"
+    }
+  },
+  "artists": [
+    {
+      "id": "steve-winwood",
+      "name": "Steve Winwood",
+      "sort_name": "Winwood, Steve",
+      "aliases": [
+        "SW",
+        "Steve Winwood",
+        "Traffic",
+        "Blind Faith",
+        "The Spencer Davis Group",
+        "Spencer Davis Group"
+      ],
+      "genres": [
+        "Classic Rock",
+        "Blue-Eyed Soul",
+        "Blues Rock",
+        "Psychedelic Rock"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Steve-Winwood2.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Steve-Winwood2.jpg/400px-Steve-Winwood2.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Steve_Winwood_with_Traffic.jpg",
+      "bio_summary": "English singer, songwriter, and multi-instrumentalist whose genres include progressive rock, blue-eyed soul, and blues rock. Key member of The Spencer Davis Group, Traffic, Blind Faith, and celebrated solo artist with hits like 'Higher Love', 'Roll With It', 'Valerie', and 'Back in the High Life Again'.",
+      "track_signature_regex": "(?i)\\bSW\\b|Steve Winwood|Roll With It|Higher Love|Valerie|Back In The High Life|Arc Of A Diver|Traffic|Spencer Davis|Blind Faith|Gimme Some Lovin|Dear Mr Fantasy|Can['’]t Find My Way Home|While You See A Chance",
+      "known_albums": [
+        "Arc of a Diver",
+        "Back in the High Life",
+        "Roll with It",
+        "Steve Winwood",
+        "About Time",
+        "Talking Back to the Night"
+      ]
+    },
+    {
+      "id": "jerry-garcia",
+      "name": "Jerry Garcia",
+      "sort_name": "Garcia, Jerry",
+      "aliases": [
+        "JG",
+        "Jerry Garcia Band",
+        "JGB",
+        "Jerry Garcia Acoustic Band",
+        "Garcia & Grisman",
+        "Legion of Mary",
+        "Old & In the Way",
+        "Old and In the Way",
+        "Garcia/Hopkins Band",
+        "Saunders / Garcia / Kahn / Vitt"
+      ],
+      "genres": [
+        "Jam Band",
+        "Roots Rock",
+        "Bluegrass",
+        "Blues",
+        "R&B"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Jerry_Garcia.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Jerry_Garcia.jpg/400px-Jerry_Garcia.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Jerry_Garcia.jpg",
+      "bio_summary": "Legendary American musician best known as the lead guitarist, vocalist, and spiritual center of the Grateful Dead, as well as leader of the Jerry Garcia Band, Legion of Mary, and Old & In the Way.",
+      "track_signature_regex": "(?i)^jgb\\d{4}|Jerry Garcia Band|Jerry Garcia|Cats Under The Stars|How Sweet It Is|They Love Each Other|Lay Down Sally|Night They Drove Old Dixie Down|Reuben and Cherise|Mission in the Rain|Run for the Roses|Gomorrah|Tough Mama|Let It Rock|Like a Road Leading Home|My Sisters and Brothers|That Lucky Old Sun|Tangled Up in Blue|Stop That Train|Waiting for a Miracle|Evangeline|Senor|Shining Star|Ain['’]t No Bread in the Breadbox|Deep Elem Blues|Blue Yodel|Short Life of Trouble|Spike Driver Blues|Trouble In Mind|Oh Babe, It Ain['’]t No Lie|If I Lose|Ragged But Right|Bright Side Of The Road|Before The Dead|GarciaLive|Legion of Mary|Old & In The Way|Old and in the Way",
+      "known_albums": [
+        "GarciaLive Series",
+        "Cats Under the Stars",
+        "Before the Dead",
+        "Garcia",
+        "Reflections",
+        "Run for the Roses"
+      ]
+    },
+    {
+      "id": "grateful-dead",
+      "name": "Grateful Dead",
+      "sort_name": "Grateful Dead",
+      "aliases": [
+        "GD",
+        "The Dead",
+        "The Grateful Dead",
+        "Furthur",
+        "Dead & Company"
+      ],
+      "genres": [
+        "Psychedelic Rock",
+        "Jam Band",
+        "Folk Rock",
+        "Country Rock",
+        "Blues Rock"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/d/df/Grateful_Dead_1970.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Grateful_Dead_1970.jpg/400px-Grateful_Dead_1970.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/d/df/Grateful_Dead_1970.jpg",
+      "bio_summary": "Pioneering American psychedelic rock and jam band formed in 1965 in Palo Alto, California, famed for their eclectic style, live improvisation, and devoted subculture.",
+      "track_signature_regex": "(?i)^gd\\d{4}|Grateful Dead|Dark Star|Truckin|Touch Of Grey|Sugar Magnolia|Casey Jones|Uncle John['’]s Band|Ripple|Friend of the Devil|Box of Rain|China Cat|I Know You Rider|Playing in the Band|Scarlet Begonias|Fire on the Mountain|Estimated Prophet|Eyes of the World|Terrapin Station|St\\.? Stephen|Saint Stephen|Help on the Way|Slipknot|Franklin['’]s Tower|Bertha|Me and My Uncle|Althea|Tennessee Jed|Wharf Rat|Brokedown Palace|Morning Dew|Cassidy|Turn On Your Lovelight|New Minglewood|Shakedown Street",
+      "known_albums": [
+        "American Beauty",
+        "Workingman's Dead",
+        "Live/Dead",
+        "Europe '72",
+        "Terrapin Station",
+        "In the Dark"
+      ]
+    },
+    {
+      "id": "tom-waits",
+      "name": "Tom Waits",
+      "sort_name": "Waits, Tom",
+      "aliases": [
+        "Tom Waits",
+        "Thomas Alan Waits"
+      ],
+      "genres": [
+        "Experimental Rock",
+        "Blues",
+        "Jazz",
+        "Vaudeville",
+        "Spoken Word"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Tom_Waits_2007.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Tom_Waits_2007.jpg/400px-Tom_Waits_2007.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Tom_Waits_2007.jpg",
+      "bio_summary": "American musician, composer, and actor known for his distinctive gravelly baritone, noir storytelling, and eclectic blend of pre-rock music styles with industrial and avant-garde arrangements.",
+      "track_signature_regex": "(?i)16 Shells|Alice|Big In Japan|Cinny['’]s Waltz|Earth Died Screaming|Hang On St|Heartattack and Vine|Hope I Don['’]t Fall|I Hope That I Don['’]t|Lucky Day|Misery Is the River|New Coat Of Paint|Ol['’] 55|Opening Montage|Singapore|West Side Story|Tom Traubert|Top Of The Hill|Underground|Burma Shave|Clap Hands|Dirt In The Ground|Emotional Weather Report|Everything Goes to Hell|Everything You Can Think|Hoist That Rag|In Shades|Into the Water|Kiwi And The Apricot|Los Angeles Mood|Lowside Of The Road|Muriel|Red Shoes|San Diego Serenade|Step Right Up|Straight To The Top|Temptation|The Black Rider|Cemetery Polka|Christmas Card From a Hooker|Coney Island Baby|Dave the Butcher|Flower['’]s Grave|Hold On|I Never Talk To Strangers|Jitterbug Boy|Mockin['’]bird|Picking Up After You|Saving All My Love|Semi Suite|Sins Of My Father|Small Change|Such A Scream|Virginia Avenue|All Stripped Down|All the World Is Green|Cold Cold Ground|Downtown|Get Behind The Mule|I Wish I Was in New Orleans|Johnsburg|Just The Right Bullets|No One Knows I['’]m Gone|Old Boyfriends|Old Shoes|On A Foggy Night|Romeo Is Bleeding|Shiver My Timbers|The Piano Has Been Drinking|Til the Money Runs Out|Another Man['’]s Vine|Baby I['’]m Not A Baby|Big Black Mariah|Cold Water|Eggs And Sausage|How['’]s It Gonna End|I Beg Your Pardon|I['’]ll Be Gone|Invitation to the Blues|Jockey Full|Martha|Nobody|Poor Edward|Potter['’]s Field|Heart Of Saturday Night|Ocean Doesn['’]t Want Me|Town with No Cheer|Wrong Side of the Road|Yesterday Is Here|29\\.00|Sight For Sore Eyes|Annie['’]s Back|Broken Bicycles|Diamonds On My Windshield|Don['’]t Go Into That Barn|God['’]s Away on Business|House Where Nobody Lives|Innocent When You Dream|Jersey Girl|Kommienezuspadt|Midnight Lullaby|Tango Till|Who Are You|Diamonds & Gold|Fumblin['’] With The Blues|Good Old World|Gospel Train|I Want You|In the Neighbourhood|Swordfishtrombones|Rain Dogs|Franks Wild Years|Bone Machine|Mule Variations|Blood Money|Bad As Me|Closing Time|Nighthawks at the Diner",
+      "known_albums": [
+        "Rain Dogs",
+        "Swordfishtrombones",
+        "Closing Time",
+        "Mule Variations",
+        "Bone Machine",
+        "Franks Wild Years",
+        "Nighthawks at the Diner"
+      ]
+    },
+    {
+      "id": "bruce-springsteen",
+      "name": "Bruce Springsteen",
+      "sort_name": "Springsteen, Bruce",
+      "aliases": [
+        "Bruce Springsteen",
+        "Bruce Springsteen & The E Street Band",
+        "The Boss",
+        "E Street Band"
+      ],
+      "genres": [
+        "Heartland Rock",
+        "Rock and Roll",
+        "Folk Rock"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Bruce_Springsteen_-_Roskilde_Festival_2012.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Bruce_Springsteen_-_Roskilde_Festival_2012.jpg/400px-Bruce_Springsteen_-_Roskilde_Festival_2012.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Bruce_Springsteen_-_Roskilde_Festival_2012.jpg",
+      "bio_summary": "American singer, songwriter, and musician known for his poetic lyrics, Americana working-class sentiments, and legendary energetic stage performances with the E Street Band.",
+      "track_signature_regex": "(?i)Born In The U\\.S\\.A|Glory Days|Dancing In The Dark|Tunnel Of Love|Brilliant Disguise|Human Touch|Living Proof|Lucky Town|Streets Of Philadelphia|The Ghost Of Tom Joad|The Rising|Mary['’]s Place|Lonesome Day|American Skin|Land of Hope and Dreams|From Small Things|The Big Payback|Held Up Without A Gun|Trapped|None But The Brave|Missing|Lift Me Up|Viva Las Vegas|County Fair|Code Of Silence|Dead Man Walkin|Countin['’] On A Miracle|Blinded By The Light|Spirit In The Night|4th Of July|Rosalita|Thunder Road|Born To Run|Badlands|The River|E Street Band",
+      "known_albums": [
+        "Born to Run",
+        "Born in the U.S.A.",
+        "Darkness on the Edge of Town",
+        "The River",
+        "Nebraska",
+        "The Rising",
+        "The Essential Bruce Springsteen"
+      ]
+    },
+    {
+      "id": "mark-knopfler",
+      "name": "Mark Knopfler",
+      "sort_name": "Knopfler, Mark",
+      "aliases": [
+        "Mark Knopfler",
+        "Dire Straits"
+      ],
+      "genres": [
+        "Roots Rock",
+        "Blues Rock",
+        "Celtic Rock",
+        "Classic Rock"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Mark_Knopfler_-_Guitares_en_sc%C3%A8ne_2019_-_012.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Mark_Knopfler_-_Guitares_en_sc%C3%A8ne_2019_-_012.jpg/400px-Mark_Knopfler_-_Guitares_en_sc%C3%A8ne_2019_-_012.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Mark_Knopfler_-_Guitares_en_sc%C3%A8ne_2019_-_012.jpg",
+      "bio_summary": "British singer-songwriter, guitarist, and producer who founded Dire Straits and developed a celebrated solo career blending rock, blues, country, and Celtic melodies with his signature fingerstyle guitar technique.",
+      "track_signature_regex": "(?i)Mark Knopfler|Dire Straits|Sultans of Swing|Money for Nothing|Brothers in Arms|Walk of Life|Romeo and Juliet|Tunnel of Love|Telegraph Road|Sailing to Philadelphia|What It Is|Speedway at Nazareth",
+      "known_albums": [
+        "Brothers in Arms",
+        "Dire Straits",
+        "Making Movies",
+        "Love over Gold",
+        "Sailing to Philadelphia",
+        "Shangri-La"
+      ]
+    },
+    {
+      "id": "frank-zappa",
+      "name": "Frank Zappa",
+      "sort_name": "Zappa, Frank",
+      "aliases": [
+        "Frank Zappa",
+        "The Mothers of Invention",
+        "The Mothers"
+      ],
+      "genres": [
+        "Experimental Rock",
+        "Jazz Fusion",
+        "Comedy Rock",
+        "Avant-Garde",
+        "Progressive Rock"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/d/da/Frank_Zappa_1977.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Frank_Zappa_1977.jpg/400px-Frank_Zappa_1977.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/d/da/Frank_Zappa_1977.jpg",
+      "bio_summary": "Prolific American composer, guitarist, and bandleader whose work spanned rock, jazz, orchestral, and musique concrète with satirical social critique.",
+      "track_signature_regex": "(?i)Frank Zappa|The Mothers of Invention|Hot Rats|Peaches en Regalia|Joe['’]s Garage|Apostrophe|Over-Nite Sensation|Watermelon in Easter Hay|Cosmik Debris|Montana|Zomby Woof|Don['’]t Eat the Yellow Snow",
+      "known_albums": [
+        "Hot Rats",
+        "Apostrophe (')",
+        "Over-Nite Sensation",
+        "Joe's Garage",
+        "Sheik Yerbouti",
+        "Freak Out!"
+      ]
+    },
+    {
+      "id": "rush",
+      "name": "Rush",
+      "sort_name": "Rush",
+      "aliases": [
+        "Rush",
+        "Geddy Lee",
+        "Alex Lifeson",
+        "Neil Peart"
+      ],
+      "genres": [
+        "Progressive Rock",
+        "Hard Rock",
+        "Heavy Metal"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Rush_in_Milan%2C_2004.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Rush_in_Milan%2C_2004.jpg/400px-Rush_in_Milan%2C_2004.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Rush_in_Milan%2C_2004.jpg",
+      "bio_summary": "Celebrated Canadian progressive rock trio renowned for musicianship, complex compositions, and philosophical lyrics by Neil Peart.",
+      "track_signature_regex": "(?i)\\bRush\\b|Tom Sawyer|Limelight|YYZ|The Spirit of Radio|Subdivisions|Freewill|2112|Closer to the Heart|Fly by Night|Red Barchetta|Working Man|Moving Pictures",
+      "known_albums": [
+        "Moving Pictures",
+        "2112",
+        "Permanent Waves",
+        "Hemispheres",
+        "A Farewell to Kings",
+        "Signals"
+      ]
+    },
+    {
+      "id": "yes",
+      "name": "Yes",
+      "sort_name": "Yes",
+      "aliases": [
+        "Yes",
+        "Jon Anderson",
+        "Chris Squire",
+        "Steve Howe",
+        "Rick Wakeman"
+      ],
+      "genres": [
+        "Progressive Rock",
+        "Art Rock",
+        "Symphonic Rock"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/5/57/Yes_in_Indianapolis.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Yes_in_Indianapolis.jpg/400px-Yes_in_Indianapolis.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/5/57/Yes_in_Indianapolis.jpg",
+      "bio_summary": "Pioneering English progressive rock band formed in London in 1968, known for dramatic musical dynamic shifts, symphonic structures, and virtuosic musicianship.",
+      "track_signature_regex": "(?i)\\bYes\\b|Close To The Edge|Long Distance Runaround|Roundabout|Owner of a Lonely Heart|I['’]ve Seen All Good People|Starship Trooper|And You and I|Heart of the Sunrise|The Gates of Delirium|Fragile",
+      "known_albums": [
+        "Fragile",
+        "Close to the Edge",
+        "The Yes Album",
+        "Tales from Topographic Oceans",
+        "Relayer",
+        "90125"
+      ]
+    },
+    {
+      "id": "bob-dylan",
+      "name": "Bob Dylan",
+      "sort_name": "Dylan, Bob",
+      "aliases": [
+        "Bob Dylan",
+        "Robert Allen Zimmerman",
+        "The Traveling Wilburys"
+      ],
+      "genres": [
+        "Folk Rock",
+        "Poetry / Americana",
+        "Singer-Songwriter",
+        "Rock"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/2/28/Bob_Dylan_in_1963.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Bob_Dylan_in_1963.jpg/400px-Bob_Dylan_in_1963.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/2/28/Bob_Dylan_in_1963.jpg",
+      "bio_summary": "Influential American singer-songwriter and Nobel laureate whose career spans six decades as a cultural and musical icon.",
+      "track_signature_regex": "(?i)Bob Dylan|Like A Rolling Stone|Blowin['’] In The Wind|Hurricane|Simple Twist of Fate|Just Like a Woman|All Along the Watchtower|Don['’]t Think Twice|Highway 61|Blood on the Tracks|Tangled Up in Blue",
+      "known_albums": [
+        "Blood on the Tracks",
+        "Highway 61 Revisited",
+        "Blonde on Blonde",
+        "The Freewheelin' Bob Dylan",
+        "Desire",
+        "Time Out of Mind"
+      ]
+    },
+    {
+      "id": "paul-simon",
+      "name": "Paul Simon",
+      "sort_name": "Simon, Paul",
+      "aliases": [
+        "Paul Simon",
+        "Simon & Garfunkel",
+        "Simon and Garfunkel"
+      ],
+      "genres": [
+        "Folk Rock",
+        "Pop",
+        "Worldbeat",
+        "Singer-Songwriter"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/1/15/Paul_Simon_in_1982.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Paul_Simon_in_1982.jpg/400px-Paul_Simon_in_1982.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/1/15/Paul_Simon_in_1982.jpg",
+      "bio_summary": "Renowned American singer-songwriter whose solo career and partnership with Art Garfunkel produced some of popular music's most enduring recordings.",
+      "track_signature_regex": "(?i)Paul Simon|Graceland|You Can Call Me Al|Me and Julio|50 Ways|Mother and Child Reunion|Diamonds On The Soles|Father and Daughter|Boy In The Bubble|Simon & Garfunkel",
+      "known_albums": [
+        "Graceland",
+        "The Rhythm of the Saints",
+        "Paul Simon",
+        "There Goes Rhymin' Simon",
+        "Still Crazy After All These Years"
+      ]
+    },
+    {
+      "id": "david-bowie",
+      "name": "David Bowie",
+      "sort_name": "Bowie, David",
+      "aliases": [
+        "David Bowie",
+        "Ziggy Stardust",
+        "The Thin White Duke"
+      ],
+      "genres": [
+        "Art Rock",
+        "Glam Rock",
+        "Pop Rock",
+        "Electronic Rock"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/e8/David_Bowie_1974.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/David_Bowie_1974.jpg/400px-David_Bowie_1974.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/e/e8/David_Bowie_1974.jpg",
+      "bio_summary": "Visionary English singer-songwriter and actor widely regarded as one of the most influential musicians of the 20th century.",
+      "track_signature_regex": "(?i)David Bowie|Ziggy Stardust|Space Oddity|Heroes|Let['’]s Dance|Life on Mars|Rebel Rebel|Starman|Modern Love|Fame|Changes|Young Americans|Blackstar",
+      "known_albums": [
+        "The Rise and Fall of Ziggy Stardust",
+        "Hunky Dory",
+        "Heroes",
+        "Low",
+        "Station to Station",
+        "Let's Dance"
+      ]
+    },
+    {
+      "id": "modest-mouse",
+      "name": "Modest Mouse",
+      "sort_name": "Modest Mouse",
+      "aliases": [
+        "Modest Mouse",
+        "Isaac Brock"
+      ],
+      "genres": [
+        "Indie Rock",
+        "Post-Punk",
+        "Alternative Rock"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Modest_Mouse_in_2009.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Modest_Mouse_in_2009.jpg/400px-Modest_Mouse_in_2009.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Modest_Mouse_in_2009.jpg",
+      "bio_summary": "American indie rock band formed in 1992 in Issaquah, Washington, acclaimed for their idiosyncratic lyricism, shifting dynamic rhythms, and distinctive guitar textures.",
+      "track_signature_regex": "(?i)Modest Mouse|Float On|Ocean Breathes Salty|Dashboard|The World at Large|Trailer Trash|Dramamine|3rd Planet|Gravity Rides Everything",
+      "known_albums": [
+        "The Lonesome Crowded West",
+        "The Moon & Antarctica",
+        "Good News for People Who Love Bad News",
+        "We Were Dead Before the Ship Even Sank"
+      ]
+    },
+    {
+      "id": "solar-circus",
+      "name": "Solar Circus",
+      "sort_name": "Solar Circus",
+      "aliases": [
+        "Solar Circus",
+        "SC",
+        "Stonehenge Reunion"
+      ],
+      "genres": [
+        "Jam Band",
+        "Roots Rock",
+        "Psychedelic Rock"
+      ],
+      "image_url": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=800&auto=format&fit=crop",
+      "thumbnail_url": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=400&auto=format&fit=crop",
+      "banner_url": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=1600&auto=format&fit=crop",
+      "bio_summary": "Beloved East Coast jam band powerhouse known for their energetic live concerts, improvisational grooves, and vibrant community following throughout the 1990s and 2000s.",
+      "track_signature_regex": "(?i)solarcircus|SC199\\d|StonehengeReunion|Solar Circus|IntoTomorrow|betterThings|JahIsClose|JustFine|UpOnTheCoast|shadesOfBlue",
+      "known_albums": [
+        "Live at Wetlands",
+        "Stonehenge Reunion Live",
+        "Solar Circus Live Series"
+      ]
+    },
+    {
+      "id": "they-might-be-giants",
+      "name": "They Might Be Giants",
+      "sort_name": "They Might Be Giants",
+      "aliases": [
+        "TMBG",
+        "They Might Be Giants",
+        "John Flansburgh",
+        "John Linnell"
+      ],
+      "genres": [
+        "Alternative Rock",
+        "Geek Rock",
+        "Indie Pop"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/They_Might_Be_Giants_2013.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/They_Might_Be_Giants_2013.jpg/400px-They_Might_Be_Giants_2013.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/They_Might_Be_Giants_2013.jpg",
+      "bio_summary": "American alternative rock band formed in 1982 by John Flansburgh and John Linnell, celebrated for their witty, innovative songwriting and catchy melodies.",
+      "track_signature_regex": "(?i)They Might Be Giants|Birdhouse In Your Soul|Istanbul|Particle Man|Your Racist Friend|Road Movie to Berlin|Sapphire Bullets|Women and Men|Hot Cha|Whistling in the Dark|Letterbox|Minimum Wage|Hearing Aid|Someone Keeps Moving My Chair|We Want A Rock|Twisting|Theme From Flood|Flood",
+      "known_albums": [
+        "Flood",
+        "Lincoln",
+        "They Might Be Giants",
+        "Apollo 18",
+        "John Henry"
+      ]
+    },
+    {
+      "id": "gorillaz",
+      "name": "Gorillaz",
+      "sort_name": "Gorillaz",
+      "aliases": [
+        "Gorillaz",
+        "Damon Albarn",
+        "Jamie Hewlett"
+      ],
+      "genres": [
+        "Alternative Rock",
+        "Hip Hop",
+        "Electronic",
+        "Trip Hop",
+        "Pop"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/8/87/Gorillaz_logo.svg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Gorillaz_logo.svg/400px-Gorillaz_logo.svg.png",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/8/87/Gorillaz_logo.svg",
+      "bio_summary": "British virtual band created in 1998 by musician Damon Albarn and artist Jamie Hewlett, blending hip hop, electronic, and alternative rock.",
+      "track_signature_regex": "(?i)Gorillaz|Kids With Guns|Dirty Harry|Feel Good Inc|Clint Eastwood|19-2000|Dare|Tomorrow Comes Today|On Melancholy Hill|Demon Days|Re-Hash|New Genius|Man Research|Punk|Sound Check|Double Bass|Rock the House|Latin Simone|Starshine|Slow Country|M1 A1",
+      "known_albums": [
+        "Demon Days",
+        "Gorillaz",
+        "Plastic Beach",
+        "The Now Now",
+        "Song Machine"
+      ]
+    },
+    {
+      "id": "phish",
+      "name": "Phish",
+      "sort_name": "Phish",
+      "aliases": [
+        "Phish",
+        "Trey Anastasio",
+        "Jon Fishman",
+        "Mike Gordon",
+        "Page McConnell",
+        "Ghosts of The Forest"
+      ],
+      "genres": [
+        "Jam Band",
+        "Progressive Rock",
+        "Funk Rock",
+        "Psychedelic Rock"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Phish_2009.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Phish_2009.jpg/400px-Phish_2009.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Phish_2009.jpg",
+      "bio_summary": "Premier American jam band formed in Burlington, Vermont in 1983, celebrated for extended improvisation, blending of genres, and dedicated concert touring tradition.",
+      "track_signature_regex": "(?i)Phish|Carini|Everything['’]s Right|Back On The Train|Kill Devil Falls|Harry Hood|Bathtub Gin|You Enjoy Myself|Tweezer|Bouncing Around The Room|Chalk Dust Torture|Stash|Divided Sky|Run Like An Antelope|Down With Disease|Waste|First Tube|Farmhouse|Character Zero|Ghosts of The Forest",
+      "known_albums": [
+        "Junta",
+        "A Live One",
+        "Billy Breathes",
+        "Lawn Boy",
+        "Rift",
+        "Story of the Ghost"
+      ]
+    },
+    {
+      "id": "king-crimson",
+      "name": "King Crimson",
+      "sort_name": "King Crimson",
+      "aliases": [
+        "King Crimson",
+        "Robert Fripp",
+        "Adrian Belew",
+        "Tony Levin",
+        "Bill Bruford"
+      ],
+      "genres": [
+        "Progressive Rock",
+        "Art Rock",
+        "Math Rock",
+        "Experimental"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/9/90/King_Crimson_1974.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/King_Crimson_1974.jpg/400px-King_Crimson_1974.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/9/90/King_Crimson_1974.jpg",
+      "bio_summary": "Legendary English progressive rock band formed in London in 1968, whose masterworks and constantly evolving line-ups redefined the rock aesthetic.",
+      "track_signature_regex": "(?i)King Crimson|Neurotica|Neal and Jack and Me|Sartori in Tangier|Dig Me|Heartbeat|Waiting Man|Two Hands|The Howler|21st Century Schizoid Man|In the Court of the Crimson King|Epitaph|Larks['’] Tongues|Red|Frame by Frame|Elephant Talk|Discipline|Three of a Perfect Pair|BEAT",
+      "known_albums": [
+        "In the Court of the Crimson King",
+        "Red",
+        "Discipline",
+        "Larks' Tongues in Aspic",
+        "Beat",
+        "Three of a Perfect Pair"
+      ]
+    },
+    {
+      "id": "talking-heads",
+      "name": "Talking Heads",
+      "sort_name": "Talking Heads",
+      "aliases": [
+        "Talking Heads",
+        "David Byrne",
+        "Tina Weymouth",
+        "Chris Frantz",
+        "Jerry Harrison"
+      ],
+      "genres": [
+        "New Wave",
+        "Post-Punk",
+        "Funk Rock",
+        "Art Pop"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Talking_Heads_1978.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Talking_Heads_1978.jpg/400px-Talking_Heads_1978.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Talking_Heads_1978.jpg",
+      "bio_summary": "Trailblazing American new wave band formed in 1975 in NYC, pioneering the synthesis of punk, art rock, funk, and African rhythms.",
+      "track_signature_regex": "(?i)Talking Heads|Born Under Punches|Crosseyed And Painless|Listening Wind|Once in a Lifetime|Psycho Killer|Burning Down The House|This Must Be The Place|Life During Wartime|Take Me to the River|Remain in Light|Speaking in Tongues|Fear of Music",
+      "known_albums": [
+        "Remain in Light",
+        "Speaking in Tongues",
+        "Stop Making Sense",
+        "Fear of Music",
+        "Talking Heads: 77"
+      ]
+    },
+    {
+      "id": "blue-oyster-cult",
+      "name": "Blue Öyster Cult",
+      "sort_name": "Blue Öyster Cult",
+      "aliases": [
+        "Blue Öyster Cult",
+        "Blue Oyster Cult",
+        "BÖC",
+        "BOC",
+        "Eric Bloom",
+        "Buck Dharma"
+      ],
+      "genres": [
+        "Hard Rock",
+        "Heavy Metal",
+        "Psychedelic Rock"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Blue_Oyster_Cult_1977.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Blue_Oyster_Cult_1977.jpg/400px-Blue_Oyster_Cult_1977.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Blue_Oyster_Cult_1977.jpg",
+      "bio_summary": "Pioneering American hard rock band formed on Long Island in 1967, celebrated for hard-hitting riffs, clever lyricism, and dark atmospheric themes.",
+      "track_signature_regex": "(?i)Blue [ÖO]yster Cult|This Ain['’]t the Summer of Love|Hot Rails to Hell|Joan Crawford|Cities on Flame|Veteran of the Psychic Wars|Don['’]t Fear the Reaper|Burnin['’] for You|Godzilla|Astronomy|Transmaniacon MC",
+      "known_albums": [
+        "Agents of Fortune",
+        "Secret Treaties",
+        "Fire of Unknown Origin",
+        "Tyranny and Mutation",
+        "Blue Öyster Cult"
+      ]
+    },
+    {
+      "id": "the-band",
+      "name": "The Band",
+      "sort_name": "Band, The",
+      "aliases": [
+        "The Band",
+        "Robbie Robertson",
+        "Levon Helm",
+        "Rick Danko",
+        "Garth Hudson",
+        "Richard Manuel"
+      ],
+      "genres": [
+        "Roots Rock",
+        "Americana",
+        "Country Rock",
+        "Folk Rock"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/0/09/The_Band_%281969%29.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/The_Band_%281969%29.jpg/400px-The_Band_%281969%29.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/0/09/The_Band_%281969%29.jpg",
+      "bio_summary": "Seminal Canadian-American rock group that defined the roots rock and Americana movement, renowned for their intricate vocal harmonies and rustic storytelling.",
+      "track_signature_regex": "(?i)\\bThe Band\\b|The Weight|Up on Cripple Creek|Music From Big Pink|In a Station|Caledonia Mission|We Can Talk|Chest Fever|Tears of Rage|I Shall Be Released|This Wheel['’]s on Fire|Stage Fright|The Last Waltz",
+      "known_albums": [
+        "Music from Big Pink",
+        "The Band (Brown Album)",
+        "Stage Fright",
+        "Northern Lights – Southern Cross",
+        "The Last Waltz"
+      ]
+    },
+    {
+      "id": "dethklok",
+      "name": "Dethklok",
+      "sort_name": "Dethklok",
+      "aliases": [
+        "Dethklok",
+        "Brendon Small",
+        "Metalocalypse"
+      ],
+      "genres": [
+        "Melodic Death Metal",
+        "Heavy Metal",
+        "Comedy Metal"
+      ],
+      "image_url": "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?q=80&w=800&auto=format&fit=crop",
+      "thumbnail_url": "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?q=80&w=400&auto=format&fit=crop",
+      "banner_url": "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?q=80&w=1600&auto=format&fit=crop",
+      "bio_summary": "Fictional and real-life melodic death metal band created by Brendon Small and Tommy Blacha as the centerpiece of Adult Swim's animated series Metalocalypse.",
+      "track_signature_regex": "(?i)Dethklok|Duncan Hills Coffee|Murmaider|Blood Ocean|Bloodrocuted|Go Forth and Die|Fansong|Better Metal Snake|The Metalocalypse|Awaken|Murdertrain|Hatredy|Castratikron|Thunderhorse",
+      "known_albums": [
+        "The Dethalbum",
+        "Dethalbum II",
+        "Dethalbum III",
+        "The Doomstar Requiem"
+      ]
+    },
+    {
+      "id": "heart",
+      "name": "Heart",
+      "sort_name": "Heart",
+      "aliases": [
+        "Heart",
+        "Ann Wilson",
+        "Nancy Wilson"
+      ],
+      "genres": [
+        "Hard Rock",
+        "Folk Rock",
+        "Pop Rock"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Heart_1977.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Heart_1977.jpg/400px-Heart_1977.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Heart_1977.jpg",
+      "bio_summary": "American rock band formed in 1970 in Seattle, Washington, fronted by sisters Ann Wilson and Nancy Wilson, creating hard rock and power ballad classics.",
+      "track_signature_regex": "(?i)\\bHeart\\b|Bebe Le Strange|Magic Man|Even It Up|Dogs & Butterfly|Crazy On You|Barracuda|Alone|These Dreams|Dreamboat Annie|Straight On",
+      "known_albums": [
+        "Dreamboat Annie",
+        "Little Queen",
+        "Dog & Butterfly",
+        "Heart (1985)",
+        "Bad Animals"
+      ]
+    },
+    {
+      "id": "bjork",
+      "name": "Björk",
+      "sort_name": "Björk",
+      "aliases": [
+        "Björk",
+        "Bjork",
+        "Björk Guðmundsdóttir",
+        "The Sugarcubes"
+      ],
+      "genres": [
+        "Art Pop",
+        "Electronic",
+        "Experimental",
+        "Trip Hop",
+        "Avant-Garde"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/2/22/Bj%C3%B6rk_2007.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Bj%C3%B6rk_2007.jpg/400px-Bj%C3%B6rk_2007.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/2/22/Bj%C3%B6rk_2007.jpg",
+      "bio_summary": "Icelandic singer, songwriter, and producer renowned for her groundbreaking, genre-defying electronic arrangements and singular vocal range.",
+      "track_signature_regex": "(?i)Bj[öo]rk|Earth Intruders|Pagan Poetry|Venus As A Boy|Army of Me|Hyperballad|Jóga|Human Behaviour|Hidden Place|Bachelorette|Declare Independence|Wanderlust|Volta|Debut|Post|Homogenic|Vespertine",
+      "known_albums": [
+        "Debut",
+        "Post",
+        "Homogenic",
+        "Vespertine",
+        "Medúlla",
+        "Volta"
+      ]
+    },
+    {
+      "id": "air",
+      "name": "Air",
+      "sort_name": "Air",
+      "aliases": [
+        "Air",
+        "Nicolas Godin",
+        "Jean-Benoît Dunckel"
+      ],
+      "genres": [
+        "Downtempo",
+        "Electronic",
+        "Space Pop",
+        "Ambient Pop",
+        "French Touch"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Air_%28French_band%29.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Air_%28French_band%29.jpg/400px-Air_%28French_band%29.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Air_%28French_band%29.jpg",
+      "bio_summary": "French music duo from Versailles consisting of Nicolas Godin and Jean-Benoît Dunckel, acclaimed for their lush, vintage analog synthesizer landscapes.",
+      "track_signature_regex": "(?i)\\bAir\\b|Radio #1|Alpha Beta Gaga|Cherry Blossom Girl|Sexy Boy|Kelly Watch the Stars|All I Need|Playground Love|La Femme d['’]Argent|Talkie Walkie|Moon Safari|10 000 Hz Legend",
+      "known_albums": [
+        "Moon Safari",
+        "Talkie Walkie",
+        "The Virgin Suicides",
+        "10 000 Hz Legend",
+        "Pocket Symphony"
+      ]
+    },
+    {
+      "id": "david-gilmour",
+      "name": "David Gilmour",
+      "sort_name": "Gilmour, David",
+      "aliases": [
+        "David Gilmour",
+        "Pink Floyd"
+      ],
+      "genres": [
+        "Progressive Rock",
+        "Art Rock",
+        "Psychedelic Rock",
+        "Blues Rock"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/8/87/David_Gilmour_1984.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/David_Gilmour_1984.jpg/400px-David_Gilmour_1984.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/8/87/David_Gilmour_1984.jpg",
+      "bio_summary": "Legendary English guitarist and singer of Pink Floyd, famed for his expressive, lyrical solos and atmospheric solo compositions.",
+      "track_signature_regex": "(?i)David Gilmour|Castellorizon|Wearing The Inside Out|On An Island|Comfortably Numb|Wish You Were Here|Shine On You Crazy Diamond|Another Brick In The Wall|Echoes|High Hopes|Rattle That Lock",
+      "known_albums": [
+        "On an Island",
+        "David Gilmour",
+        "About Face",
+        "Rattle That Lock",
+        "The Division Bell"
+      ]
+    },
+    {
+      "id": "robert-plant",
+      "name": "Robert Plant",
+      "sort_name": "Plant, Robert",
+      "aliases": [
+        "Robert Plant",
+        "Led Zeppelin",
+        "Band of Joy",
+        "The Sensational Space Shifters"
+      ],
+      "genres": [
+        "Hard Rock",
+        "Blues Rock",
+        "Folk Rock",
+        "World Fusion"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Robert_Plant_1975.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Robert_Plant_1975.jpg/400px-Robert_Plant_1975.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Robert_Plant_1975.jpg",
+      "bio_summary": "Legendary English singer and songwriter, best known as the lead vocalist of Led Zeppelin, with a diverse, acclaimed solo career.",
+      "track_signature_regex": "(?i)Robert Plant|Shine It All Around|Freedom Fries|Tin Pan Valley|Led Zeppelin|Stairway to Heaven|Whole Lotta Love|Kashmir|Black Dog|Rock and Roll|Immigrant Song|Mighty ReArranger|Raising Sand",
+      "known_albums": [
+        "Mighty ReArranger",
+        "Raising Sand",
+        "Band of Joy",
+        "Lullaby and... The Ceaseless Roar",
+        "Physical Graffiti"
+      ]
+    },
+    {
+      "id": "john-mclaughlin",
+      "name": "John McLaughlin",
+      "sort_name": "McLaughlin, John",
+      "aliases": [
+        "John McLaughlin",
+        "Remember Shakti",
+        "Shakti",
+        "Mahavishnu Orchestra"
+      ],
+      "genres": [
+        "Jazz Fusion",
+        "World Fusion",
+        "Indian Classical",
+        "Progressive Jazz"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/3/30/John_McLaughlin_1980.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/John_McLaughlin_1980.jpg/400px-John_McLaughlin_1980.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/3/30/John_McLaughlin_1980.jpg",
+      "bio_summary": "Pioneering English jazz fusion guitarist and bandleader, known for his work with Miles Davis, the Mahavishnu Orchestra, and Shakti.",
+      "track_signature_regex": "(?i)John McLaughlin|Remember Shakti|Mahavishnu Orchestra|Zakir Hussain|Luki|Niyati|Shringar|Giriraj Sudha|Lotus Feet|Chandrakauns|Mukti",
+      "known_albums": [
+        "Birds of Fire",
+        "The Inner Mounting Flame",
+        "Remember Shakti",
+        "Shakti with John McLaughlin",
+        "My Goal's Beyond"
+      ]
+    },
+    {
+      "id": "george-harrison",
+      "name": "George Harrison",
+      "sort_name": "Harrison, George",
+      "aliases": [
+        "George Harrison",
+        "The Beatles",
+        "Traveling Wilburys"
+      ],
+      "genres": [
+        "Rock",
+        "Pop Rock",
+        "Indian Classical Fusion",
+        "Psychedelic Pop"
+      ],
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/4/42/George_Harrison_1974.jpg",
+      "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/George_Harrison_1974.jpg/400px-George_Harrison_1974.jpg",
+      "banner_url": "https://upload.wikimedia.org/wikipedia/commons/4/42/George_Harrison_1974.jpg",
+      "bio_summary": "English musician, singer-songwriter, and lead guitarist of the Beatles, renowned for introducing Indian instrumentation to Western pop music.",
+      "track_signature_regex": "(?i)George Harrison|Hari['’]s On Tour|Something 1644|While My Guitar Gently Weeps 1644|Sue Me Sue You Blues 1644|Zoom Zoom Zoom 1644|Dark Horse|All Things Must Pass|My Sweet Lord|Give Me Love|Got My Mind Set On You",
+      "known_albums": [
+        "All Things Must Pass",
+        "Living in the Material World",
+        "Dark Horse",
+        "Cloud Nine",
+        "Brainwashed"
+      ]
+    },
+    {
+      "id": "tedeschi-trucks-band",
+      "name": "Tedeschi Trucks Band",
+      "sort_name": "Tedeschi Trucks Band",
+      "aliases": [
+        "Tedeschi Trucks Band",
+        "Susan Tedeschi",
+        "Derek Trucks",
+        "Derek Trucks Band"
+      ],
+      "genres": [
+        "Blues Rock",
+        "Soul",
+        "Southern Rock",
+        "Jam Band"
+      ],
+      "image_url": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop",
+      "thumbnail_url": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=400&auto=format&fit=crop",
+      "banner_url": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1600&auto=format&fit=crop",
+      "bio_summary": "Grammy-winning American blues and rock powerhouse led by husband-and-wife team Derek Trucks and Susan Tedeschi.",
+      "track_signature_regex": "(?i)Tedeschi Trucks Band|Susan Tedeschi|Derek Trucks|Midnight in Harlem|Bound for Glory|Made Up Mind",
+      "known_albums": [
+        "Revelator",
+        "Made Up Mind",
+        "Let Me Get By",
+        "Signs",
+        "I Am the Moon"
+      ]
+    },
+    {
+      "id": "keller-williams",
+      "name": "Keller Williams",
+      "sort_name": "Williams, Keller",
+      "aliases": [
+        "Keller Williams",
+        "The Keller Williams Incident",
+        "Keller & The Keels"
+      ],
+      "genres": [
+        "Jam Band",
+        "Acoustic",
+        "Bluegrass",
+        "Funk",
+        "Reggae"
+      ],
+      "image_url": "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=800&auto=format&fit=crop",
+      "thumbnail_url": "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=400&auto=format&fit=crop",
+      "banner_url": "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=1600&auto=format&fit=crop",
+      "bio_summary": "One-man jam band innovator acclaimed for acoustic live looping and multi-genre improvisational wizardry.",
+      "track_signature_regex": "(?i)Keller Williams|The Keller Williams Incident|Freaker by the Speaker|Breathe|Dream",
+      "known_albums": [
+        "Breathe",
+        "Loop",
+        "Laugh",
+        "Sight",
+        "Grass"
+      ]
+    }
+  ]
+}

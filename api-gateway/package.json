@@ -1,0 +1,21 @@
+{
+  "name": "mediastack-api-gateway",
+  "version": "1.0.0",
+  "description": "API Gateway and MCP Server for MediaStack",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.1",
+    "express": "^4.19.2",
+    "http-proxy-middleware": "^3.0.0",
+    "cors": "^2.8.5",
+    "axios": "^1.6.8",
+    "dockerode": "^3.3.5",
+    "archiver": "^7.0.1",
+    "compression": "^1.7.4",
+    "sqlite3": "^5.1.7"
+  }
+}
+

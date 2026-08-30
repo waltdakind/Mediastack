@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "Caddyfile": "caddyfile",
+        "Caddyfile*": "caddyfile",
+        "*Caddyfile*": "caddyfile"
+    },
+    "powershell.scriptAnalysis.enable": true
+}

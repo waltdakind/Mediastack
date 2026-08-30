@@ -1,0 +1,31 @@
+{
+  "enableRss": true,
+  "enableAutomaticSearch": true,
+  "enableInteractiveSearch": true,
+  "supportsRss": true,
+  "supportsSearch": true,
+  "protocol": "torrent",
+  "priority": 25,
+  "name": "Jackett-1337x",
+  "fields": [
+    {
+      "name": "baseUrl",
+      "value": "http://jackett:9117/api/v2.0/indexers/1337x/results/torznab/"
+    },
+    {
+      "name": "apiPath",
+      "value": "/api"
+    },
+    {
+      "name": "apiKey",
+      "value": "<REDACTED_API_KEY>"
+    },
+    {
+      "name": "categories",
+      "value": [5030, 5040]
+    }
+  ],
+  "implementationName": "Torznab",
+  "implementation": "Torznab",
+  "configContract": "TorznabSettings"
+}

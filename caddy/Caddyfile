@@ -1,0 +1,13 @@
+{
+    default_sni 192.168.4.30
+}
+
+mediaserverlaptop.local, localhost, 192.168.4.30 {
+    tls /certs/cert.pem /certs/key.pem
+
+    reverse_proxy jellyfin:8096 {
+        lb_policy first
+        health_uri /health
+        health_interval 10s
+    }
+}

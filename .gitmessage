@@ -1,0 +1,22 @@
+# <type>(<scope>): <subject>
+#
+# ----------------------------------------------------------------------
+# Format: <type>(<scope>): <short description>
+#
+# Types:
+#   feat     (new feature for the user or stack)
+#   fix      (bug fix for a service, route, or script)
+#   docs     (documentation changes only)
+#   style    (formatting, missing semi colons, etc; no code change)
+#   refactor (refactoring production code)
+#   perf     (performance optimization)
+#   ops      (operational scripts, docker-compose, caddy, autoheal)
+#   test     (adding or refactoring tests)
+#   chore    (updating dependencies, git config, housekeeping)
+#
+# Scope:
+#   (caddy, jellyfin, musicbrainz, autoheal, picard, ops, db, dashboard, network)
+#
+# Example:
+#   feat(musicbrainz): implement live replication stream and local picard mirror
+# ----------------------------------------------------------------------

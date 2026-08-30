@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaStack Player</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Dynamic custom styles will be injected here -->
+    <style id="custom-enforced-styles"></style>
+</head>
+<body>
+    <!-- Background overlay -->
+    <div id="bg-overlay" class="bg-overlay"></div>
+
+    <!-- Login Screen -->
+    <div id="login-container" class="auth-container">
+        <!-- Floating theme toggle for login only -->
+        <button id="login-theme-toggle" class="btn icon-btn round-toggle-btn" title="Toggle Theme">
+            <i class="ph ph-moon"></i>
+        </button>
+        <div class="glass-panel login-card">
+            <div class="profile-area">
+                <img id="profile-avatar" class="avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231f2538'/><circle cx='50' cy='40' r='20' fill='%236c5ce7'/><path d='M25 80c0-15 10-20 25-20s25 5 25 20' fill='%236c5ce7'/></svg>" alt="Profile Avatar">
+            </div>
+            <h2 id="login-title">MediaStack Player</h2>
+            <p id="opening-msg" class="opening-message">Loading opening message...</p>
+            
+            <form id="login-form">
+                <div class="input-group">
+                    <i class="ph ph-user"></i>
+                    <input type="text" id="username" placeholder="Username" required autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <i class="ph ph-key"></i>
+                    <input type="password" id="password" placeholder="Password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn primary-btn"><i class="ph ph-sign-in"></i> Access Player</button>
+            </form>
+            <div id="login-error" class="error-msg"></div>
+        </div>
+    </div>
+
+    <!-- Main Player Client Application -->
+    <div id="app-container" class="app-container hidden">
+        <header class="app-header">
+            <div class="header-logo">
+                <i class="ph ph-film-slate header-icon"></i>
+                <div>
+                    <h2>MediaStack</h2>
+                    <span class="badge">Player Mode Only</span>
+                </div>
+            </div>
+            <div class="user-control">
+                <button id="app-theme-toggle" class="btn icon-btn round-toggle-btn" title="Toggle Theme"><i class="ph ph-moon"></i></button>
+                <span id="user-display"><i class="ph ph-user-circle"></i> Guest</span>
+                <button id="logout-btn" class="btn icon-btn" title="Log Out"><i class="ph ph-sign-out"></i></button>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <!-- Navigation Tabs -->
+            <section class="nav-tabs">
+                <button class="tab-btn active" data-type="Movie"><i class="ph ph-film-strip"></i> Movies</button>
+                <button class="tab-btn" data-type="Series"><i class="ph ph-television"></i> TV Shows</button>
+            </section>
+
+            <!-- Media Grid -->
+            <section class="grid-container">
+                <div id="media-grid" class="media-grid">
+                    <!-- Cards will be populated here -->
+                </div>
+                <div id="loading-spinner" class="spinner hidden">
+                    <div class="double-bounce1"></div>
+                    <div class="double-bounce2"></div>
+                </div>
+                <div id="empty-state" class="empty-state hidden">
+                    <i class="ph ph-film-strip empty-icon"></i>
+                    <p>No media files found in this category.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Custom Fullscreen Video Player Modal -->
+    <div id="player-modal" class="player-modal hidden">
+        <button id="close-player-btn" class="close-player-btn" title="Close Player" aria-label="Close Player"><i class="ph ph-x"></i></button>
+        <div class="player-wrapper">
+            <video id="video-element" controls></video>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
