@@ -2,7 +2,11 @@
     "files.associations": {
         "Caddyfile": "caddyfile",
         "Caddyfile*": "caddyfile",
-        "*Caddyfile*": "caddyfile"
+        "*Caddyfile*": "caddyfile",
+        "*.R": "r",
+        "*.r": "r",
+        ".Rprofile": "r",
+        ".Renviron": "r"
     },
     "powershell.scriptAnalysis.enable": true
 }

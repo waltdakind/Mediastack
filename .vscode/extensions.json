@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "REditorSupport.r-syntax",
+        "REditorSupport.r",
+        "ms-vscode.powershell"
+    ]
+}

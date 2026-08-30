@@ -1,0 +1,3 @@
+[submodule "vendor/vscode-R-syntax"]
+	path = vendor/vscode-R-syntax
+	url = https://github.com/REditorSupport/vscode-R-syntax.git
