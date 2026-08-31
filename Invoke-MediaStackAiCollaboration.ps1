@@ -43,12 +43,14 @@
 param(
     [Parameter(Mandatory = $false)][switch]$AutoRepair,
     [Parameter(Mandatory = $false)][bool]$SyncKnowledge = $true,
+    [Parameter(Mandatory = $false)][switch]$Continuous,
+    [Parameter(Mandatory = $false)][int]$IntervalSeconds = 15,
     [Parameter(Mandatory = $false)][bool]$Interactive = $true,
     [Parameter(Mandatory = $false)][switch]$NonInteractive,
     [Parameter(Mandatory = $false)][switch]$DryRun
 )
 
-if ($NonInteractive) { $Interactive = $false }
+if ($NonInteractive -or $Continuous) { $Interactive = $false }
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 [System.Console]::InputEncoding = [System.Text.Encoding]::UTF8
@@ -484,7 +486,23 @@ $nexusObj | ConvertTo-Json -Depth 5 | Set-Content -Path $nexusJsonPath -Encoding
 Write-Host ("`n[COLLABORATION SESSION COMPLETE] Markdown Report -> {0}" -f $reportPath) -ForegroundColor Green
 Write-Host ("  Persistent AI Knowledge Nexus updated -> {0}" -f $nexusJsonPath) -ForegroundColor DarkCyan
 
-if ($Interactive) {
+if ($Continuous) {
+    Write-Host "`n[CONTINUOUS SENTINEL ACTIVE] Polling for VoltaireUn updates every ${IntervalSeconds}s (Press Ctrl+C to stop)..." -ForegroundColor Cyan
+    $lastReportTime = [DateTime]::UtcNow
+    while ($true) {
+        Start-Sleep -Seconds $IntervalSeconds
+        $newReports = Get-ChildItem -Path $HandoffsDir -Filter "VoltaireUn_*.md" -ErrorAction SilentlyContinue |
+            Where-Object { $_.LastWriteTimeUtc -gt $lastReportTime } |
+            Sort-Object LastWriteTimeUtc -Descending |
+            Select-Object -First 1
+        
+        if ($newReports) {
+            Write-Host "`n[NEW TELEMETRY DETECTED] Found fresh report from VoltaireUn: $($newReports.Name)" -ForegroundColor Magenta
+            $lastReportTime = $newReports.LastWriteTimeUtc
+            & $PSCommandPath -AutoRepair:$AutoRepair -NonInteractive -DryRun:$DryRun
+        }
+    }
+} elseif ($Interactive) {
     Write-Host "`nPress any key to return..." -ForegroundColor DarkGray
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }

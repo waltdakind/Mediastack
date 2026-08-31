@@ -52,6 +52,8 @@ services:
       - "443:443/udp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./certs:/etc/caddy/certs:ro
+      - ./dashboard:/var/www/dashboard:ro
       - caddy_data:/data
       - caddy_config:/config
       - ${MEDIASTACK_ROOT:-C:/Users/Public/Mediastack}:/mediastack

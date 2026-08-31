@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,7 +7,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+        <!-- LCP Optimization: Preload Critical Stylesheet with High Fetch Priority -->
+    <link rel="preload" href="styles.css" as="style" fetchpriority="high">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -811,3 +813,4 @@
     </script>
 </body>
 </html>
+

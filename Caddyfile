@@ -1,8 +1,9 @@
-# =============================================================================
+﻿# =============================================================================
 # Caddyfile - MediaStack Master Reverse Proxy
 # Supports Multi-Server Load Balancing, Failover, LAN (*.voltaireun.local / *.voltairedeux.local) & DDNS (waltdakind.xubi.org)
 # Full End-to-End TLS / HTTPS (:443) with Custom Root CA & Wildcard SANs
 # Default Policy: Direct ALL root incoming traffic to JELLYFIN Media Streaming
+# Internal Security Policy: All HTTP (:80) traffic redirected to HTTPS (:443)
 # =============================================================================
 
 # --- Global Options ---
@@ -26,10 +27,21 @@
     tls /etc/caddy/certs/cert.pem /etc/caddy/certs/key.pem
 }
 
-# --- Multi-Server Jellyfin Cluster with Auto-Failover & Read-Only Listener Autologin ---
+# --- Multi-Server Jellyfin Cluster with Auto-Failover & Edge Caching Acceleration ---
 (jellyfin_cluster) {
     import security_headers
-    encode gzip zstd
+    encode zstd gzip
+
+    # Accelerated Web & Image Cache for Fast External Load Times
+    @staticAssets {
+        path *.ico *.css *.js *.gif *.jpg *.jpeg *.png *.svg *.woff *.woff2 *.webp
+    }
+    header @staticAssets Cache-Control "public, max-age=2592000, stale-while-revalidate=86400"
+
+    @mediaPosters {
+        path /Items/*/Images/* /Artists/*/Images/* /Albums/*/Images/* /web/assets/img/*
+    }
+    header @mediaPosters Cache-Control "public, max-age=604800, stale-while-revalidate=86400"
 
     # Read-Only Guest Autologin Routes
     handle /autologin* {
@@ -50,8 +62,43 @@
         file_server
     }
 
-    # Mission Control Dashboard Route
+    # Mission Control & Real-Time Switch Radar Routes
     handle /dashboard* {
+        root * /var/www/dashboard
+        file_server
+    }
+
+    handle /radar* {
+        root * /var/www/dashboard
+        file_server
+    }
+
+    handle /status* {
+        root * /var/www/dashboard
+        file_server
+    }
+
+    handle /portal* {
+        root * /var/www/dashboard
+        file_server
+    }
+
+    handle /hub* {
+        root * /var/www/dashboard
+        file_server
+    }
+
+    handle /apps* {
+        root * /var/www/dashboard
+        file_server
+    }
+
+    handle /noc* {
+        root * /var/www/dashboard
+        file_server
+    }
+
+    handle /index.html {
         root * /var/www/dashboard
         file_server
     }
@@ -64,179 +111,69 @@
     # Upstream Media Server Reverse Proxy (Default Root Destination)
     handle {
         reverse_proxy jellyfin:8096 192.168.4.30:8096 {
-            # Priority: Primary container first, fails over to VoltaireDeux
             lb_policy first
             lb_retries 2
             lb_try_duration 4s
-
-            # Passive health checking (quarantines failed backend for 15s)
             fail_duration 15s
             max_fails 2
-
-            # Unbuffered real-time media streaming for Jellyfin Media Player / MPV / Web
             flush_interval -1
-
-            # WebSocket & Live Streaming headers
             header_up Connection {>Connection}
             header_up Upgrade {>Upgrade}
+            transport http {
+                keepalive 300s
+                keepalive_idle_conns 64
+                compression off
+            }
         }
     }
 
-    # Error handling: If all Jellyfin servers are down, serve modern status page
     handle_errors {
-        @down `{err.status_code} in [502, 503, 504]`
-        respond @down `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediaStack - All Jellyfin Servers Offline</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        body { background: #0b0e14; color: #e2e8f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-        .card { background: rgba(22, 27, 34, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 40px; max-width: 580px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
-        .icon { font-size: 54px; margin-bottom: 20px; display: inline-block; }
-        h1 { font-size: 26px; font-weight: 700; margin-bottom: 12px; color: #f8fafc; }
-        p { color: #94a3b8; font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
-        .server-status { background: #131922; border-radius: 10px; padding: 16px; margin-bottom: 24px; text-align: left; font-size: 13px; font-family: monospace; border: 1px solid #1e293b; }
-        .server-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .server-item:last-child { margin-bottom: 0; }
-        .badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
-        .badge-fail { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-        .btn { display: inline-block; background: #0284c7; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; transition: 0.2s; cursor: pointer; border: none; }
-        .btn:hover { background: #0369a1; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <div class="icon">📡</div>
-        <h1>Media Servers Offline</h1>
-        <p>No active Jellyfin server could be reached on the network. Caddy attempted routing to both the primary and fallback servers, but all upstreams are currently offline or initializing.</p>
-        <div class="server-status">
-            <div class="server-item">
-                <span>Primary (VoltaireUn - 192.168.4.21:8096):</span>
-                <span class="badge badge-fail">Unreachable</span>
-            </div>
-            <div class="server-item">
-                <span>Fallback (VoltaireDeux - 192.168.4.30:8096):</span>
-                <span class="badge badge-fail">Unreachable</span>
-            </div>
-        </div>
-        <button class="btn" onclick="window.location.reload()">Retry Connection</button>
-    </div>
-</body>
-</html>` 503
+        respond "MediaStack: Upstream media server offline or initializing. Please retry in a few moments." 503
     }
 }
 
-# --- Direct Port Listeners ---
+# --- Direct Streaming Port Listener ---
 :8096 {
     import jellyfin_cluster
 }
 
-# --- External DDNS Domain (waltdakind.xubi.org) ---
-http://waltdakind.xubi.org, http://jellyfin.waltdakind.xubi.org {
+# =============================================================================
+# 1. HTTP (:80) TO HTTPS (:443) GLOBAL ENFORCEMENT & REDIRECTS
+# =============================================================================
+
+# External DDNS & Jellyfin HTTP Redirection
+http://waltdakind.xubi.org, http://jellyfin.waltdakind.xubi.org, http://jellyseerr.waltdakind.xubi.org, http://sonarr.waltdakind.xubi.org, http://radarr.waltdakind.xubi.org, http://prowlarr.waltdakind.xubi.org, http://bazarr.waltdakind.xubi.org, http://musicbrainz.waltdakind.xubi.org {
     import security_headers
     encode gzip zstd
     redir https://{host}{uri} permanent
 }
 
-https://waltdakind.xubi.org, https://jellyfin.waltdakind.xubi.org {
-    import custom_tls
-    import jellyfin_cluster
-}
-
-http://jellyseerr.waltdakind.xubi.org {
-    import security_headers
-    encode gzip zstd
-    reverse_proxy jellyseerr:5055 192.168.4.21:5055 {
-        lb_policy first
-        fail_duration 10s
-    }
-}
-
-https://jellyseerr.waltdakind.xubi.org {
-    import security_headers
-    import custom_tls
-    encode gzip zstd
-    reverse_proxy jellyseerr:5055 192.168.4.21:5055 {
-        lb_policy first
-        fail_duration 10s
-    }
-}
-
-http://sonarr.waltdakind.xubi.org {
-    import security_headers
-    reverse_proxy sonarr:8989 192.168.4.21:8989 {
-        lb_policy first
-        fail_duration 10s
-    }
-}
-
-https://sonarr.waltdakind.xubi.org {
-    import security_headers
-    import custom_tls
-    reverse_proxy sonarr:8989 192.168.4.21:8989 {
-        lb_policy first
-        fail_duration 10s
-    }
-}
-
-http://radarr.waltdakind.xubi.org {
-    import security_headers
-    reverse_proxy radarr:7878 192.168.4.21:7878 {
-        lb_policy first
-        fail_duration 10s
-    }
-}
-
-https://radarr.waltdakind.xubi.org {
-    import security_headers
-    import custom_tls
-    reverse_proxy radarr:7878 192.168.4.21:7878 {
-        lb_policy first
-        fail_duration 10s
-    }
-}
-
-http://musicbrainz.waltdakind.xubi.org {
-    import security_headers
-    encode gzip zstd
-    reverse_proxy 192.168.4.21:5000 127.0.0.1:5001 {
-        lb_policy first
-        fail_duration 10s
-    }
-}
-
-https://musicbrainz.waltdakind.xubi.org {
-    import security_headers
-    import custom_tls
-    encode gzip zstd
-    reverse_proxy 192.168.4.21:5000 127.0.0.1:5001 {
-        lb_policy first
-        fail_duration 10s
-    }
-}
-
-# --- Local LAN Root Ingress (Directed to JELLYFIN) ---
+# Internal LAN Root & IP HTTP Redirection
 http://ordinateur.local, http://voltaireun.local, http://voltairedeux.local, http://mediaserver.local, http://192.168.4.30, http://192.168.4.21, http://localhost {
-    import jellyfin_cluster
+    import security_headers
+    encode gzip zstd
+    redir https://{host}{uri} permanent
 }
 
-https://ordinateur.local, https://voltaireun.local, https://voltairedeux.local, https://mediaserver.local, https://192.168.4.30, https://192.168.4.21, https://localhost {
+# Internal Subdomains HTTP Redirection
+http://jellyfin.ordinateur.local, http://jellyfin.voltaireun.local, http://jellyfin.voltairedeux.local, http://jellyfin.mediaserver.local, http://dashboard.ordinateur.local, http://dashboard.voltaireun.local, http://dashboard.voltairedeux.local, http://noc.voltaireun.local, http://radarr.ordinateur.local, http://radarr.voltaireun.local, http://radarr.voltairedeux.local, http://sonarr.ordinateur.local, http://sonarr.voltaireun.local, http://sonarr.voltairedeux.local, http://jellyseerr.ordinateur.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltairedeux.local, http://prowlarr.ordinateur.local, http://prowlarr.voltaireun.local, http://prowlarr.voltairedeux.local, http://bazarr.ordinateur.local, http://bazarr.voltaireun.local, http://bazarr.voltairedeux.local, http://transmission.ordinateur.local, http://transmission.voltaireun.local, http://transmission.voltairedeux.local, http://tvheadend.ordinateur.local, http://tvheadend.voltaireun.local, http://tvheadend.voltairedeux.local, http://hdhomerun.ordinateur.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltairedeux.local, http://musicbrainz.ordinateur.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltairedeux.local, http://db.ordinateur.local, http://db.voltaireun.local, http://db.voltairedeux.local {
+    import security_headers
+    encode gzip zstd
+    redir https://{host}{uri} permanent
+}
+
+# =============================================================================
+# 2. SECURE HTTPS (:443) INGRESS ENDPOINTS
+# =============================================================================
+
+# --- A. Root Ingress (Directed to JELLYFIN) ---
+https://waltdakind.xubi.org, https://jellyfin.waltdakind.xubi.org, https://ordinateur.local, https://voltaireun.local, https://voltairedeux.local, https://mediaserver.local, https://192.168.4.30, https://192.168.4.21, https://localhost {
     import custom_tls
     import jellyfin_cluster
 }
 
 # --- Dedicated NOC / Ops Dashboard Subdomains ---
-http://dashboard.ordinateur.local, http://dashboard.voltaireun.local, http://dashboard.voltairedeux.local, http://noc.voltaireun.local {
-    import security_headers
-    encode gzip zstd
-    root * /var/www/dashboard
-    file_server
-}
-
-https://dashboard.ordinateur.local, https://dashboard.voltaireun.local, https://dashboard.voltairedeux.local, https://noc.voltaireun.local {
+https://dashboard.ordinateur.local, https://dashboard.voltaireun.local, https://dashboard.voltairedeux.local, https://noc.voltaireun.local, https://portal.voltaireun.local, https://hub.voltaireun.local {
     import security_headers
     import custom_tls
     encode gzip zstd
@@ -244,65 +181,29 @@ https://dashboard.ordinateur.local, https://dashboard.voltaireun.local, https://
     file_server
 }
 
-# --- Service Specific Subdomains (HTTP & HTTPS with Custom TLS) ---
-
-# 1. Jellyfin Media Streaming Subdomains
-http://jellyfin.ordinateur.local, http://jellyfin.voltaireun.local, http://jellyfin.voltairedeux.local, http://jellyfin.mediaserver.local {
-    import jellyfin_cluster
-}
-
-https://jellyfin.ordinateur.local, https://jellyfin.voltaireun.local, https://jellyfin.voltairedeux.local, https://jellyfin.mediaserver.local {
-    import custom_tls
-    import jellyfin_cluster
-}
-
-# 2. Radarr Movie Management
-http://radarr.ordinateur.local, http://radarr.voltaireun.local, http://radarr.voltairedeux.local {
-    import security_headers
-    reverse_proxy radarr:7878 192.168.4.21:7878 {
-        lb_policy first
-        fail_duration 10s
-    }
-}
-
-https://radarr.ordinateur.local, https://radarr.voltaireun.local, https://radarr.voltairedeux.local {
+# --- Homepage Dashboard ---
+https://homepage.waltdakind.xubi.org, https://home.ordinateur.local, https://home.voltaireun.local, https://home.voltairedeux.local, https://homepage.voltaireun.local {
     import security_headers
     import custom_tls
-    reverse_proxy radarr:7878 192.168.4.21:7878 {
-        lb_policy first
-        fail_duration 10s
-    }
-}
-
-# 3. Sonarr TV Series Management
-http://sonarr.ordinateur.local, http://sonarr.voltaireun.local, http://sonarr.voltairedeux.local {
-    import security_headers
-    reverse_proxy sonarr:8989 192.168.4.21:8989 {
-        lb_policy first
-        fail_duration 10s
-    }
-}
-
-https://sonarr.ordinateur.local, https://sonarr.voltaireun.local, https://sonarr.voltairedeux.local {
-    import security_headers
-    import custom_tls
-    reverse_proxy sonarr:8989 192.168.4.21:8989 {
-        lb_policy first
-        fail_duration 10s
-    }
-}
-
-# 4. Jellyseerr Media Requests
-http://jellyseerr.ordinateur.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltairedeux.local {
-    import security_headers
     encode gzip zstd
-    reverse_proxy jellyseerr:5055 192.168.4.21:5055 {
+    reverse_proxy homepage:3000 192.168.4.21:3000 {
         lb_policy first
         fail_duration 10s
     }
 }
 
-https://jellyseerr.ordinateur.local, https://jellyseerr.voltaireun.local, https://jellyseerr.voltairedeux.local {
+# --- Diun Docker Image Update Notifier ---
+https://diun.ordinateur.local, https://diun.voltaireun.local, https://diun.voltairedeux.local {
+    import security_headers
+    import custom_tls
+    reverse_proxy diun:9090 192.168.4.21:9090 {
+        lb_policy first
+        fail_duration 10s
+    }
+}
+
+# --- D. Jellyseerr Media Requests ---
+https://jellyseerr.waltdakind.xubi.org, https://jellyseerr.ordinateur.local, https://jellyseerr.voltaireun.local, https://jellyseerr.voltairedeux.local {
     import security_headers
     import custom_tls
     encode gzip zstd
@@ -312,16 +213,28 @@ https://jellyseerr.ordinateur.local, https://jellyseerr.voltaireun.local, https:
     }
 }
 
-# 5. Prowlarr Indexer Synchronization
-http://prowlarr.ordinateur.local, http://prowlarr.voltaireun.local, http://prowlarr.voltairedeux.local {
+# --- E. Sonarr TV Series Management ---
+https://sonarr.waltdakind.xubi.org, https://sonarr.ordinateur.local, https://sonarr.voltaireun.local, https://sonarr.voltairedeux.local {
     import security_headers
-    reverse_proxy prowlarr:9696 192.168.4.21:9696 {
+    import custom_tls
+    reverse_proxy sonarr:8989 192.168.4.21:8989 {
         lb_policy first
         fail_duration 10s
     }
 }
 
-https://prowlarr.ordinateur.local, https://prowlarr.voltaireun.local, https://prowlarr.voltairedeux.local {
+# --- F. Radarr Movie Management ---
+https://radarr.waltdakind.xubi.org, https://radarr.ordinateur.local, https://radarr.voltaireun.local, https://radarr.voltairedeux.local {
+    import security_headers
+    import custom_tls
+    reverse_proxy radarr:7878 192.168.4.21:7878 {
+        lb_policy first
+        fail_duration 10s
+    }
+}
+
+# --- G. Prowlarr Indexer Synchronization ---
+https://prowlarr.waltdakind.xubi.org, https://prowlarr.ordinateur.local, https://prowlarr.voltaireun.local, https://prowlarr.voltairedeux.local {
     import security_headers
     import custom_tls
     reverse_proxy prowlarr:9696 192.168.4.21:9696 {
@@ -330,16 +243,8 @@ https://prowlarr.ordinateur.local, https://prowlarr.voltaireun.local, https://pr
     }
 }
 
-# 6. Bazarr Subtitles Automation
-http://bazarr.ordinateur.local, http://bazarr.voltaireun.local, http://bazarr.voltairedeux.local {
-    import security_headers
-    reverse_proxy bazarr:6767 192.168.4.21:6767 {
-        lb_policy first
-        fail_duration 10s
-    }
-}
-
-https://bazarr.ordinateur.local, https://bazarr.voltaireun.local, https://bazarr.voltairedeux.local {
+# --- H. Bazarr Subtitles Automation ---
+https://bazarr.waltdakind.xubi.org, https://bazarr.ordinateur.local, https://bazarr.voltaireun.local, https://bazarr.voltairedeux.local {
     import security_headers
     import custom_tls
     reverse_proxy bazarr:6767 192.168.4.21:6767 {
@@ -348,14 +253,7 @@ https://bazarr.ordinateur.local, https://bazarr.voltaireun.local, https://bazarr
     }
 }
 
-# 7. Transmission Torrent Client
-http://transmission.ordinateur.local, http://transmission.voltaireun.local, http://transmission.voltairedeux.local {
-    import security_headers
-    reverse_proxy transmission:9091 192.168.4.21:9091 {
-        header_up X-Transmission-Session-Id {http.request.header.X-Transmission-Session-Id}
-    }
-}
-
+# --- I. Transmission Torrent Client ---
 https://transmission.ordinateur.local, https://transmission.voltaireun.local, https://transmission.voltairedeux.local {
     import security_headers
     import custom_tls
@@ -364,41 +262,22 @@ https://transmission.ordinateur.local, https://transmission.voltaireun.local, ht
     }
 }
 
-# 8. Tvheadend Live TV & DVR
-http://tvheadend.ordinateur.local, http://tvheadend.voltaireun.local, http://tvheadend.voltairedeux.local {
-    import security_headers
-    reverse_proxy tvheadend:9981 192.168.4.21:9981
-}
-
+# --- J. Tvheadend Live TV & DVR ---
 https://tvheadend.ordinateur.local, https://tvheadend.voltaireun.local, https://tvheadend.voltairedeux.local {
     import security_headers
     import custom_tls
     reverse_proxy tvheadend:9981 192.168.4.21:9981
 }
 
-# 9. HDHomeRun Hardware Tuner
-http://hdhomerun.ordinateur.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltairedeux.local {
-    import security_headers
-    reverse_proxy 192.168.4.45:80
-}
-
+# --- K. HDHomeRun Hardware Tuner ---
 https://hdhomerun.ordinateur.local, https://hdhomerun.voltaireun.local, https://hdhomerun.voltairedeux.local {
     import security_headers
     import custom_tls
     reverse_proxy 192.168.4.45:80
 }
 
-# 10. MusicBrainz Mirror
-http://musicbrainz.ordinateur.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltairedeux.local {
-    import security_headers
-    encode gzip zstd
-    reverse_proxy 192.168.4.21:5000 127.0.0.1:5001 {
-        lb_policy first
-        fail_duration 10s
-    }
-}
-
-https://musicbrainz.ordinateur.local, https://musicbrainz.voltaireun.local, https://musicbrainz.voltairedeux.local {
+# --- L. MusicBrainz Mirror ---
+https://musicbrainz.waltdakind.xubi.org, https://musicbrainz.ordinateur.local, https://musicbrainz.voltaireun.local, https://musicbrainz.voltairedeux.local {
     import security_headers
     import custom_tls
     encode gzip zstd
@@ -408,12 +287,7 @@ https://musicbrainz.ordinateur.local, https://musicbrainz.voltaireun.local, http
     }
 }
 
-# 11. MediaStack Database Administration
-http://db.ordinateur.local, http://db.voltaireun.local, http://db.voltairedeux.local {
-    import security_headers
-    reverse_proxy mediastack-db:8080 192.168.4.21:8080
-}
-
+# --- M. MediaStack Database Administration ---
 https://db.ordinateur.local, https://db.voltaireun.local, https://db.voltairedeux.local {
     import security_headers
     import custom_tls

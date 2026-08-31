@@ -1,0 +1,25 @@
+﻿{
+    "ReplicationTimestamp":  "2026-08-31 16:08:05",
+    "Architecture":  "x64",
+    "TargetNodeIP":  "192.168.4.30",
+    "ExternalDomain":  "waltdakind.xubi.org",
+    "PackagedToolkits":  [
+                             "Repair-JellyfinServer.ps1",
+                             "jellyfin_fix.sh",
+                             "Optimize-MediaStackPerformance.ps1",
+                             "Optimize-LocalLcp.ps1",
+                             "Test-LocalNetworkSwitch.ps1",
+                             "Setup-MediaStackCaddyServer.ps1",
+                             "start-x64.ps1"
+                         ],
+    "OptimizationsApplied":  [
+                                 "Caddy Zstandard (zstd) + Gzip dual-stream compression",
+                                 "30-day immutable cache for static assets \u0026 web bundles",
+                                 "7-day stale-while-revalidate cache for Jellyfin media artwork posters",
+                                 "Jellyfin RAM cache expanded to 1500 MB",
+                                 "SQLite WAL mode, synchronous=NORMAL, 64MB cache, 256MB MMAP",
+                                 "Windows TCP Window Auto-Tuning (Normal) + ECN Congestion Control",
+                                 "Sub-second LCP Web Vitals (DNS preconnect, font swap, script deferral)"
+                             ],
+    "Status":  "READY_FOR_X64_EXECUTION"
+}
