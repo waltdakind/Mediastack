@@ -419,6 +419,19 @@ function Invoke-ClusterAiCollaboration {
     Pause-Console
 }
 
+function Invoke-AutonomousCollaboratorDaemon {
+    Show-Header
+    Write-Host "[13] LAUNCHING AUTONOMOUS COLLABORATOR PERPETUAL DAEMON..." -ForegroundColor Yellow
+    Write-Host ""
+    $script = Join-Path $BaseDir "Start-AutonomousMediaStackCollaborator.ps1"
+    if (Test-Path $script) {
+        & $script
+    } else {
+        Write-Host "Collaborator script not found: $script" -ForegroundColor Red
+        Pause-Console
+    }
+}
+
 # -----------------------------------------------------------------------------
 # MAIN INTERACTIVE MENU LOOP
 # -----------------------------------------------------------------------------
@@ -439,10 +452,11 @@ while ($true) {
     Write-Host "  [10] Published Port Verification & Health Matrix (8096, 8989, 7878...)" -ForegroundColor Cyan
     Write-Host "  [11] Check for Cluster Updates & Exchange Handoff Report [U]" -ForegroundColor Cyan
     Write-Host "  [12] AI Collaboration & Autonomous Self-Healing Nexus [A]" -ForegroundColor Magenta
+    Write-Host "  [13] Autonomous Collaborator: Self-Monitoring, Incident Dispatch & Auto-Repair [C]" -ForegroundColor Green
     Write-Host "  [0]  Exit Console" -ForegroundColor DarkGray
 
     Write-Host ""
-    $choice = Read-Host -Prompt "Enter selection [0-12]"
+    $choice = Read-Host -Prompt "Enter selection [0-13]"
 
     switch ($choice) {
         "1"  { Start-FullStackSafe }
@@ -463,6 +477,9 @@ while ($true) {
         "12" { Invoke-ClusterAiCollaboration }
         "a"  { Invoke-ClusterAiCollaboration }
         "A"  { Invoke-ClusterAiCollaboration }
+        "13" { Invoke-AutonomousCollaboratorDaemon }
+        "c"  { Invoke-AutonomousCollaboratorDaemon }
+        "C"  { Invoke-AutonomousCollaboratorDaemon }
         "0"  { 
             Write-Host "`nExiting MediaStack Control Console. Goodbye!`n" -ForegroundColor Green
             exit 0 

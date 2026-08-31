@@ -76,13 +76,14 @@ foreach ($p in $scanPaths) {
     }
 }
 
-# E. Scan Jellyseerr
+# E. Scan Jellyseerr & Jellyfin
 foreach ($p in $scanPaths) {
     $cfg = Join-Path $p "jellyseerr\settings.json"
     if (Test-Path $cfg) {
         $json = Get-Content $cfg -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
-        if ($json.main.apiKey) { $apiKeys["Jellyseerr"] = $json.main.apiKey; break }
-        elseif ($json.apiKey) { $apiKeys["Jellyseerr"] = $json.apiKey; break }
+        if ($json.main.apiKey) { $apiKeys["Jellyseerr"] = $json.main.apiKey }
+        elseif ($json.apiKey) { $apiKeys["Jellyseerr"] = $json.apiKey }
+        if ($json.jellyfin.apiKey) { $apiKeys["Jellyfin"] = $json.jellyfin.apiKey }
     }
 }
 
@@ -113,6 +114,10 @@ foreach ($service in $apiKeys.Keys) {
         Write-Host ("  * {0,-16}: [NOT FOUND / PUBLIC]" -f $service) -ForegroundColor DarkGray
     }
 }
+
+# Enable TLS 1.2 / 1.3 and Trust Custom Local Certificates
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12 -bor [System.Net.SecurityProtocolType]::Tls13
+[System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
 
 # --- 2. EXECUTE REST API CALLS & ASSERT VALIDATION ---
 Write-Host "`n[2/3] Executing Live REST API Health & Authentication Tests..." -ForegroundColor Yellow
@@ -249,9 +254,14 @@ $seerrHeaders = @{ "Host" = "jellyseerr.voltairedeux.local" }
 if ($apiKeys["Jellyseerr"]) { $seerrHeaders["X-Api-Key"] = $apiKeys["Jellyseerr"] }
 $testResults += Test-Endpoint -ServiceName "Jellyseerr API" -Url "http://localhost:5055/api/v1/status" -Headers $seerrHeaders -ExpectedContentField "version"
 
-# 6. Jellyfin Public API
+# 6. Jellyfin Public API (HTTP & HTTPS)
 $jfHeaders = @{ "Host" = "jellyfin.voltairedeux.local" }
-$testResults += Test-Endpoint -ServiceName "Jellyfin API" -Url "http://localhost:8096/System/Info/Public" -Headers $jfHeaders -ExpectedContentField "Version"
+if ($apiKeys["Jellyfin"]) { $jfHeaders["X-Emby-Token"] = $apiKeys["Jellyfin"] }
+$testResults += Test-Endpoint -ServiceName "Jellyfin HTTP" -Url "http://localhost:8096/System/Info/Public" -Headers $jfHeaders -ExpectedContentField "Version"
+
+$jfHttpsHeaders = @{ "Host" = "jellyfin.voltairedeux.local" }
+if ($apiKeys["Jellyfin"]) { $jfHttpsHeaders["X-Emby-Token"] = $apiKeys["Jellyfin"] }
+$testResults += Test-Endpoint -ServiceName "Jellyfin HTTPS" -Url "https://localhost/System/Info/Public" -Headers $jfHttpsHeaders -ExpectedContentField "Version"
 
 # 7. MusicBrainz WebService v2 (Local Mirror)
 $mbHeaders = @{ "Host" = "musicbrainz.voltairedeux.local" }

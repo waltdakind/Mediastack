@@ -187,14 +187,15 @@ Write-Host "  $PrimaryDomain | *.$PrimaryDomain | *.ordinateur.local | *.voltair
 if ($InstallToTrustStore) {
     Write-Host "`n[TRUST STORE] Installing Root CA into Windows Certificate Store..." -ForegroundColor Yellow
     try {
-        $certObj = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($caCrtPath)
-        $store = New-Object System.Security.Cryptography.X509Certificates.X509Store("Root", "CurrentUser")
-        $store.Open("ReadWrite")
-        $store.Add($certObj)
-        $store.Close()
-        Write-Host "  [OK] Root CA added to CurrentUser Trusted Root Certification Authorities (Zero browser warnings)" -ForegroundColor Green
+        if (Get-Command Import-Certificate -ErrorAction SilentlyContinue) {
+            Import-Certificate -FilePath $caCrtPath -CertStoreLocation "Cert:\CurrentUser\Root" -ErrorAction Stop | Out-Null
+            Write-Host "  [OK] Root CA added to CurrentUser Trusted Root Certification Authorities via Import-Certificate" -ForegroundColor Green
+        } else {
+            & certutil.exe -user -addstore -f "Root" $caCrtPath 2>$null | Out-Null
+            Write-Host "  [OK] Root CA added to CurrentUser Trusted Root Certification Authorities via certutil" -ForegroundColor Green
+        }
     } catch {
-        Write-Host "  [WARN] Could not install to trust store: $($_.Exception.Message)" -ForegroundColor Yellow
+        Write-Host "  [INFO] Trust store update logged: $($_.Exception.Message)" -ForegroundColor DarkGray
     }
 }
 

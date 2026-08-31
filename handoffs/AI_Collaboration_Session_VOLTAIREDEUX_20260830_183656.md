@@ -1,0 +1,67 @@
+﻿# MediaStack AI Collaboration & Self-Healing Session
+
+- **Session Host:** VOLTAIREDEUX (VoltaireDeux (AI Acceleration & Push Node))
+- **Host Local IP:** 192.168.4.30
+- **Collaborator Peer:** VOLTAIREUN (VoltaireUn (Main 24/7 Server Node))
+- **Peer LAN IP:** 192.168.4.21
+- **Execution Time:** 2026-08-30 18:36:56
+- **Mode:** Autonomous Self-Healing (AutoRepair)
+
+---
+
+## 1. Dual-Node Topology & Resource Roles
+
+| Node Name | Role | LAN IP | Ollama AI | Media Services | Primary Duty |
+| :--- | :--- | :--- | :---: | :---: | :--- |
+| **VOLTAIREDEUX** (Local) | VoltaireDeux (AI Acceleration & Push Node) | 192.168.4.30 | Standby | Active | AI Code Synthesis, LLM Offloading, Metadata Tagging |
+| **VOLTAIREUN** (Peer) | VoltaireUn (Main 24/7 Server Node) | 192.168.4.21 | Standby | Active | 24/7 Media Streaming, Servarr, Storage |
+
+---
+
+## 2. SQLite Database Health & Concurrency Audit
+
+| Database File | Size (KB) | WAL Active | WAL Size (KB) | Status |
+| :--- | :---: | :---: | :---: | :---: |
+| `sonarr.db` | 2836 | Yes | 1279.5 | PRISTINE |
+| `radarr.db` | 612 | Yes | 44.3 | PRISTINE |
+| `prowlarr.db` | 336 | Yes | 104.6 | PRISTINE |
+| `bazarr.db` | 316 | Yes | 120.7 | PRISTINE |
+| `db.sqlite3` | 220 | Yes | 221.3 | PRISTINE |
+| `jellyfin.db` | 36188 | Yes | 0 | PRISTINE |
+| `backup.db` | 120 | No | 0 | PRISTINE |
+
+---
+
+## 3. Discovered Anomalies & Remediation Log
+
+### File Naming & Sync Conflict Anomalies:
+- File: `logs-VoltaireDeux.db` (11016 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `radarr-VoltaireDeux.db-wal` (152.92 KB) - OneDrive Sync Conflict Lock / Duplicate
+
+### Remediations Executed:
+- [FIXED] Quarantined and removed stale conflict file `logs-VoltaireDeux.db`
+- [FIXED] Quarantined and removed stale conflict file `radarr-VoltaireDeux.db-wal`
+
+### Recent System Incidents Analyzed:
+- [AI_Collaboration_Session_VOLTAIREDEUX_20260830_183404.md] - [Proxy_Port_Diagnostic_Report_20260830_183309.md] - **Critical Failures Remaining:** 0
+- [AI_Collaboration_Session_VOLTAIREDEUX_20260830_183404.md] - [Proxy_Port_Diagnostic_Report_20260830_183309.md] | **Jellyfin Subdomain** | http://jellyfin.voltairedeux.local | 0 WARN | 559 ms | HTTP 0 via curl |
+- [AI_Collaboration_Session_VOLTAIREDEUX_20260830_183404.md] - [Api_Verification_Report_20260830_183107.md] | Sonarr API | http://localhost:8989/api/v3/system/status | FAIL | FAIL | 4059ms | Unable to connect to the remote server |
+- [Proxy_Port_Diagnostic_Report_20260830_183309.md] - **Critical Failures Remaining:** 0
+- [Proxy_Port_Diagnostic_Report_20260830_183309.md] | **Jellyfin Subdomain** | http://jellyfin.voltairedeux.local | 0 WARN | 559 ms | HTTP 0 via curl |
+- [Api_Verification_Report_20260830_183107.md] | Sonarr API | http://localhost:8989/api/v3/system/status | FAIL | FAIL | 4059ms | Unable to connect to the remote server |
+- [Api_Verification_Report_20260830_183107.md] | Radarr API | http://localhost:7878/api/v3/system/status | FAIL | FAIL | 4031ms | Unable to connect to the remote server |
+- [Api_Verification_Report_20260830_183107.md] | Prowlarr API | http://localhost:9696/api/v1/system/status | FAIL | FAIL | 4046ms | Unable to connect to the remote server |
+- [AI_Collaboration_Session_VOLTAIREDEUX_20260830_183114.md] - [Database_Optimization_Report_20260830_182928.md] | Radarr Database | FAIL: *** in database main *** Tree 45 page 647: btreeInitPage() returns error code 11 Tree 45 page 646: btreeInitPage() returns error code 11 Tree 45 page 645: btreeInitPage() returns error code 11 Tree 45 page 644: btreeInitPage() returns error code 11 Tree 45 page 643: btreeInitPage() returns error code 11 Tree 45 page 642: btreeInitPage() returns error code 11 Tree 45 page 641: btreeInitPage() returns error code 11 Tree 45 page 640: btreeInitPage() returns error code 11 Tree 45 page 639: btreeInitPage() returns error code 11 Tree 45 page 638: btreeInitPage() returns error code 11 Tree 45 page 636: btreeInitPage() returns error code 11 Tree 45 page 635: btreeInitPage() returns error code 11 Tree 45 page 634: btreeInitPage() returns error code 11 Tree 45 page 633: btreeInitPage() returns error code 11 Tree 45 page 632: btreeInitPage() returns error code 11 Tree 45 page 631: btreeInitPage() returns error code 11 Tree 45 page 630: btreeInitPage() returns error code 11 Tree 45 page 629: btreeInitPage() returns error code 11 Tree 45 page 628: btreeInitPage() returns error code 11 Tree 45 page 627: btreeInitPage() returns error code 11 Tree 45 page 626: btreeInitPage() returns error code 11 Error: stepping, database disk image is malformed (11) Tree 46 page 637: btreeInitPage() returns error code 11 | WARN | 2636 KB | 2636 KB | 0 KB | 0% |
+- [AI_Collaboration_Session_VOLTAIREDEUX_20260830_183114.md] - [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182841.md] - [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182802.md] - [Proxy_Port_Diagnostic_Report_20260830_182506.md] - **Critical Failures Remaining:** 12
+- [AI_Collaboration_Session_VOLTAIREDEUX_20260830_183114.md] - [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182841.md] - [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182802.md] - [Proxy_Port_Diagnostic_Report_20260830_182506.md] | **Caddy Gateway HTTP** | 80 | caddy | INGRESS | **YES** | FAILING | 1211 ms | Container 'caddy' is stopped / not created. |
+
+---
+
+## 4. AI-Directed Self-Healing & Peer Recommendations
+
+1. **VoltaireUn (Main Server) Database IO Optimization:** Keep PRAGMA synchronous=NORMAL; and PRAGMA wal_autocheckpoint=1000; on sonarr.db and radarr.db to prevent I/O wait during streaming peaks.
+2. **MusicBrainz Proxy Partitioning:** Use local Picard mirror on VoltaireDeux (http://127.0.0.1:5001) for batch tagging tasks to leave VoltaireUn 5000 port free for automated Servarr lookups.
+3. **Automated Handoff Exchange:** Continue running the daily update poller on VoltaireUn to ingest fixes authored on VoltaireDeux.
+
+---
+*Report generated by MediaStack AI Collaboration Nexus Engine.*

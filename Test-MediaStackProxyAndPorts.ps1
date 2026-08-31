@@ -30,7 +30,7 @@
 
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory=$false)][bool]$AutoRepair = $true,
+    [Parameter(Mandatory=$false)][switch]$AutoRepair,
     [Parameter(Mandatory=$false)][switch]$AuditOnly,
     [Parameter(Mandatory=$false)][int]$TimeoutMs = 1200,
     [Parameter(Mandatory=$false)][string]$ReportPath = ""
@@ -90,18 +90,20 @@ $ServiceMatrix = @(
     @{ Name="MusicBrainz Primary";   Port=5000;  Container="remote";       Category="METADATA";   Critical=$false; Endpoint="http://$($nodeInfo.PrimaryServerIP):5000/" }
 )
 
-# Define Subdomain Reverse Proxy Routes
+# Define Subdomain Reverse Proxy Routes (HTTP & HTTPS)
 $DomainPrefix = if ($nodeInfo.IsVoltaireDeux) { "voltairedeux.local" } else { "voltaireun.local" }
 $ProxyRoutes = @(
-    @{ Name="Dashboard Ingress";  Host="http://$DomainPrefix" },
-    @{ Name="Jellyfin Subdomain"; Host="http://jellyfin.$DomainPrefix" },
-    @{ Name="Sonarr Subdomain";   Host="http://sonarr.$DomainPrefix" },
-    @{ Name="Radarr Subdomain";   Host="http://radarr.$DomainPrefix" },
-    @{ Name="Prowlarr Subdomain"; Host="http://prowlarr.$DomainPrefix" },
-    @{ Name="Bazarr Subdomain";   Host="http://bazarr.$DomainPrefix" },
-    @{ Name="Jellyseerr Route";   Host="http://jellyseerr.$DomainPrefix" },
-    @{ Name="API Gateway Route";  Host="http://api.$DomainPrefix" },
-    @{ Name="Database GUI Route"; Host="http://db.$DomainPrefix" }
+    @{ Name="Dashboard Ingress HTTP";   Host="http://$DomainPrefix" },
+    @{ Name="Dashboard Ingress HTTPS";  Host="https://$DomainPrefix" },
+    @{ Name="Jellyfin Subdomain HTTP";  Host="http://jellyfin.$DomainPrefix" },
+    @{ Name="Jellyfin Subdomain HTTPS"; Host="https://jellyfin.$DomainPrefix" },
+    @{ Name="Sonarr Subdomain HTTPS";   Host="https://sonarr.$DomainPrefix" },
+    @{ Name="Radarr Subdomain HTTPS";   Host="https://radarr.$DomainPrefix" },
+    @{ Name="Prowlarr Subdomain HTTPS"; Host="https://prowlarr.$DomainPrefix" },
+    @{ Name="Bazarr Subdomain HTTPS";   Host="https://bazarr.$DomainPrefix" },
+    @{ Name="Jellyseerr Route HTTPS";   Host="https://jellyseerr.$DomainPrefix" },
+    @{ Name="API Gateway Route HTTPS";  Host="https://api.$DomainPrefix" },
+    @{ Name="Database GUI Route HTTPS"; Host="https://db.$DomainPrefix" }
 )
 
 $diagnosticResults = @()

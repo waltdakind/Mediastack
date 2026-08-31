@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Stop'
 $BaseDir = "$PSScriptRoot"
 
 Clear-Host
@@ -10,8 +10,8 @@ Write-Host ""
 
 Write-Host "1. Checking if containers are accessible..." -ForegroundColor Yellow
 try {
-    $sonarrPing = Invoke-RestMethod -Uri "http://localhost:8989" -Method Get -ErrorAction Stop
-    $radarrPing = Invoke-RestMethod -Uri "http://localhost:7878" -Method Get -ErrorAction Stop
+    $null = Invoke-RestMethod -Uri "http://localhost:8989" -Method Get -ErrorAction Stop
+    $null = Invoke-RestMethod -Uri "http://localhost:7878" -Method Get -ErrorAction Stop
     Write-Host "   -> Containers are online!" -ForegroundColor Green
 } catch {
     Write-Host "   -> ERROR: Unable to reach Sonarr or Radarr on localhost. Please ensure Docker is running and your MediaStack is started (Option 2 in Control Room)." -ForegroundColor Red

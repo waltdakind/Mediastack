@@ -98,6 +98,19 @@ function Invoke-SentinelPass {
             Write-Host ("  • Storage Headroom (Drive {0}:): {1} GB free / {2} GB total ({3}% free)" -f $driveLetter, $freeGb, $totalGb, $pctFree) -ForegroundColor $col
             if ($pctFree -lt 10) {
                 $anomalies += "Critically low disk space on Drive $driveLetter ($freeGb GB remaining / $pctFree% free)."
+                if ($AutoRepair -and -not $DryRun) {
+                    Write-Host "    [*] Proactively recovering disk space to prevent Docker SIGKILL (137)..." -ForegroundColor Yellow
+                    # 1. Prune Docker dangling caches
+                    docker system prune -f --volumes=false 2>$null | Out-Null
+                    # 2. Prune old database snapshots (>5 days old)
+                    $oldSnaps = Get-ChildItem -Path "$ActiveConfig\db-backup\snapshots" -Filter "*.zip" -ErrorAction SilentlyContinue |
+                        Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-5) }
+                    foreach ($os in $oldSnaps) {
+                        Remove-Item $os.FullName -Force -ErrorAction SilentlyContinue
+                    }
+                    $remediations += "Pruned Docker image cache and old snapshots (>5 days) to protect headroom."
+                    Write-Host "    [REPAIRED] Docker system cache pruned and legacy snapshots rotated." -ForegroundColor Green
+                }
             }
         }
     } catch { }

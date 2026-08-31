@@ -1,11 +1,11 @@
 ﻿{
-    "update_id":  "VOLTAIREDEUX_OPT_20260830_182222",
-    "staged_at":  "2026-08-30 18:22:22",
+    "update_id":  "VOLTAIREDEUX_OPT_20260830_204103",
+    "staged_at":  "2026-08-30 20:41:03",
     "staged_by_node":  "VOLTAIREDEUX",
     "target_node":  "VOLTAIREUN",
     "status":  "READY_FOR_VOLTAIREUN_PULL",
     "commit_message":  "AI Stack Optimization, Persistent Data Protection \u0026 24/7 Sentinel Suite",
-    "advice_document":  "AI_Expert_Advice_FOR_VOLTAIREUN_20260830_182222.md",
+    "advice_document":  "AI_Expert_Advice_FOR_VOLTAIREUN_20260830_204103.md",
     "action_items":  [
                          "Purge snapshot archives older than 7 days in db-backup/snapshots/",
                          "Apply PRAGMA wal_autocheckpoint=1000 and PRAGMA busy_timeout=5000 across core DBs",

@@ -75,6 +75,8 @@ $scripts = @(
     "Invoke-MediaStackCleanShutdown.ps1",
     "Invoke-MediaStackClusterHandoff.ps1",
     "Invoke-MediaStackAiCollaboration.ps1",
+    "Start-MediaStackAiWatcher.ps1",
+    "New-MediaStackSslCertificates.ps1",
     "PrimarySentinelSuite.ps1",
     "Start-MediaStackAutohealer.ps1",
     "Invoke-MediaStackSuite.ps1",
@@ -96,6 +98,17 @@ foreach ($s in $scripts) {
             Copy-Item $src (Join-Path $LocalConfigPath $s) -Force -ErrorAction SilentlyContinue
         }
     }
+}
+
+# D. Synchronize SSL/TLS Certificates
+$srcCerts = Join-Path $OneDrivePath "certs"
+if (Test-Path $srcCerts) {
+    $dstCerts = Join-Path $LocalConfigPath "certs"
+    if (-not (Test-Path $dstCerts)) { New-Item -ItemType Directory -Force -Path $dstCerts | Out-Null }
+    Get-ChildItem -Path $srcCerts -File -ErrorAction SilentlyContinue | ForEach-Object {
+        Copy-Item $_.FullName (Join-Path $dstCerts $_.Name) -Force -ErrorAction SilentlyContinue
+    }
+    Write-Host "  [OK] SSL/TLS Certificate Store synchronized to $dstCerts" -ForegroundColor Green
 }
 
 # --- 3. MERGE SERVARR & APPLICATION DIRECTORIES ---
