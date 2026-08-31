@@ -97,10 +97,13 @@ Write-Host "Run Jellyfin Self-Healing & Diagnostic Engine -> Shortcut: .\s.ps1 -
 Write-Host "  [6] " -NoNewline -ForegroundColor Yellow
 Write-Host "Synchronize & Reconcile Cluster (OneDrive)    -> Shortcut: .\s.ps1 -m" -ForegroundColor White
 
+Write-Host "  [7] " -NoNewline -ForegroundColor Yellow
+Write-Host "Enforce 24/7 Host Safeguards (No-Sleep & Autoheal) -> Shortcut: .\s.ps1 -p" -ForegroundColor Green
+
 Write-Host "  [Q] " -NoNewline -ForegroundColor DarkGray
 Write-Host "Quit" -ForegroundColor DarkGray
 
-Write-Host "`nSelect an option [1-6, Q]: " -NoNewline -ForegroundColor Yellow
+Write-Host "`nSelect an option [1-7, Q]: " -NoNewline -ForegroundColor Yellow
 
 if ($NonInteractive) {
     Write-Host "3 (Default NonInteractive: Dual-Node LCP)" -ForegroundColor Cyan
@@ -124,6 +127,8 @@ switch ($key.ToString().ToUpper()) {
     "J" { & "$PSScriptRoot\Repair-JellyfinServer.ps1" -AutoFix }
     "6" { & "$PSScriptRoot\Merge-OneDriveMediaStack.ps1" }
     "M" { & "$PSScriptRoot\Merge-OneDriveMediaStack.ps1" }
+    "7" { & "$PSScriptRoot\Set-MediaStackHostSafeguards.ps1" }
+    "P" { & "$PSScriptRoot\Set-MediaStackHostSafeguards.ps1" }
     "Q" { Write-Host "Exited." -ForegroundColor DarkGray; return }
     default {
         Write-Host "Executing default: Dual-Node LCP & Performance Optimization..." -ForegroundColor Cyan
