@@ -392,7 +392,7 @@ function Confirm-Startup {
     }
 
     Write-Host "`n--- Route Verification ---" -ForegroundColor Cyan
-    $routes = @("ordinateur.local", "jellyfin.ordinateur.local", "radarr.ordinateur.local", "sonarr.ordinateur.local", "jellyseerr.ordinateur.local", "jackett.ordinateur.local", "bazarr.ordinateur.local", "transmission.ordinateur.local", "tvheadend.ordinateur.local", "dashboard.ordinateur.local", "hdhomerun.ordinateur.local")
+    $routes = @("voltaireun.local", "jellyfin.voltaireun.local", "radarr.voltaireun.local", "sonarr.voltaireun.local", "jellyseerr.voltaireun.local", "jackett.voltaireun.local", "bazarr.voltaireun.local", "transmission.voltaireun.local", "tvheadend.voltaireun.local", "dashboard.voltaireun.local", "hdhomerun.voltaireun.local")
     
     foreach ($route in $routes) {
         $routeOk = $false
@@ -501,12 +501,12 @@ Write-Host "Initializing base files for Docker Pull..." -ForegroundColor Yellow
 # Wait, parsing the script is tedious. Since we know what it looks like, we can just run the initialization block directly here, or we can just run docker compose pull directly if the compose file is built.
 # To build the compose file, we just write it directly.
 $CaddyFileContent = @'
-http://ordinateur.local, :8080 {
+http://voltaireun.local, :8080 {
     root * /var/www/dashboard
     file_server
 }
 
-http://jellyfin.ordinateur.local, :8096 {
+http://jellyfin.voltaireun.local, :8096 {
     reverse_proxy 192.168.4.21:8096 192.168.4.30:8096 {
         lb_policy first
         health_uri /health
@@ -516,31 +516,31 @@ http://jellyfin.ordinateur.local, :8096 {
     }
 }
 
-http://radarr.ordinateur.local {
+http://radarr.voltaireun.local {
     reverse_proxy radarr:7878
 }
 
-http://sonarr.ordinateur.local {
+http://sonarr.voltaireun.local {
     reverse_proxy sonarr:8989
 }
 
-http://jellyseerr.ordinateur.local {
+http://jellyseerr.voltaireun.local {
     reverse_proxy jellyseerr:5055
 }
 
-http://jackett.ordinateur.local {
+http://jackett.voltaireun.local {
     reverse_proxy jackett:9117
 }
 
-http://bazarr.ordinateur.local {
+http://bazarr.voltaireun.local {
     reverse_proxy bazarr:6767
 }
 
-http://transmission.ordinateur.local {
+http://transmission.voltaireun.local {
     reverse_proxy transmission:9091
 }
 
-http://tvheadend.ordinateur.local {
+http://tvheadend.voltaireun.local {
     reverse_proxy tvheadend:9981
 }
 '@

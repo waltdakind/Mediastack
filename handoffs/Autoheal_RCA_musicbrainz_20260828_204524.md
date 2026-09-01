@@ -3,7 +3,7 @@
 | Parameter | Value |
 | :--- | :--- |
 | **Container Target** | musicbrainz |
-| **Affected Endpoint** | http://musicbrainz.ordinateur.local/ |
+| **Affected Endpoint** | http://musicbrainz.voltaireun.local/ |
 | **Incident Timestamp** | 2026-08-28 20:45:24 |
 | **Trigger Reason** | Container State: NOT FOUND |
 | **Remediation Action** | Container Restart |

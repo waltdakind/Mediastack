@@ -1,4 +1,4 @@
-# Test-NetworkDiagnostics.ps1 - Comprehensive Network Diagnostic & WAN Health Suite
+﻿# Test-NetworkDiagnostics.ps1 - Comprehensive Network Diagnostic & WAN Health Suite
 param(
     [string]$PrimaryServerIp = "192.168.4.21",
     [string]$SecondaryServerIp = "192.168.4.30",
@@ -105,14 +105,14 @@ $results["Local_Ports"] = $portResults
 # --- SECTION 4: DNS & mDNS Domain Resolution ---
 Write-Host "`n[4/6] Testing Domain Name & mDNS Resolution..." -ForegroundColor Yellow
 $domains = @(
-    "ordinateur.local",
+    "voltaireun.local",
     "mediaserver.local",
-    "jellyfin.ordinateur.local",
+    "jellyfin.voltaireun.local",
     "jellyfin.mediaserver.local",
-    "musicbrainz.ordinateur.local",
-    "homepage.ordinateur.local",
-    "api.ordinateur.local",
-    "db.ordinateur.local"
+    "musicbrainz.voltaireun.local",
+    "homepage.voltaireun.local",
+    "api.voltaireun.local",
+    "db.voltaireun.local"
 )
 
 $dnsResults = @()

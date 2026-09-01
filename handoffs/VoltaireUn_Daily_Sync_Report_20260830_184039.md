@@ -1,7 +1,7 @@
 ﻿# VoltaireUn Daily Sync & Health Report
 
 **Execution Timestamp:** 2026-08-30 18:40:39  
-**Executing Node:** ORDINATEURDEVOL (VoltaireUn (Main 24/7 Server Node))  
+**Executing Node:** VOLTAIREUN (VoltaireUn (Main 24/7 Server Node))  
 **Local IP:** 192.168.4.21  
 **Peer AI Node:** VOLTAIREDEUX (fe80::a96e:fd36:62a8:42ba%25)  
 **Update Found:** YES  

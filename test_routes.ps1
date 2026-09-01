@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop";
+﻿$ErrorActionPreference = "Stop";
 
 $global:FailureCounts = @{}
 $global:GracePeriods = @{}
@@ -64,8 +64,8 @@ function Test-Routes {
         @{ Route="hdhomerun.voltairedeux.local"; Container="caddy"; Path="" },
         @{ Route="db.voltairedeux.local"; Container="mediastack-db"; Path="" },
         @{ Route="musicbrainz.voltairedeux.local"; Container="musicbrainz"; Path="" },
-        @{ Route="ordinateur.local"; Container="caddy"; Path="" },
-        @{ Route="jellyfin.ordinateur.local"; Container="jellyfin"; Path="/health" }
+        @{ Route="voltaireun.local"; Container="caddy"; Path="" },
+        @{ Route="jellyfin.voltaireun.local"; Container="jellyfin"; Path="/health" }
     )
     
     foreach ($r in $routes) {

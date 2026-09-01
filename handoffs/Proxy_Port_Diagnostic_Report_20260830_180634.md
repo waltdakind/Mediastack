@@ -1,7 +1,7 @@
 ﻿# MediaStack Fleet Proxy & Port Diagnostic Report
 
 - **Generated:** 2026-08-30 18:06:34
-- **Local Node:** ORDINATEURDEVOL (VoltaireUn (Main 24/7 Server Node))
+- **Local Node:** VOLTAIREUN (VoltaireUn (Main 24/7 Server Node))
 - **Local IP:** 192.168.4.21
 - **Peer Node:** VOLTAIREDEUX (VoltaireDeux (AI Acceleration & Push Node))
 - **Peer IP:** fe80::a96e:fd36:62a8:42ba%25

@@ -3,7 +3,7 @@
 | Metric | Value |
 | :--- | :--- |
 | **Replication Timestamp** | 2026-08-30 13:41:54 |
-| **Node Name** | ORDINATEURDEVOL |
+| **Node Name** | VOLTAIREUN |
 | **Node Architecture** | x64 |
 | **Primary Cluster Host** | 192.168.4.30 |
 | **Valkey Container Instance** | \$ValkeyContainer\ |
@@ -24,5 +24,5 @@
 ### Replication Execution Guide for Additional Nodes
 ``powershell
 # Run replication on target machine with automatic container startup and SSL trust installation:
-.\Replicate-MediaStackNode.ps1 -TargetNodeName "ORDINATEURDEVOL" -TargetArch "x64" -InstallCertificates -StartStack
+.\Replicate-MediaStackNode.ps1 -TargetNodeName "VOLTAIREUN" -TargetArch "x64" -InstallCertificates -StartStack
 ``

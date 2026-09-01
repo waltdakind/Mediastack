@@ -1,6 +1,6 @@
-# ==============================================================================
+﻿# ==============================================================================
 # Add-HostsEntries.ps1 - Intelligent Windows Hosts File Provisioner & Domain Resolver
-# Adds voltairedeux.local, voltaireun.local, ordinateur.local & mediaserver.local domain mappings
+# Adds voltairedeux.local, voltaireun.local, voltaireun.local & mediaserver.local domain mappings
 # ==============================================================================
 param(
     [string]$HostsPath = "$env:SystemRoot\System32\drivers\etc\hosts",
@@ -74,20 +74,20 @@ $domainsToAdd = @(
     @{ IP="127.0.0.1"; Domain="hdhomerun.voltairedeux.local" },
 
     # Ordinateur Local Domains
-    @{ IP="127.0.0.1"; Domain="ordinateur.local" },
-    @{ IP="127.0.0.1"; Domain="jellyfin.ordinateur.local" },
-    @{ IP="127.0.0.1"; Domain="sonarr.ordinateur.local" },
-    @{ IP="127.0.0.1"; Domain="radarr.ordinateur.local" },
-    @{ IP="127.0.0.1"; Domain="prowlarr.ordinateur.local" },
-    @{ IP="127.0.0.1"; Domain="bazarr.ordinateur.local" },
-    @{ IP="127.0.0.1"; Domain="jellyseerr.ordinateur.local" },
-    @{ IP="127.0.0.1"; Domain="transmission.ordinateur.local" },
-    @{ IP="127.0.0.1"; Domain="tvheadend.ordinateur.local" },
-    @{ IP="127.0.0.1"; Domain="musicbrainz.ordinateur.local" },
-    @{ IP="127.0.0.1"; Domain="db.ordinateur.local" },
-    @{ IP="127.0.0.1"; Domain="api.ordinateur.local" },
-    @{ IP="127.0.0.1"; Domain="homepage.ordinateur.local" },
-    @{ IP="127.0.0.1"; Domain="hdhomerun.ordinateur.local" },
+    @{ IP="127.0.0.1"; Domain="voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="jellyfin.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="sonarr.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="radarr.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="prowlarr.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="bazarr.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="jellyseerr.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="transmission.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="tvheadend.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="musicbrainz.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="db.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="api.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="homepage.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="hdhomerun.voltaireun.local" },
 
     # MediaServer Local Domains
     @{ IP="127.0.0.1"; Domain="db.mediaserver.local" },

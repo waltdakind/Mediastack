@@ -2,18 +2,18 @@
 
 | Parameter | Value |
 | :--- | :--- |
-| **Audit Timestamp** | 2026-08-28 22:17:24 |
+| **Audit Timestamp** | 2026-08-31 21:27:50 |
 | **Host Node** | VOLTAIREDEUX |
 | **Picard Target** | 192.168.4.21:5000 |
-| **Caddy Proxy Route** | http://musicbrainz.voltaireun.local (Code: 500) |
+| **Caddy Proxy Route** | http://musicbrainz.voltaireun.local (Code: 301) |
 
 ---
 
 ## MusicBrainz Nodes Probed
 | Node | Endpoint | TCP Port | HTTP UI | WS/2 API | Latency | Status | Details |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| Local Primary Mirror | 127.0.0.1:5001 | OPEN | 500 | 500 | 15ms | STANDBY | Database Tables Pending Import |
-| Remote Fallback Mirror | 192.168.4.21:5000 | OPEN | 000 | 000 | 7ms | OFFLINE | HTTP 000 |
+| Local Primary Mirror | 127.0.0.1:5001 | OPEN | 500 | 500 | 20ms | STANDBY | Database Tables Pending Import |
+| Remote Fallback Mirror | 192.168.4.21:5000 | OPEN | 000 | 000 | 8ms | OFFLINE | HTTP 000 |
 
 ---
 ### Recommendations

@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     MediaStack Primary Control Center & Interactive Engineering Console
 .DESCRIPTION
@@ -172,13 +172,13 @@ function Invoke-RoutingInspector {
     $routes = @(
         @{ Name="Jellyfin External";       Host="waltdakind.xubi.org";          Path="";      Port=80 },
         @{ Name="Jellyfin Direct Port";    Host="";                             Path="";      Port=8096 },
-        @{ Name="Jellyfin Local LAN";      Host="jellyfin.ordinateur.local";    Path="";      Port=80 },
+        @{ Name="Jellyfin Local LAN";      Host="jellyfin.voltaireun.local";    Path="";      Port=80 },
         @{ Name="Jellyseerr External";     Host="jellyseerr.waltdakind.xubi.org"; Path="";    Port=80 },
         @{ Name="Sonarr API";              Host="sonarr.waltdakind.xubi.org";   Path="/ping"; Port=80 },
         @{ Name="Radarr API";              Host="radarr.waltdakind.xubi.org";   Path="/ping"; Port=80 },
         @{ Name="MusicBrainz API (5000)";  Host="";                             Path="";      Port=5000 },
         @{ Name="MusicBrainz External";    Host="musicbrainz.waltdakind.xubi.org"; Path="";   Port=80 },
-        @{ Name="Homepage Local LAN";      Host="ordinateur.local";             Path="";      Port=80 }
+        @{ Name="Homepage Local LAN";      Host="voltaireun.local";             Path="";      Port=80 }
     )
 
     foreach ($r in $routes) {

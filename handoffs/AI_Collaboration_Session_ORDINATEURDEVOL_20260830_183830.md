@@ -1,6 +1,6 @@
 ﻿# MediaStack AI Collaboration & Self-Healing Session
 
-- **Session Host:** ORDINATEURDEVOL (VoltaireUn (Main 24/7 Server Node))
+- **Session Host:** VOLTAIREUN (VoltaireUn (Main 24/7 Server Node))
 - **Host Local IP:** 192.168.4.21
 - **Collaborator Peer:** VOLTAIREDEUX (VoltaireDeux (AI Acceleration & Push Node))
 - **Peer LAN IP:** fe80::a96e:fd36:62a8:42ba%25
@@ -13,7 +13,7 @@
 
 | Node Name | Role | LAN IP | Ollama AI | Media Services | Primary Duty |
 | :--- | :--- | :--- | :---: | :---: | :--- |
-| **ORDINATEURDEVOL** (Local) | VoltaireUn (Main 24/7 Server Node) | 192.168.4.21 | Standby | Active | 24/7 Media Streaming, Servarr Automation, Storage Hosting |
+| **VOLTAIREUN** (Local) | VoltaireUn (Main 24/7 Server Node) | 192.168.4.21 | Standby | Active | 24/7 Media Streaming, Servarr Automation, Storage Hosting |
 | **VOLTAIREDEUX** (Peer) | VoltaireDeux (AI Acceleration & Push Node) | fe80::a96e:fd36:62a8:42ba%25 | Standby | Standby | AI Acceleration, Push Source |
 
 ---
@@ -35,10 +35,10 @@
 ## 3. Discovered Anomalies & Remediation Log
 
 ### File Naming & Sync Conflict Anomalies:
-- File: mediastack_backup-ordinateurdevoltaire.db (120 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: mediastack_backup-voltaireun.db (120 KB) - OneDrive Sync Conflict Lock / Duplicate
 
 ### Remediations Executed:
-- [FIXED] Quarantined and removed stale conflict file: mediastack_backup-ordinateurdevoltaire.db
+- [FIXED] Quarantined and removed stale conflict file: mediastack_backup-voltaireun.db
 
 ### Recent System Incidents Analyzed:
 - [System_Status_Handoff_ORDINATEURDEVOL_20260830_183813.md] Ingress: Caddy Reverse Proxy (Ports 80 / 443)  |  Failover Ingress: Port 80

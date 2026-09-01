@@ -142,7 +142,7 @@ if ($PurgeStaleConflictFiles) {
     Write-Host "`n[4/4] Purging Stale OneDrive Sync Conflict Artifacts & Dead Temp Locks..." -ForegroundColor Yellow
     $conflictPatterns = @(
         "*-VoltaireDeux.db*",
-        "*-ordinateurdevoltaire.db*",
+        "*-voltaireun.db*",
         "* - Copy.*",
         "*.db-wal.tmp*",
         "*.db-shm.tmp*"

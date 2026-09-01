@@ -5,7 +5,7 @@
 | **Audit Timestamp** | 2026-08-29 23:36:47 |
 | **Host Node** | VOLTAIREDEUX |
 | **Picard Target** | 192.168.4.21:5000 |
-| **Caddy Proxy Route** | http://musicbrainz.ordinateur.local (Code: 502) |
+| **Caddy Proxy Route** | http://musicbrainz.voltaireun.local (Code: 502) |
 
 ---
 

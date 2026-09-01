@@ -1,4 +1,4 @@
-# =============================================================================
+﻿# =============================================================================
 # Start-SecureMonitor.ps1 — MediaStack Auth-Bound Health Monitor
 # =============================================================================
 # Dynamically queries Jellyfin users, displays a profile selection menu,
@@ -206,13 +206,13 @@ while ($monitoring) {
     
     # Scan standard routing pathways
     $routes = @(
-        "ordinateur.local"
+        "voltaireun.local"
         "mediaserver.local"
-        "jellyfin.ordinateur.local"
+        "jellyfin.voltaireun.local"
         "jellyfin.mediaserver.local"
-        "radarr.ordinateur.local"
+        "radarr.voltaireun.local"
         "radarr.mediaserver.local"
-        "sonarr.ordinateur.local"
+        "sonarr.voltaireun.local"
         "sonarr.mediaserver.local"
         "waltdakind.xubi.org"
     )

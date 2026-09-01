@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 param(
     [Alias("u", "1")][switch]$VoltaireUn,
     [Alias("d", "2")][switch]$VoltaireDeux,
@@ -16,6 +16,7 @@ param(
     [Alias("rep", "syncfleet", "replicate")][switch]$SyncFleet,
     [Alias("v", "verifyfleet")][switch]$VerifyFleet,
     [Alias("da", "deepanalysis", "handoffs")][switch]$DeepAnalysis,
+    [Alias("i", "install", "newnode")][switch]$InstallNode,
     [Parameter(Mandatory = $false)][switch]$NonInteractive
 )
 
@@ -96,6 +97,10 @@ if ($DeepAnalysis) {
     & "$PSScriptRoot\Invoke-MediaStackDeepAnalysis.ps1"
     return
 }
+if ($InstallNode) {
+    & "$PSScriptRoot\Install-VoltaireNode.ps1"
+    return
+}
 
 # Interactive Single-Key HUD Menu
 Clear-Host
@@ -157,10 +162,13 @@ Write-Host "Primary Fleet Verification (Health Index Certification) -> Shortcut:
 Write-Host "  [D] " -NoNewline -ForegroundColor Yellow
 Write-Host "Primary Deep Analysis & Expert Handoffs Generator -> Shortcut: .\s.ps1 -da" -ForegroundColor Magenta
 
+Write-Host "  [I] " -NoNewline -ForegroundColor Yellow
+Write-Host "Install / Replicate New Node on Voltaire Network -> Shortcut: .\s.ps1 -i" -ForegroundColor Green
+
 Write-Host "  [Q] " -NoNewline -ForegroundColor DarkGray
 Write-Host "Quit" -ForegroundColor DarkGray
 
-Write-Host "`nSelect an option [0-9, F, R, B, C, S, V, D, Q]: " -NoNewline -ForegroundColor Yellow
+Write-Host "`nSelect an option [0-9, F, R, B, C, S, V, D, I, Q]: " -NoNewline -ForegroundColor Yellow
 
 if ($NonInteractive) {
     Write-Host "3 (Default NonInteractive: Dual-Node LCP)" -ForegroundColor Cyan
@@ -197,6 +205,7 @@ switch ($key.ToString().ToUpper()) {
     "S" { & "$PSScriptRoot\Replicate-MediaStackCluster.ps1" -All -RunOnce }
     "V" { & "$PSScriptRoot\Test-MediaStackFleetVerification.ps1" -All }
     "D" { & "$PSScriptRoot\Invoke-MediaStackDeepAnalysis.ps1" }
+    "I" { & "$PSScriptRoot\Install-VoltaireNode.ps1" }
     "Q" { Write-Host "Exited." -ForegroundColor DarkGray; return }
     default {
         Write-Host "Executing default: Dual-Node LCP and Performance Optimization..." -ForegroundColor Cyan

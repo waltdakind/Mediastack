@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 # =============================================================================
 # start-arm.ps1  --  MediaStack ARM Satellite Launcher (Windows ARM / Pi)
 # =============================================================================
@@ -275,7 +275,7 @@ function Show-ConnectivityReport {
     $checks = @(
         @{ Label="Internet (Google DNS)"; Host="8.8.8.8";        Desc="outbound internet"  }
         @{ Label="Main Server (x64)";     Host=$MainHost;         Desc="MAIN_SERVER_HOST"   }
-        @{ Label="Media NAS (primary)";   Host="Ordinateurdevol"; Desc="\\Ordinateurdevol"  }
+        @{ Label="Media NAS (primary)";   Host="VoltaireUn"; Desc="\\VoltaireUn"  }
     )
     foreach ($c in $checks) {
         if ([string]::IsNullOrWhiteSpace($c.Host)) {

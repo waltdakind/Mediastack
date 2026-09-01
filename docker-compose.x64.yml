@@ -1,4 +1,4 @@
-# =============================================================================
+﻿# =============================================================================
 # docker-compose.x64.yml - MediaStack x64 (Main Server) Services
 # =============================================================================
 #
@@ -81,9 +81,9 @@ services:
       - ${CONFIG_ROOT:-./config}/jellyfin:/config
       - /dev/shm/jellyfin_cache:/cache
       - ${MUSIC_ROOT:-C:/Users/Public/Music}:/data/music:ro
-      - //Ordinateurdevol/Users/Public/Movies:/data/movies:ro
-      - //Ordinateurdevol/Users/Public/Videos:/data/tv:ro
-      - //Ordinateurdevol/Users/Public/Pictures:/data/photos:ro
+      - //VoltaireUn/Users/Public/Movies:/data/movies:ro
+      - //VoltaireUn/Users/Public/Videos:/data/tv:ro
+      - //VoltaireUn/Users/Public/Pictures:/data/photos:ro
       - ${MEDIASTACK_ROOT:-C:/Users/Public/Mediastack}:/mediastack
     ports:
       - "8096:8096"
@@ -129,7 +129,7 @@ services:
       <<: *env-ls
     volumes:
       - ${CONFIG_ROOT:-./config}/radarr:/config
-      - //Ordinateurdevol/Users/Public/Movies:/movies
+      - //VoltaireUn/Users/Public/Movies:/movies
       - ${DOWNLOAD_ROOT:-./downloads}:/downloads
       - ${MEDIASTACK_ROOT:-C:/Users/Public/Mediastack}:/mediastack
     ports:
@@ -156,7 +156,7 @@ services:
       <<: *env-ls
     volumes:
       - ${CONFIG_ROOT:-./config}/sonarr:/config
-      - //Ordinateurdevol/Users/Public/Videos:/tv
+      - //VoltaireUn/Users/Public/Videos:/tv
       - ${DOWNLOAD_ROOT:-./downloads}:/downloads
       - ${MEDIASTACK_ROOT:-C:/Users/Public/Mediastack}:/mediastack
     ports:
@@ -211,7 +211,7 @@ services:
       <<: *env-ls
     volumes:
       - ${CONFIG_ROOT:-./config}/tvheadend:/config
-      - //Ordinateurdevol/Users/Public/Videos/Recordings:/recordings
+      - //VoltaireUn/Users/Public/Videos/Recordings:/recordings
       - ${MEDIASTACK_ROOT:-C:/Users/Public/Mediastack}:/mediastack
     ports:
       - "9981:9981"

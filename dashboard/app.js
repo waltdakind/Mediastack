@@ -1,4 +1,4 @@
-﻿/* =============================================================================
+/* =============================================================================
    MediaStack Mission Control - Interactive Application Engine
    Manages Live Probing, Full Suite Actions, Image Registry & Handoff Explorer
    ============================================================================= */
@@ -317,6 +317,17 @@ const SUITES = [
         icon: "ph-lightning",
         color: "#38bdf8",
         bg: "rgba(56, 189, 248, 0.12)"
+    },
+    {
+        id: "installnode",
+        title: "Voltaire Node Installer",
+        shortcut: "I",
+        cliCmd: ".\\s.ps1 -i",
+        script: "Install-VoltaireNode.ps1",
+        desc: "Turnkey clean installer with automated Docker setup, custom Dockerfile build, online-only storage & Gemini AI self-healing.",
+        icon: "ph-sparkle",
+        color: "#10b981",
+        bg: "rgba(16, 185, 129, 0.12)"
     }
 ];
 

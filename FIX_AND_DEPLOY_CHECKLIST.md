@@ -1,4 +1,4 @@
-# MediaStack Fix & Deploy Checklist
+﻿# MediaStack Fix & Deploy Checklist
 # Hand this to another AI agent or human to complete deployment
 
 ## Pre-Deployment Tasks
@@ -128,5 +128,5 @@ If healthcheck fails:
 - [x] Automated Deduplication completed on OneDrive
 
 ## Agent Handoff Summary
-The ARM node (VOLTAIREDEUX / 192.168.4.30) is fully functional and running the Music + Theming stack (Jellyfin, Caddy, Syncthing, Homepage, Diun). It successfully communicates with the x64 main server (ORDINATEURDEVOL / 192.168.4.21).
+The ARM node (VOLTAIREDEUX / 192.168.4.30) is fully functional and running the Music + Theming stack (Jellyfin, Caddy, Syncthing, Homepage, Diun). It successfully communicates with the x64 main server (VOLTAIREUN / 192.168.4.21).
 Future agents: If managing the x64 machine, ensure the Syncthing folder is shared with this ARM node to allow theme synchronizations to propagate.

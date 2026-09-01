@@ -3,9 +3,9 @@
 | Parameter | Value |
 | :--- | :--- |
 | **Audit Timestamp** | 2026-08-30 13:23:35 |
-| **Host Node** | ORDINATEURDEVOL |
+| **Host Node** | VOLTAIREUN |
 | **Picard Target** | musicbrainz.org:80 |
-| **Caddy Proxy Route** | http://musicbrainz.ordinateur.local (Code: 502) |
+| **Caddy Proxy Route** | http://musicbrainz.voltaireun.local (Code: 502) |
 
 ---
 

@@ -217,7 +217,7 @@ function Invoke-SentinelAudit {
         "jellyseerr.voltairedeux.local", "transmission.voltairedeux.local", "tvheadend.voltairedeux.local",
         "musicbrainz.voltairedeux.local", "db.voltairedeux.local", "api.voltairedeux.local",
         "homepage.voltairedeux.local", "hdhomerun.voltairedeux.local",
-        "ordinateur.local", "jellyfin.ordinateur.local", "db.mediaserver.local"
+        "voltaireun.local", "jellyfin.voltaireun.local", "db.mediaserver.local"
     )
     $gwPass = 0
     foreach ($gr in $gwRoutes) {

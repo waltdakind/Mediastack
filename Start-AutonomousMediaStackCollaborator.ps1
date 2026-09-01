@@ -1,10 +1,10 @@
-<#
+﻿<#
 .SYNOPSIS
     Start-AutonomousMediaStackCollaborator.ps1 - Autonomous Dual-Node Self-Monitoring, Incident Dispatch,
     Remediation Ingestion & AI Handoff Engine.
 
 .DESCRIPTION
-    Runs as a 24/7 perpetual background daemon on VoltaireUn (ORDINATEURDEVOL) or VoltaireDeux:
+    Runs as a 24/7 perpetual background daemon on VoltaireUn (VOLTAIREUN) or VoltaireDeux:
     1. CONTINUOUS SELF-MONITORING:
        - Probes Docker containers, TCP listening sockets, HTTP reverse proxy endpoints, and REST APIs.
        - Monitors SQLite database integrity (PRAGMA quick_check), WAL contention, and file conflict locks.

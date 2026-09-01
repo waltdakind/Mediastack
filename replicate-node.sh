@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 # ==============================================================================
 # replicate-node.sh - Linux & Raspberry Pi MediaStack Node Replication Engine
 # Replicates the complete MediaStack architecture onto Linux / ARM / x64 nodes.
@@ -31,7 +31,7 @@ PUID=$(id -u)
 PGID=$(id -g)
 TZ=America/New_York
 PUBLIC_DOMAIN=${PUBLIC_DOMAIN}
-LAN_DOMAIN=ordinateur.local
+LAN_DOMAIN=voltaireun.local
 CONFIG_DIR=${SCRIPT_DIR}/config
 MEDIA_DIR=/media/library
 MUSIC_ROOT=/media/library/Music
@@ -80,7 +80,7 @@ subjectAltName = @alt_names
 [alt_names]
 DNS.1 = ${PUBLIC_DOMAIN}
 DNS.2 = *.${PUBLIC_DOMAIN}
-DNS.3 = *.ordinateur.local
+DNS.3 = *.voltaireun.local
 DNS.4 = *.voltairedeux.local
 DNS.5 = *.voltaireun.local
 DNS.6 = localhost

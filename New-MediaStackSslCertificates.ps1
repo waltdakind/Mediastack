@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # New-MediaStackSslCertificates.ps1 - Enterprise SSL/TLS Certificate Generator
 # Generates multi-domain wildcard SAN certificates, Root CA, PEM, CRT, KEY, and PFX
 # for Caddy, Jellyfin, HTTPS Reverse Proxies, and LAN/WAN remote connections.
@@ -103,8 +103,8 @@ DNS.8  = bazarr.$PrimaryDomain
 DNS.9  = musicbrainz.$PrimaryDomain
 
 # Local LAN Domains
-DNS.10 = ordinateur.local
-DNS.11 = *.ordinateur.local
+DNS.10 = voltaireun.local
+DNS.11 = *.voltaireun.local
 DNS.12 = voltairedeux.local
 DNS.13 = *.voltairedeux.local
 DNS.14 = voltaireun.local
@@ -181,7 +181,7 @@ if (Test-Path $srvCrtPath) {
 Write-Host "`n[4/4] Validating Certificate Subject Alternative Names..." -ForegroundColor Yellow
 
 Write-Host "  [SAN VERIFICATION]" -ForegroundColor DarkCyan
-Write-Host "  $PrimaryDomain | *.$PrimaryDomain | *.ordinateur.local | *.voltairedeux.local | localhost | 192.168.4.30 | 192.168.4.21" -ForegroundColor White
+Write-Host "  $PrimaryDomain | *.$PrimaryDomain | *.voltaireun.local | *.voltairedeux.local | localhost | 192.168.4.30 | 192.168.4.21" -ForegroundColor White
 
 # Optional Trust Store Installation
 if ($InstallToTrustStore) {
@@ -232,7 +232,7 @@ $mdReport = @"
 
 ### Subject Alternative Names (SANs) Covered
 * **WAN / DDNS**: \`waltdakind.xubi.org\`, \`*.waltdakind.xubi.org\`
-* **LAN Hostnames**: \`ordinateur.local\`, \`voltairedeux.local\`, \`voltaireun.local\`, \`mediaserver.local\`, \`mediaserverlaptop.local\`
+* **LAN Hostnames**: \`voltaireun.local\`, \`voltairedeux.local\`, \`voltaireun.local\`, \`mediaserver.local\`, \`mediaserverlaptop.local\`
 * **Loopback & IPs**: \`localhost\`, \`127.0.0.1\`, \`192.168.4.30\`, \`192.168.4.21\`, \`192.168.4.1\`
 
 ### Usage in MediaStack Components

@@ -14,7 +14,7 @@
 
 ### Subject Alternative Names (SANs) Covered
 * **WAN / DDNS**: \waltdakind.xubi.org\, \*.waltdakind.xubi.org\
-* **LAN Hostnames**: \ordinateur.local\, \oltairedeux.local\, \oltaireun.local\, \mediaserver.local\, \mediaserverlaptop.local\
+* **LAN Hostnames**: \voltaireun.local\, \oltairedeux.local\, \oltaireun.local\, \mediaserver.local\, \mediaserverlaptop.local\
 * **Loopback & IPs**: \localhost\, \127.0.0.1\, \::1\, \192.168.4.30\, \192.168.4.21\
 
 ### Usage in MediaStack Components

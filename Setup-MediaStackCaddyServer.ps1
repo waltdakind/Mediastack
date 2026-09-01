@@ -261,14 +261,14 @@ http://__EXTERNAL_DOMAIN__, http://jellyfin.__EXTERNAL_DOMAIN__, http://jellysee
 }
 
 # Internal LAN Root & IP HTTP Redirection
-http://ordinateur.local, http://voltaireun.local, http://voltairedeux.local, http://mediaserver.local, http://__SECONDARY_IP__, http://__PRIMARY_IP__, http://localhost {
+http://voltaireun.local, http://voltaireun.local, http://voltairedeux.local, http://mediaserver.local, http://__SECONDARY_IP__, http://__PRIMARY_IP__, http://localhost {
     import security_headers
     encode gzip zstd
     redir https://{host}{uri} permanent
 }
 
 # Internal Subdomains HTTP Redirection
-http://jellyfin.ordinateur.local, http://jellyfin.voltaireun.local, http://jellyfin.voltairedeux.local, http://jellyfin.mediaserver.local, http://dashboard.ordinateur.local, http://dashboard.voltaireun.local, http://dashboard.voltairedeux.local, http://noc.voltaireun.local, http://radarr.ordinateur.local, http://radarr.voltaireun.local, http://radarr.voltairedeux.local, http://sonarr.ordinateur.local, http://sonarr.voltaireun.local, http://sonarr.voltairedeux.local, http://jellyseerr.ordinateur.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltairedeux.local, http://prowlarr.ordinateur.local, http://prowlarr.voltaireun.local, http://prowlarr.voltairedeux.local, http://bazarr.ordinateur.local, http://bazarr.voltaireun.local, http://bazarr.voltairedeux.local, http://transmission.ordinateur.local, http://transmission.voltaireun.local, http://transmission.voltairedeux.local, http://tvheadend.ordinateur.local, http://tvheadend.voltaireun.local, http://tvheadend.voltairedeux.local, http://hdhomerun.ordinateur.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltairedeux.local, http://musicbrainz.ordinateur.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltairedeux.local, http://db.ordinateur.local, http://db.voltaireun.local, http://db.voltairedeux.local {
+http://jellyfin.voltaireun.local, http://jellyfin.voltaireun.local, http://jellyfin.voltairedeux.local, http://jellyfin.mediaserver.local, http://dashboard.voltaireun.local, http://dashboard.voltaireun.local, http://dashboard.voltairedeux.local, http://noc.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltairedeux.local, http://sonarr.voltaireun.local, http://sonarr.voltaireun.local, http://sonarr.voltairedeux.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltairedeux.local, http://prowlarr.voltaireun.local, http://prowlarr.voltaireun.local, http://prowlarr.voltairedeux.local, http://bazarr.voltaireun.local, http://bazarr.voltaireun.local, http://bazarr.voltairedeux.local, http://transmission.voltaireun.local, http://transmission.voltaireun.local, http://transmission.voltairedeux.local, http://tvheadend.voltaireun.local, http://tvheadend.voltaireun.local, http://tvheadend.voltairedeux.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltairedeux.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltairedeux.local, http://db.voltaireun.local, http://db.voltaireun.local, http://db.voltairedeux.local {
     import security_headers
     encode gzip zstd
     redir https://{host}{uri} permanent
@@ -279,13 +279,13 @@ http://jellyfin.ordinateur.local, http://jellyfin.voltaireun.local, http://jelly
 # =============================================================================
 
 # --- A. Root Ingress (Directed to JELLYFIN) ---
-https://__EXTERNAL_DOMAIN__, https://jellyfin.__EXTERNAL_DOMAIN__, https://ordinateur.local, https://voltaireun.local, https://voltairedeux.local, https://mediaserver.local, https://__SECONDARY_IP__, https://__PRIMARY_IP__, https://localhost {
+https://__EXTERNAL_DOMAIN__, https://jellyfin.__EXTERNAL_DOMAIN__, https://voltaireun.local, https://voltaireun.local, https://voltairedeux.local, https://mediaserver.local, https://__SECONDARY_IP__, https://__PRIMARY_IP__, https://localhost {
     import custom_tls
     import jellyfin_cluster
 }
 
 # --- Dedicated NOC / Ops Dashboard Subdomains ---
-https://dashboard.ordinateur.local, https://dashboard.voltaireun.local, https://dashboard.voltairedeux.local, https://noc.voltaireun.local, https://portal.voltaireun.local, https://hub.voltaireun.local {
+https://dashboard.voltaireun.local, https://dashboard.voltaireun.local, https://dashboard.voltairedeux.local, https://noc.voltaireun.local, https://portal.voltaireun.local, https://hub.voltaireun.local {
     import security_headers
     import custom_tls
     encode gzip zstd
@@ -294,7 +294,7 @@ https://dashboard.ordinateur.local, https://dashboard.voltaireun.local, https://
 }
 
 # --- Homepage Dashboard ---
-https://homepage.__EXTERNAL_DOMAIN__, https://home.ordinateur.local, https://home.voltaireun.local, https://home.voltairedeux.local, https://homepage.voltaireun.local {
+https://homepage.__EXTERNAL_DOMAIN__, https://home.voltaireun.local, https://home.voltaireun.local, https://home.voltairedeux.local, https://homepage.voltaireun.local {
     import security_headers
     import custom_tls
     encode gzip zstd
@@ -305,7 +305,7 @@ https://homepage.__EXTERNAL_DOMAIN__, https://home.ordinateur.local, https://hom
 }
 
 # --- Diun Docker Image Update Notifier ---
-https://diun.ordinateur.local, https://diun.voltaireun.local, https://diun.voltairedeux.local {
+https://diun.voltaireun.local, https://diun.voltaireun.local, https://diun.voltairedeux.local {
     import security_headers
     import custom_tls
     reverse_proxy diun:9090 __PRIMARY_IP__:9090 {
@@ -315,7 +315,7 @@ https://diun.ordinateur.local, https://diun.voltaireun.local, https://diun.volta
 }
 
 # --- D. Jellyseerr Media Requests ---
-https://jellyseerr.__EXTERNAL_DOMAIN__, https://jellyseerr.ordinateur.local, https://jellyseerr.voltaireun.local, https://jellyseerr.voltairedeux.local {
+https://jellyseerr.__EXTERNAL_DOMAIN__, https://jellyseerr.voltaireun.local, https://jellyseerr.voltaireun.local, https://jellyseerr.voltairedeux.local {
     import security_headers
     import custom_tls
     encode gzip zstd
@@ -326,7 +326,7 @@ https://jellyseerr.__EXTERNAL_DOMAIN__, https://jellyseerr.ordinateur.local, htt
 }
 
 # --- E. Sonarr TV Series Management ---
-https://sonarr.__EXTERNAL_DOMAIN__, https://sonarr.ordinateur.local, https://sonarr.voltaireun.local, https://sonarr.voltairedeux.local {
+https://sonarr.__EXTERNAL_DOMAIN__, https://sonarr.voltaireun.local, https://sonarr.voltaireun.local, https://sonarr.voltairedeux.local {
     import security_headers
     import custom_tls
     reverse_proxy sonarr:8989 __PRIMARY_IP__:8989 {
@@ -336,7 +336,7 @@ https://sonarr.__EXTERNAL_DOMAIN__, https://sonarr.ordinateur.local, https://son
 }
 
 # --- F. Radarr Movie Management ---
-https://radarr.__EXTERNAL_DOMAIN__, https://radarr.ordinateur.local, https://radarr.voltaireun.local, https://radarr.voltairedeux.local {
+https://radarr.__EXTERNAL_DOMAIN__, https://radarr.voltaireun.local, https://radarr.voltaireun.local, https://radarr.voltairedeux.local {
     import security_headers
     import custom_tls
     reverse_proxy radarr:7878 __PRIMARY_IP__:7878 {
@@ -346,7 +346,7 @@ https://radarr.__EXTERNAL_DOMAIN__, https://radarr.ordinateur.local, https://rad
 }
 
 # --- G. Prowlarr Indexer Synchronization ---
-https://prowlarr.__EXTERNAL_DOMAIN__, https://prowlarr.ordinateur.local, https://prowlarr.voltaireun.local, https://prowlarr.voltairedeux.local {
+https://prowlarr.__EXTERNAL_DOMAIN__, https://prowlarr.voltaireun.local, https://prowlarr.voltaireun.local, https://prowlarr.voltairedeux.local {
     import security_headers
     import custom_tls
     reverse_proxy prowlarr:9696 __PRIMARY_IP__:9696 {
@@ -356,7 +356,7 @@ https://prowlarr.__EXTERNAL_DOMAIN__, https://prowlarr.ordinateur.local, https:/
 }
 
 # --- H. Bazarr Subtitles Automation ---
-https://bazarr.__EXTERNAL_DOMAIN__, https://bazarr.ordinateur.local, https://bazarr.voltaireun.local, https://bazarr.voltairedeux.local {
+https://bazarr.__EXTERNAL_DOMAIN__, https://bazarr.voltaireun.local, https://bazarr.voltaireun.local, https://bazarr.voltairedeux.local {
     import security_headers
     import custom_tls
     reverse_proxy bazarr:6767 __PRIMARY_IP__:6767 {
@@ -366,7 +366,7 @@ https://bazarr.__EXTERNAL_DOMAIN__, https://bazarr.ordinateur.local, https://baz
 }
 
 # --- I. Transmission Torrent Client ---
-https://transmission.ordinateur.local, https://transmission.voltaireun.local, https://transmission.voltairedeux.local {
+https://transmission.voltaireun.local, https://transmission.voltaireun.local, https://transmission.voltairedeux.local {
     import security_headers
     import custom_tls
     reverse_proxy transmission:9091 __PRIMARY_IP__:9091 {
@@ -375,21 +375,21 @@ https://transmission.ordinateur.local, https://transmission.voltaireun.local, ht
 }
 
 # --- J. Tvheadend Live TV & DVR ---
-https://tvheadend.ordinateur.local, https://tvheadend.voltaireun.local, https://tvheadend.voltairedeux.local {
+https://tvheadend.voltaireun.local, https://tvheadend.voltaireun.local, https://tvheadend.voltairedeux.local {
     import security_headers
     import custom_tls
     reverse_proxy tvheadend:9981 __PRIMARY_IP__:9981
 }
 
 # --- K. HDHomeRun Hardware Tuner ---
-https://hdhomerun.ordinateur.local, https://hdhomerun.voltaireun.local, https://hdhomerun.voltairedeux.local {
+https://hdhomerun.voltaireun.local, https://hdhomerun.voltaireun.local, https://hdhomerun.voltairedeux.local {
     import security_headers
     import custom_tls
     reverse_proxy 192.168.4.45:80
 }
 
 # --- L. MusicBrainz Mirror ---
-https://musicbrainz.__EXTERNAL_DOMAIN__, https://musicbrainz.ordinateur.local, https://musicbrainz.voltaireun.local, https://musicbrainz.voltairedeux.local {
+https://musicbrainz.__EXTERNAL_DOMAIN__, https://musicbrainz.voltaireun.local, https://musicbrainz.voltaireun.local, https://musicbrainz.voltairedeux.local {
     import security_headers
     import custom_tls
     encode gzip zstd
@@ -400,7 +400,7 @@ https://musicbrainz.__EXTERNAL_DOMAIN__, https://musicbrainz.ordinateur.local, h
 }
 
 # --- M. MediaStack Database Administration ---
-https://db.ordinateur.local, https://db.voltaireun.local, https://db.voltairedeux.local {
+https://db.voltaireun.local, https://db.voltaireun.local, https://db.voltairedeux.local {
     import security_headers
     import custom_tls
     reverse_proxy mediastack-db:8080 __PRIMARY_IP__:8080

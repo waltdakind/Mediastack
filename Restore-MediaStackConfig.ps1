@@ -136,7 +136,7 @@ if ((-not (Test-Path $caddyfilePath)) -or $Force) {
     $caddyContent = @'
 # =============================================================================
 # Caddyfile - MediaStack Primary Reverse Proxy
-# Supports Multi-Server Load Balancing, Failover, LAN (*.ordinateur.local) & DDNS (waltdakind.xubi.org)
+# Supports Multi-Server Load Balancing, Failover, LAN (*.voltaireun.local) & DDNS (waltdakind.xubi.org)
 # =============================================================================
 
 # --- Common Snippets ---
@@ -252,67 +252,67 @@ http://musicbrainz.waltdakind.xubi.org, https://musicbrainz.waltdakind.xubi.org 
     reverse_proxy 192.168.4.21:5000
 }
 
-# --- Local LAN Access (*.ordinateur.local) ---
-http://ordinateur.local {
+# --- Local LAN Access (*.voltaireun.local) ---
+http://voltaireun.local {
     import security_headers
     encode gzip zstd
     reverse_proxy homepage:3000
 }
 
-http://jellyfin.ordinateur.local {
+http://jellyfin.voltaireun.local {
     import jellyfin_cluster
 }
 
-http://radarr.ordinateur.local {
+http://radarr.voltaireun.local {
     import security_headers
     reverse_proxy radarr:7878
 }
 
-http://sonarr.ordinateur.local {
+http://sonarr.voltaireun.local {
     import security_headers
     reverse_proxy sonarr:8989
 }
 
-http://jellyseerr.ordinateur.local {
+http://jellyseerr.voltaireun.local {
     import security_headers
     encode gzip zstd
     reverse_proxy jellyseerr:5055
 }
 
-http://prowlarr.ordinateur.local {
+http://prowlarr.voltaireun.local {
     import security_headers
     reverse_proxy prowlarr:9696
 }
 
-http://bazarr.ordinateur.local {
+http://bazarr.voltaireun.local {
     import security_headers
     reverse_proxy bazarr:6767
 }
 
-http://transmission.ordinateur.local {
+http://transmission.voltaireun.local {
     import security_headers
     reverse_proxy transmission:9091 {
         header_up X-Transmission-Session-Id {http.request.header.X-Transmission-Session-Id}
     }
 }
 
-http://tvheadend.ordinateur.local {
+http://tvheadend.voltaireun.local {
     import security_headers
     reverse_proxy tvheadend:9981
 }
 
-http://hdhomerun.ordinateur.local {
+http://hdhomerun.voltaireun.local {
     import security_headers
     reverse_proxy 192.168.4.45:80
 }
 
-http://musicbrainz.ordinateur.local {
+http://musicbrainz.voltaireun.local {
     import security_headers
     encode gzip zstd
     reverse_proxy 192.168.4.21:5000
 }
 
-http://db.ordinateur.local {
+http://db.voltaireun.local {
     import security_headers
     reverse_proxy mediastack-db:8080
 }

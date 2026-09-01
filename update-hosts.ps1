@@ -34,16 +34,7 @@ $primaryServices = @(
     "noc.voltaireun.local",
     "portal.voltaireun.local",
     "hub.voltaireun.local",
-    # Legacy aliases for backwards compatibility with previous hostname
-    "ordinateur",
-    "ordinateur.local",
-    "prinateurdevol",
-    "prinateurdevol.local",
-    "mediaserver.local",
-    "jellyfin.ordinateur.local",
-    "musicbrainz.ordinateur.local",
-    "radarr.ordinateur.local",
-    "sonarr.ordinateur.local"
+    "mediaserver.local"
 )
 
 $secondaryServices = @(
@@ -62,7 +53,7 @@ $newEntries = @()
 $newEntries += $blockHeader
 $newEntries += "# Generated at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 $newEntries += ""
-$newEntries += "# Primary Node: VoltaireUn (192.168.4.21 - Formerly ORDINATEURDEVOL / prinateurdevol)"
+$newEntries += "# Primary Node: VoltaireUn (192.168.4.21 - Formerly VOLTAIREUN / voltaireun)"
 foreach ($s in $primaryServices) {
     $newEntries += "$PrimaryIp`t$s"
 }

@@ -1,6 +1,6 @@
 ﻿# MediaStack AI Collaboration & Self-Healing Nexus Report
 
-- **Session Host:** ORDINATEURDEVOL (VoltaireUn (Main 24/7 Server Node))
+- **Session Host:** VOLTAIREUN (VoltaireUn (Main 24/7 Server Node))
 - **Local LAN IP:** 192.168.4.21
 - **Collaborating Peer:** VOLTAIREDEUX (VoltaireDeux (AI Acceleration & Push Node))
 - **Peer LAN IP:** fe80::a96e:fd36:62a8:42ba%25

@@ -106,22 +106,22 @@
 - File: `prowlarr-VoltaireDeux.db` (224 KB) - OneDrive Sync Conflict Lock / Duplicate
 - File: `radarr-VoltaireDeux.db` (632 KB) - OneDrive Sync Conflict Lock / Duplicate
 - File: `sonarr-VoltaireDeux.db` (392 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `jellyfin-ordinateurdevoltaire.db-wal` (0 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `logs-ordinateurdevoltaire.db` (368 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `logs-ordinateurdevoltaire.db-wal` (370.19 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `prowlarr-ordinateurdevoltaire.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `prowlarr-ordinateurdevoltaire.db-wal` (0 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `logs-ordinateurdevoltaire.db` (424 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `logs-ordinateurdevoltaire.db-wal` (144.88 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `logs-ordinateurdevoltaire.db` (560 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `logs-ordinateurdevoltaire.db-wal` (84.52 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `sonarr-ordinateurdevoltaire.db-wal` (442.61 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `logs-ordinateurdevoltaire.db` (560 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `prowlarr-ordinateurdevoltaire.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `logs-ordinateurdevoltaire.db` (560 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `prowlarr-ordinateurdevoltaire.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `logs-ordinateurdevoltaire.db` (560 KB) - OneDrive Sync Conflict Lock / Duplicate
-- File: `prowlarr-ordinateurdevoltaire.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `jellyfin-voltaireun.db-wal` (0 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-voltaireun.db` (368 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-voltaireun.db-wal` (370.19 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-voltaireun.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-voltaireun.db-wal` (0 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-voltaireun.db` (424 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-voltaireun.db-wal` (144.88 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-voltaireun.db` (560 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-voltaireun.db-wal` (84.52 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `sonarr-voltaireun.db-wal` (442.61 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-voltaireun.db` (560 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-voltaireun.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-voltaireun.db` (560 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-voltaireun.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `logs-voltaireun.db` (560 KB) - OneDrive Sync Conflict Lock / Duplicate
+- File: `prowlarr-voltaireun.db` (380 KB) - OneDrive Sync Conflict Lock / Duplicate
 
 ### Remediations Executed:
 - [FIXED] Quarantined and removed stale conflict file `logs-VoltaireDeux.db`
@@ -195,22 +195,22 @@
 - [FIXED] Quarantined and removed stale conflict file `prowlarr-VoltaireDeux.db`
 - [FIXED] Quarantined and removed stale conflict file `radarr-VoltaireDeux.db`
 - [FIXED] Quarantined and removed stale conflict file `sonarr-VoltaireDeux.db`
-- [FIXED] Quarantined and removed stale conflict file `jellyfin-ordinateurdevoltaire.db-wal`
-- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db`
-- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db-wal`
-- [FIXED] Quarantined and removed stale conflict file `prowlarr-ordinateurdevoltaire.db`
-- [FIXED] Quarantined and removed stale conflict file `prowlarr-ordinateurdevoltaire.db-wal`
-- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db`
-- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db-wal`
-- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db`
-- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db-wal`
-- [FIXED] Quarantined and removed stale conflict file `sonarr-ordinateurdevoltaire.db-wal`
-- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db`
-- [FIXED] Quarantined and removed stale conflict file `prowlarr-ordinateurdevoltaire.db`
-- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db`
-- [FIXED] Quarantined and removed stale conflict file `prowlarr-ordinateurdevoltaire.db`
-- [FIXED] Quarantined and removed stale conflict file `logs-ordinateurdevoltaire.db`
-- [FIXED] Quarantined and removed stale conflict file `prowlarr-ordinateurdevoltaire.db`
+- [FIXED] Quarantined and removed stale conflict file `jellyfin-voltaireun.db-wal`
+- [FIXED] Quarantined and removed stale conflict file `logs-voltaireun.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-voltaireun.db-wal`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-voltaireun.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-voltaireun.db-wal`
+- [FIXED] Quarantined and removed stale conflict file `logs-voltaireun.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-voltaireun.db-wal`
+- [FIXED] Quarantined and removed stale conflict file `logs-voltaireun.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-voltaireun.db-wal`
+- [FIXED] Quarantined and removed stale conflict file `sonarr-voltaireun.db-wal`
+- [FIXED] Quarantined and removed stale conflict file `logs-voltaireun.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-voltaireun.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-voltaireun.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-voltaireun.db`
+- [FIXED] Quarantined and removed stale conflict file `logs-voltaireun.db`
+- [FIXED] Quarantined and removed stale conflict file `prowlarr-voltaireun.db`
 
 ### Recent System Incidents Analyzed:
 - [Api_Verification_Report_20260830_181023.md] | Jellyfin API | http://localhost:8096/System/Info/Public | FAIL | FAIL | 319ms | The remote server returned an error: (500) Internal Server Error. |

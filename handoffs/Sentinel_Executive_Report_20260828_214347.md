@@ -1,4 +1,4 @@
-# 🛡️ Primary Music Server Sentinel Executive Health Report
+﻿# 🛡️ Primary Music Server Sentinel Executive Health Report
 
 | Metric | Value | Status |
 | :--- | :--- | :--- |
@@ -21,7 +21,7 @@
 2. **Picard Client Auto-Aligned**:
    - Realigned `Picard.ini` to target the active Primary Node (`192.168.4.21:5000`) where music metadata and acoustid lookups are currently live and operational.
 3. **Multi-Domain Ingress Verified**:
-   - Caddy reverse-proxy routing verified across `voltairedeux.local`, `ordinateur.local`, and `mediaserver.local`.
+   - Caddy reverse-proxy routing verified across `voltairedeux.local`, `voltaireun.local`, and `mediaserver.local`.
 
 ---
 

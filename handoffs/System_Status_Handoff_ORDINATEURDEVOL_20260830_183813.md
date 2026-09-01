@@ -1,6 +1,6 @@
 ﻿# MediaStack Cross-Node System Status & Architecture Handoff
 
-- **Authoring Node:** ORDINATEURDEVOL (VoltaireUn (Main 24/7 Server Node))
+- **Authoring Node:** VOLTAIREUN (VoltaireUn (Main 24/7 Server Node))
 - **Local LAN IP:** 192.168.4.21
 - **Target Peer Node:** VOLTAIREDEUX (VoltaireDeux (AI Acceleration & Push Node))
 - **Peer LAN IP:** fe80::a96e:fd36:62a8:42ba%25
@@ -12,7 +12,7 @@
 ## 1. System Architecture & Topology Overview
 
 ```
-  Node: ORDINATEURDEVOL (192.168.4.21) <===> Peer: VOLTAIREDEUX (fe80::a96e:fd36:62a8:42ba%25)
+  Node: VOLTAIREUN (192.168.4.21) <===> Peer: VOLTAIREDEUX (fe80::a96e:fd36:62a8:42ba%25)
   Role: VoltaireUn (Main 24/7 Server Node)  |  Peer Role: VoltaireDeux (AI Acceleration & Push Node)
   Ingress: Caddy Reverse Proxy (Ports 80 / 443)  |  Failover Ingress: Port 80
   Databases: SQLite WAL Mode (7 core DBs)  |  Synchronized Mirror + Snapshots
@@ -49,7 +49,7 @@
 ## 4. AI Suggestions for Stability, Self-Healing & Peer Node Optimization
 
 > [!TIP]
-> **Recommendations offered by ORDINATEURDEVOL for VOLTAIREDEUX:**
+> **Recommendations offered by VOLTAIREUN for VOLTAIREDEUX:**
 
 1. **AI Acceleration Batch Ingestion:** For VoltaireDeux AI workloads, offload music embedding generation and tagging to Picard via local mirror (`127.0.0.1:5001`) to preserve VoltaireUn WAN bandwidth.
 

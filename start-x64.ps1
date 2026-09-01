@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 # =============================================================================
 # start-x64.ps1  --  MediaStack  x64  Main Server Launcher
 # =============================================================================
@@ -150,20 +150,20 @@ function Show-DatabaseMap {
         @{ Svc="Jellyfin";     Host="$ConfigRoot/jellyfin";                  Ct="/config";                  Type="SQLite+config"  }
         @{ Svc="Jellyfin";     Host="/dev/shm/jellyfin_cache";               Ct="/cache";                   Type="RAM disk"       }
         @{ Svc="Jellyfin";     Host="$MusicRoot";                            Ct="/data/music";              Type="Media :ro"      }
-        @{ Svc="Jellyfin";     Host="//Ordinateurdevol/.../Movies";          Ct="/data/movies";             Type="NAS share :ro"  }
-        @{ Svc="Jellyfin";     Host="//Ordinateurdevol/.../Videos";          Ct="/data/tv";                 Type="NAS share :ro"  }
-        @{ Svc="Jellyfin";     Host="//Ordinateurdevol/.../Pictures";        Ct="/data/photos";             Type="NAS share :ro"  }
+        @{ Svc="Jellyfin";     Host="//VoltaireUn/.../Movies";          Ct="/data/movies";             Type="NAS share :ro"  }
+        @{ Svc="Jellyfin";     Host="//VoltaireUn/.../Videos";          Ct="/data/tv";                 Type="NAS share :ro"  }
+        @{ Svc="Jellyfin";     Host="//VoltaireUn/.../Pictures";        Ct="/data/photos";             Type="NAS share :ro"  }
         @{ Svc="Prowlarr";     Host="$ConfigRoot/prowlarr";                  Ct="/config";                  Type="SQLite+config"  }
         @{ Svc="Radarr";       Host="$ConfigRoot/radarr";                    Ct="/config";                  Type="SQLite+config"  }
-        @{ Svc="Radarr";       Host="//Ordinateurdevol/.../Movies";          Ct="/movies";                  Type="NAS share rw"   }
+        @{ Svc="Radarr";       Host="//VoltaireUn/.../Movies";          Ct="/movies";                  Type="NAS share rw"   }
         @{ Svc="Radarr";       Host="$DownloadRoot";                         Ct="/downloads";               Type="Downloads rw"   }
         @{ Svc="Sonarr";       Host="$ConfigRoot/sonarr";                    Ct="/config";                  Type="SQLite+config"  }
-        @{ Svc="Sonarr";       Host="//Ordinateurdevol/.../Videos";          Ct="/tv";                      Type="NAS share rw"   }
+        @{ Svc="Sonarr";       Host="//VoltaireUn/.../Videos";          Ct="/tv";                      Type="NAS share rw"   }
         @{ Svc="Sonarr";       Host="$DownloadRoot";                         Ct="/downloads";               Type="Downloads rw"   }
         @{ Svc="Transmission"; Host="$ConfigRoot/transmission";              Ct="/config";                  Type="Config+settings"}
         @{ Svc="Transmission"; Host="$DownloadRoot";                         Ct="/downloads";               Type="Downloads rw"   }
         @{ Svc="TVHeadend";    Host="$ConfigRoot/tvheadend";                 Ct="/config";                  Type="SQLite+config"  }
-        @{ Svc="TVHeadend";    Host="//Ordinateurdevol/.../Recordings";      Ct="/recordings";              Type="NAS share rw"   }
+        @{ Svc="TVHeadend";    Host="//VoltaireUn/.../Recordings";      Ct="/recordings";              Type="NAS share rw"   }
         @{ Svc="Syncthing";    Host="$ConfigRoot/syncthing";                 Ct="/var/syncthing/config";    Type="Config+index DB"}
         @{ Svc="Syncthing";    Host="$ConfigRoot/jellyfin/web";              Ct="/data/jellyfin-theme";     Type="Theme share rw" }
         @{ Svc="healthguard";  Host="C:/Users/Public/Mediastack";            Ct="/mediastack";              Type="Logs+scripts"   }
@@ -283,7 +283,7 @@ function Show-ConnectivityReport {
     $checks = @(
         @{ Label="Internet (Google DNS)";  Host="8.8.8.8";        Desc="outbound internet"         }
         @{ Label="External Domain";        Host=$Domain;           Desc="CADDY_DOMAIN target"       }
-        @{ Label="Media NAS (primary)";    Host="Ordinateurdevol"; Desc="\\Ordinateurdevol shares"  }
+        @{ Label="Media NAS (primary)";    Host="VoltaireUn"; Desc="\\VoltaireUn shares"  }
     )
     foreach ($c in $checks) {
         if ([string]::IsNullOrWhiteSpace($c.Host)) { continue }

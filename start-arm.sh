@@ -1,4 +1,4 @@
-#!/bin/sh
+﻿#!/bin/sh
 # =============================================================================
 # start-arm.sh — MediaStack ARM Satellite Launcher (Raspberry Pi / Linux ARM)
 # =============================================================================
@@ -208,7 +208,7 @@ show_connectivity_report() {
 
   test_ping "Internet (DNS)" "8.8.8.8"
   test_ping "Main Server" "${MAIN_HOST}"
-  test_ping "Media NAS" "Ordinateurdevol"
+  test_ping "Media NAS" "VoltaireUn"
 
   printf "${BBLK}  "; printf "═%.0s" $(seq 1 $LINE_W); printf "${RST}\n"
   NL

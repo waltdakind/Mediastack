@@ -1,7 +1,7 @@
-# ==============================================================================
+﻿# ==============================================================================
 # MediaStack High-Performance & External WAN Gateway Caddyfile
 # Node: VOLTAIREDEUX (192.168.4.30)
-# Features: Multi-Domain Routing (voltairedeux.local, ordinateur.local, mediaserver.local)
+# Features: Multi-Domain Routing (voltairedeux.local, voltaireun.local, mediaserver.local)
 #           Cross-Node Failover, Zero-Latency Streaming, Full Subdomain Support
 # ==============================================================================
 {
@@ -9,7 +9,7 @@
 }
 
 # 1. Main Dashboard & API Gateway Portal
-http://voltairedeux.local, http://ordinateur.local, http://mediaserver.local, http://192.168.4.30, http://localhost, http://127.0.0.1 {
+http://voltairedeux.local, http://voltaireun.local, http://mediaserver.local, http://192.168.4.30, http://localhost, http://127.0.0.1 {
 	# Proxy API Gateway routes
 	handle /api/* {
 		reverse_proxy api-gateway:3000
@@ -40,19 +40,19 @@ http://voltairedeux.local, http://ordinateur.local, http://mediaserver.local, ht
 }
 
 # 2. Standalone API Gateway Service
-http://api.voltairedeux.local, http://api.ordinateur.local, http://api.mediaserver.local {
+http://api.voltairedeux.local, http://api.voltaireun.local, http://api.mediaserver.local {
 	reverse_proxy api-gateway:3000
 }
 
 # 3. Homepage (GetHomepage) with Upstream Host Header
-http://homepage.voltairedeux.local, http://homepage.ordinateur.local, http://homepage.mediaserver.local {
+http://homepage.voltairedeux.local, http://homepage.voltaireun.local, http://homepage.mediaserver.local {
 	reverse_proxy homepage:3000 {
 		header_up Host {upstream_hostport}
 	}
 }
 
 # 4. Jellyfin High-Performance Media & Music Streaming (w/ Cross-Node Failover)
-http://jellyfin.voltairedeux.local, http://jellyfin.ordinateur.local, http://jellyfin.mediaserver.local {
+http://jellyfin.voltairedeux.local, http://jellyfin.voltaireun.local, http://jellyfin.mediaserver.local {
 	# Real-time streaming headers & WebSocket support
 	reverse_proxy jellyfin:8096 192.168.4.21:8096 {
 		lb_policy first
@@ -67,7 +67,7 @@ http://jellyfin.voltairedeux.local, http://jellyfin.ordinateur.local, http://jel
 }
 
 # 5. MusicBrainz & Picard WebService API (w/ Cross-Node Failover to Port 5000)
-http://musicbrainz.voltairedeux.local, http://musicbrainz.voltaireun.local, http://musicbrainz.ordinateur.local, http://musicbrainz.mediaserver.local {
+http://musicbrainz.voltairedeux.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltaireun.local, http://musicbrainz.mediaserver.local {
 	# Allow remote Picard tagging lookups from any network client
 	@options {
 		method OPTIONS
@@ -92,32 +92,32 @@ http://musicbrainz.voltairedeux.local, http://musicbrainz.voltaireun.local, http
 }
 
 # 6. Radarr Movie Management
-http://radarr.voltairedeux.local, http://radarr.ordinateur.local, http://radarr.mediaserver.local {
+http://radarr.voltairedeux.local, http://radarr.voltaireun.local, http://radarr.mediaserver.local {
 	reverse_proxy radarr:7878
 }
 
 # 7. Sonarr TV Show Management
-http://sonarr.voltairedeux.local, http://sonarr.ordinateur.local, http://sonarr.mediaserver.local {
+http://sonarr.voltairedeux.local, http://sonarr.voltaireun.local, http://sonarr.mediaserver.local {
 	reverse_proxy sonarr:8989
 }
 
 # 8. Jellyseerr Media Requests
-http://jellyseerr.voltairedeux.local, http://jellyseerr.ordinateur.local, http://jellyseerr.mediaserver.local {
+http://jellyseerr.voltairedeux.local, http://jellyseerr.voltaireun.local, http://jellyseerr.mediaserver.local {
 	reverse_proxy jellyseerr:5055
 }
 
 # 9. Prowlarr Indexer Management
-http://prowlarr.voltairedeux.local, http://prowlarr.ordinateur.local, http://prowlarr.mediaserver.local {
+http://prowlarr.voltairedeux.local, http://prowlarr.voltaireun.local, http://prowlarr.mediaserver.local {
 	reverse_proxy prowlarr:9696
 }
 
 # 10. Bazarr Subtitles Management
-http://bazarr.voltairedeux.local, http://bazarr.ordinateur.local, http://bazarr.mediaserver.local {
+http://bazarr.voltairedeux.local, http://bazarr.voltaireun.local, http://bazarr.mediaserver.local {
 	reverse_proxy bazarr:6767
 }
 
 # 11. Transmission Torrent Client
-http://transmission.voltairedeux.local, http://transmission.ordinateur.local, http://transmission.mediaserver.local {
+http://transmission.voltairedeux.local, http://transmission.voltaireun.local, http://transmission.mediaserver.local {
 	@root path /
 	redir @root /transmission/web/ 302
 
@@ -127,18 +127,18 @@ http://transmission.voltairedeux.local, http://transmission.ordinateur.local, ht
 }
 
 # 12. TVHeadend Live TV & DVR Backend
-http://tvheadend.voltairedeux.local, http://tvheadend.ordinateur.local, http://tvheadend.mediaserver.local {
+http://tvheadend.voltairedeux.local, http://tvheadend.voltaireun.local, http://tvheadend.mediaserver.local {
 	reverse_proxy tvheadend:9981
 }
 
 # 13. HDHomeRun Physical Tuner Gateway
-http://hdhomerun.voltairedeux.local, http://hdhomerun.ordinateur.local, http://hdhomerun.mediaserver.local {
+http://hdhomerun.voltairedeux.local, http://hdhomerun.voltaireun.local, http://hdhomerun.mediaserver.local {
 	reverse_proxy 192.168.4.45:80 {
 		fail_duration 10s
 	}
 }
 
 # 14. Mediastack Database Web GUI
-http://db.voltairedeux.local, http://db.ordinateur.local, http://db.mediaserver.local {
+http://db.voltairedeux.local, http://db.voltaireun.local, http://db.mediaserver.local {
 	reverse_proxy mediastack-db:8080
 }

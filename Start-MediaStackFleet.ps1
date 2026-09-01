@@ -1,4 +1,4 @@
-<#
+﻿<#
 ====================================================================================================
  .SYNOPSIS
     MediaStack Primary Fleet Controller, Port Publisher, Database Sentinel & Interactive Console.
@@ -18,7 +18,7 @@
     - Fresh Image Redeployment: Pulls latest container images (docker compose pull), removes orphans,
       and rebuilds the stack with zero downtime.
     - Reverse Proxy & DDNS Health: Validates Caddyfile syntax and checks route responses for local
-      LAN (*.ordinateur.local) and external DDNS (waltdakind.xubi.org).
+      LAN (*.voltaireun.local) and external DDNS (waltdakind.xubi.org).
     - Persistent Console UI: Color-coded interface, progress feedback, structured session logging
       in logs/mediastack_ops_*.log, and a persistent menu loop that gracefully handles Ctrl+C.
 
@@ -930,8 +930,8 @@ function Invoke-RoutingAndDDNSDiagnostics {
         @{ Name="External Jellyseerr DDNS"; Url="http://127.0.0.1:80";            Host="jellyseerr.waltdakind.xubi.org" },
         @{ Name="External Sonarr DDNS";     Url="http://127.0.0.1:80/ping";       Host="sonarr.waltdakind.xubi.org" },
         @{ Name="External Radarr DDNS";     Url="http://127.0.0.1:80/ping";       Host="radarr.waltdakind.xubi.org" },
-        @{ Name="Local LAN Homepage";       Url="http://127.0.0.1:80";            Host="ordinateur.local" },
-        @{ Name="Local LAN Jellyfin";       Url="http://127.0.0.1:80";            Host="jellyfin.ordinateur.local" },
+        @{ Name="Local LAN Homepage";       Url="http://127.0.0.1:80";            Host="voltaireun.local" },
+        @{ Name="Local LAN Jellyfin";       Url="http://127.0.0.1:80";            Host="jellyfin.voltaireun.local" },
         @{ Name="Jellyfin Direct Port";     Url="http://127.0.0.1:8096/health";   Host="" },
         @{ Name="MusicBrainz Server Direct";Url="http://127.0.0.1:5000";          Host="" }
     )

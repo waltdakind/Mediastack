@@ -75,12 +75,12 @@ foreach ($db in $dbFiles) {
 
 # Vector C: Ingress Routing Health
 $routesToProbe = @(
-    @{ Route="ordinateur.local"; Container="caddy"; Path="" },
-    @{ Route="jellyfin.ordinateur.local"; Container="jellyfin"; Path="/health" },
-    @{ Route="sonarr.ordinateur.local"; Container="sonarr"; Path="/ping" },
-    @{ Route="radarr.ordinateur.local"; Container="radarr"; Path="/ping" },
-    @{ Route="prowlarr.ordinateur.local"; Container="prowlarr"; Path="" },
-    @{ Route="jellyseerr.ordinateur.local"; Container="jellyseerr"; Path="/api/v1/status" },
+    @{ Route="voltaireun.local"; Container="caddy"; Path="" },
+    @{ Route="jellyfin.voltaireun.local"; Container="jellyfin"; Path="/health" },
+    @{ Route="sonarr.voltaireun.local"; Container="sonarr"; Path="/ping" },
+    @{ Route="radarr.voltaireun.local"; Container="radarr"; Path="/ping" },
+    @{ Route="prowlarr.voltaireun.local"; Container="prowlarr"; Path="" },
+    @{ Route="jellyseerr.voltaireun.local"; Container="jellyseerr"; Path="/api/v1/status" },
     @{ Route="db.mediaserver.local"; Container="mediastack-db"; Path="" }
 )
 

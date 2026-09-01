@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 [System.Console]::InputEncoding  = [System.Text.Encoding]::UTF8
 $PSDefaultParameterValues['Out-File:Encoding']   = 'utf8'
@@ -233,18 +233,18 @@ function Test-Routes {
     }
     
     $routes = @(
-        @{ Route="ordinateur.local"; Container="caddy"; Path="" },
-        @{ Route="jellyfin.ordinateur.local"; Container="jellyfin"; Path="" },
-        @{ Route="radarr.ordinateur.local"; Container="radarr"; Path="/ping" },
-        @{ Route="sonarr.ordinateur.local"; Container="sonarr"; Path="/ping" },
-        @{ Route="jellyseerr.ordinateur.local"; Container="jellyseerr"; Path="" },
-        @{ Route="prowlarr.ordinateur.local"; Container="prowlarr"; Path="/ping" },
-        @{ Route="bazarr.ordinateur.local"; Container="bazarr"; Path="" },
-        @{ Route="transmission.ordinateur.local"; Container="transmission"; Path="" },
-        @{ Route="tvheadend.ordinateur.local"; Container="tvheadend"; Path="" },
-        @{ Route="hdhomerun.ordinateur.local"; Container="tvheadend"; Path="" },
-        @{ Route="db.ordinateur.local"; Container="mediastack-db"; Path="" },
-        @{ Route="node.ordinateur.local"; Container="node"; Path="" }
+        @{ Route="voltaireun.local"; Container="caddy"; Path="" },
+        @{ Route="jellyfin.voltaireun.local"; Container="jellyfin"; Path="" },
+        @{ Route="radarr.voltaireun.local"; Container="radarr"; Path="/ping" },
+        @{ Route="sonarr.voltaireun.local"; Container="sonarr"; Path="/ping" },
+        @{ Route="jellyseerr.voltaireun.local"; Container="jellyseerr"; Path="" },
+        @{ Route="prowlarr.voltaireun.local"; Container="prowlarr"; Path="/ping" },
+        @{ Route="bazarr.voltaireun.local"; Container="bazarr"; Path="" },
+        @{ Route="transmission.voltaireun.local"; Container="transmission"; Path="" },
+        @{ Route="tvheadend.voltaireun.local"; Container="tvheadend"; Path="" },
+        @{ Route="hdhomerun.voltaireun.local"; Container="tvheadend"; Path="" },
+        @{ Route="db.voltaireun.local"; Container="mediastack-db"; Path="" },
+        @{ Route="node.voltaireun.local"; Container="node"; Path="" }
     )
     
     foreach ($r in $routes) {
@@ -468,49 +468,49 @@ TV_DIR=$PSScriptRoot\downloads\watch
     
     $CaddyFile = Join-Path $ScriptDir "Caddyfile"
     $caddyContent = @'
-http://ordinateur.local {
+http://voltaireun.local {
     reverse_proxy homepage:3000
 }
 
-http://jellyfin.ordinateur.local {
+http://jellyfin.voltaireun.local {
     reverse_proxy jellyfin:8096
 }
 
-http://radarr.ordinateur.local {
+http://radarr.voltaireun.local {
     reverse_proxy radarr:7878
 }
 
-http://sonarr.ordinateur.local {
+http://sonarr.voltaireun.local {
     reverse_proxy sonarr:8989
 }
 
-http://jellyseerr.ordinateur.local {
+http://jellyseerr.voltaireun.local {
     reverse_proxy jellyseerr:5055
 }
 
-http://prowlarr.ordinateur.local {
+http://prowlarr.voltaireun.local {
     reverse_proxy prowlarr:9696
 }
 
-http://bazarr.ordinateur.local {
+http://bazarr.voltaireun.local {
     reverse_proxy bazarr:6767
 }
 
-http://transmission.ordinateur.local {
+http://transmission.voltaireun.local {
     reverse_proxy transmission:9091 {
         header_up X-Transmission-Session-Id {http.request.header.X-Transmission-Session-Id}
     }
 }
 
-http://tvheadend.ordinateur.local {
+http://tvheadend.voltaireun.local {
     reverse_proxy tvheadend:9981
 }
 
-http://hdhomerun.ordinateur.local {
+http://hdhomerun.voltaireun.local {
     reverse_proxy 192.168.4.45:80
 }
 
-http://db.ordinateur.local {
+http://db.voltaireun.local {
     reverse_proxy mediastack-db:8080
 }
 
