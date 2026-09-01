@@ -1,4 +1,4 @@
-/* =============================================================================
+﻿/* =============================================================================
    MediaStack Mission Control & Enterprise Fleet Hub
    Design System: Glassmorphism, Deep Space Dark Theme & Cybernetic Neon Accents
    ============================================================================= */
@@ -926,4 +926,10 @@ body {
     .services-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* LCP Optimization: Content Visibility for Below-the-fold Cards */
+.service-card, .radar-row-card {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 120px;
 }

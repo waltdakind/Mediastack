@@ -1,4 +1,4 @@
-# =============================================================================
+﻿# =============================================================================
 # Caddyfile - MediaStack Master Reverse Proxy
 # Supports Multi-Server Load Balancing, Failover, LAN (*.voltaireun.local / *.voltairedeux.local) & DDNS (waltdakind.xubi.org)
 # Full End-to-End TLS / HTTPS (:443) with Custom Root CA & Wildcard SANs
@@ -276,31 +276,14 @@ https://hdhomerun.ordinateur.local, https://hdhomerun.voltaireun.local, https://
     reverse_proxy 192.168.4.45:80
 }
 
-# --- L. MusicBrainz Mirror & Picard API ---
+# --- L. MusicBrainz Mirror ---
 https://musicbrainz.waltdakind.xubi.org, https://musicbrainz.ordinateur.local, https://musicbrainz.voltaireun.local, https://musicbrainz.voltairedeux.local {
     import security_headers
     import custom_tls
     encode gzip zstd
-
-    @options {
-        method OPTIONS
-    }
-    handle @options {
-        header Access-Control-Allow-Origin "*"
-        header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-        header Access-Control-Allow-Headers "*"
-        respond "" 204
-    }
-
-    reverse_proxy 192.168.4.21:5000 127.0.0.1:5001 192.168.4.30:5001 {
+    reverse_proxy 192.168.4.21:5000 127.0.0.1:5001 {
         lb_policy first
         fail_duration 10s
-        flush_interval -1
-
-        header_up Host {host}
-        header_up X-Real-IP {remote_host}
-        header_up Authorization {http.request.header.Authorization}
-        header_down Access-Control-Allow-Origin "*"
     }
 }
 
