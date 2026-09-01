@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Invoke-VoltaireDeuxAiAdvisor.ps1 - Deep Stack Analyzer, AI Telemetry Ingestion & Optimization Staging Engine.
 
@@ -134,9 +134,9 @@ $actionPlan   += 'Apply PRAGMA wal_autocheckpoint=1000 and PRAGMA busy_timeout=5
 # Vector 3: Caddy Reverse Proxy & Failover Routing
 $expertAdvice += ''
 $expertAdvice += '### 3. Caddy Reverse Proxy & Active/Passive Failover'
-$expertAdvice += '- **Upstream Failover Tuning:** Configure master `Caddyfile` with `lb_try_duration 4s` and `fail_duration 15s` on streaming routes, enabling seamless failover to VoltaireDeux if primary server transcoding bottlenecks.'
+$expertAdvice += '- **Upstream Failover Tuning:** Configure primary `Caddyfile` with `lb_try_duration 4s` and `fail_duration 15s` on streaming routes, enabling seamless failover to VoltaireDeux if primary server transcoding bottlenecks.'
 $expertAdvice += '- **Internal Subdomain Resolution:** Ensure `*.voltaireun.local` and `*.voltairedeux.local` domain host headers are dynamically forwarded with preserved client IPs.'
-$actionPlan   += 'Synchronize master Caddyfile with dynamic host routing and HA failover'
+$actionPlan   += 'Synchronize primary Caddyfile with dynamic host routing and HA failover'
 
 # Vector 4: Workload Partitioning & AI Resource Sharing
 $expertAdvice += ''

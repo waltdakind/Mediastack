@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Restores the MediaStack and Caddy reverse proxy to the verified working configuration.
 
@@ -135,7 +135,7 @@ if ((-not (Test-Path $caddyfilePath)) -or $Force) {
     Write-Host "  -> Writing verified Caddyfile (DDNS & Cluster Failover)..." -ForegroundColor Cyan
     $caddyContent = @'
 # =============================================================================
-# Caddyfile - MediaStack Master Reverse Proxy
+# Caddyfile - MediaStack Primary Reverse Proxy
 # Supports Multi-Server Load Balancing, Failover, LAN (*.ordinateur.local) & DDNS (waltdakind.xubi.org)
 # =============================================================================
 

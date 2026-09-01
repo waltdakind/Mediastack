@@ -1,6 +1,6 @@
-<#
+﻿<#
 .SYNOPSIS
-    MediaStackOps - Master Enterprise Operations, Node Discovery & Database Lifecycle Module.
+    MediaStackOps - Primary Enterprise Operations, Node Discovery & Database Lifecycle Module.
 
 .DESCRIPTION
     Provides core enterprise-grade infrastructure functions for the dual-node MediaStack ecosystem
@@ -736,7 +736,7 @@ function New-MediaStackClusterHandoff {
     $lines += '```'
     $lines += ""
     $lines += "### Code & Configuration Layout:"
-    $lines += '- **Ingress Proxy:** Master `Caddyfile` with dynamic `Host` header routing (`*.voltaireun.local` and `*.voltairedeux.local`).'
+    $lines += '- **Ingress Proxy:** Primary `Caddyfile` with dynamic `Host` header routing (`*.voltaireun.local` and `*.voltairedeux.local`).'
     $lines += '- **Orchestration:** `docker-compose.yml` with host volume mounts and bridge network `mediastack`.'
     $lines += '- **Database Sentinel:** Lock-free integrity checks via `MediaStackOps.psm1` (`PRAGMA quick_check;`).'
     $lines += '- **Cluster Push-Pull:** Git commits pushed from VoltaireDeux and ingested once per day via VoltaireUn daily poller.'

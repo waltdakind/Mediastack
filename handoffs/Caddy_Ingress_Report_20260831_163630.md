@@ -1,4 +1,4 @@
-﻿# Caddy Master Ingress & End-to-End HTTPS Security Report
+﻿# Caddy Primary Ingress & End-to-End HTTPS Security Report
 
 - **Execution Timestamp:** 2026-08-31 16:36:24
 - **Primary Server IP (VoltaireUn):** 192.168.4.21

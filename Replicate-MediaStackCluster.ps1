@@ -1,6 +1,6 @@
-<#
+﻿<#
 .SYNOPSIS
-    Replicate-MediaStackCluster.ps1 - Master Cluster Multi-Service Replication & Synchronization Engine.
+    Replicate-MediaStackCluster.ps1 - Primary Cluster Multi-Service Replication & Synchronization Engine.
 
 .DESCRIPTION
     Comprehensive multi-service replication engine synchronizing state across the Voltaire cluster:

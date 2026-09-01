@@ -1,6 +1,6 @@
 ﻿# Caddy Primary Ingress & End-to-End HTTPS Security Report
 
-- **Execution Timestamp:** 2026-08-31 15:28:43
+- **Execution Timestamp:** 2026-08-31 20:50:17
 - **Primary Server IP (VoltaireUn):** 192.168.4.21
 - **Secondary Server IP (VoltaireDeux):** 192.168.4.30
 - **External DDNS Domain:** https://waltdakind.xubi.org
@@ -13,13 +13,13 @@
 
 | Route / Endpoint | Security Protocol | Status |
 | :--- | :---: | :---: |
-| Direct Streaming Socket (:8096) | HTTP -> HTTPS (301 Redirect) | VERIFIED SECURE (OK) |
+| Direct Streaming Socket (:8096) | HTTP -> HTTPS (301 Redirect) | STANDBY |
 | HTTP Root Ingress (:80 -> HTTPS 301) | HTTP -> HTTPS (301 Redirect) | VERIFIED SECURE (OK) |
-| HTTPS Root Ingress (:443 -> Jellyfin) | Custom 4096-bit SAN TLS | VERIFIED SECURE (OK) |
-| External DDNS HTTPS Root (waltdakind.xubi.org) | Custom 4096-bit SAN TLS | VERIFIED SECURE (OK) |
-| External Jellyfin Subdomain (jellyfin.waltdakind.xubi.org) | Custom 4096-bit SAN TLS | VERIFIED SECURE (OK) |
-| Local LAN HTTPS Domain (voltaireun.local) | Custom 4096-bit SAN TLS | VERIFIED SECURE (OK) |
-| Local LAN HTTPS Domain (voltairedeux.local) | Custom 4096-bit SAN TLS | VERIFIED SECURE (OK) |
+| HTTPS Root Ingress (:443 -> Jellyfin) | Custom 4096-bit SAN TLS | STANDBY |
+| External DDNS HTTPS Root (waltdakind.xubi.org) | Custom 4096-bit SAN TLS | STANDBY |
+| External Jellyfin Subdomain (jellyfin.waltdakind.xubi.org) | Custom 4096-bit SAN TLS | STANDBY |
+| Local LAN HTTPS Domain (voltaireun.local) | Custom 4096-bit SAN TLS | STANDBY |
+| Local LAN HTTPS Domain (voltairedeux.local) | Custom 4096-bit SAN TLS | STANDBY |
 | Internal LAN HTTP -> HTTPS Redirect (voltaireun.local) | HTTP -> HTTPS (301 Redirect) | VERIFIED SECURE (OK) |
 
 ---

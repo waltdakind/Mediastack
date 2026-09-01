@@ -1,5 +1,5 @@
-# ==============================================================================
-# PrimarySentinelSuite.ps1 - Master Primary Music Server Sentinel & Health Engine
+﻿# ==============================================================================
+# PrimarySentinelSuite.ps1 - Primary Primary Music Server Sentinel & Health Engine
 # Real-Time Dual-Node Watchdog, Picard Alignment, Self-Healing & Telemetry Matrix
 # Nodes: ORDINATEURDEVOLT (192.168.4.21:5000) <---> VOLTAIREDEUX (192.168.4.30:5001)
 # ==============================================================================
@@ -82,7 +82,7 @@ if ($TargetSecondary) {
     exit 0
 }
 
-# --- MASTER SENTINEL AUDIT FUNCTION ---
+# --- PRIMARY SENTINEL AUDIT FUNCTION ---
 function Invoke-SentinelAudit {
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $fileTimestamp = Get-Date -Format "yyyyMMdd_HHmmss"

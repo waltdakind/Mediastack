@@ -3,7 +3,7 @@
 | Parameter | Cluster Specification |
 | :--- | :--- |
 | **Local Node** | VoltaireDeux (192.168.4.30) - AI Node & Ingress |
-| **Primary Peer Node** | VoltaireUn (192.168.4.21) - Master 24/7 Server |
+| **Primary Peer Node** | VoltaireUn (192.168.4.21) - Primary 24/7 Server |
 | **Cluster Naming Standard**| French Ordinal (VoltaireUn, VoltaireDeux, VoltaireTrois...) |
 | **LAN Ping Latency** | 9.67 ms |
 | **VoltaireUn MusicBrainz**| HTTP 000 (:5000) |

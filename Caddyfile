@@ -1,5 +1,5 @@
 ﻿# =============================================================================
-# Caddyfile - MediaStack Master Reverse Proxy
+# Caddyfile - MediaStack Primary Reverse Proxy
 # Supports Multi-Server Load Balancing, Failover, LAN (*.voltaireun.local / *.voltairedeux.local) & DDNS (waltdakind.xubi.org)
 # Full End-to-End TLS / HTTPS (:443) with Custom Root CA & Wildcard SANs
 # Default Policy: Direct ALL root incoming traffic to JELLYFIN Media Streaming

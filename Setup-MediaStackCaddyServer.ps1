@@ -1,9 +1,9 @@
-<#
+﻿<#
 .SYNOPSIS
-    Setup-MediaStackCaddyServer.ps1 - Master Caddy Reverse Proxy & Dual-Node Ingress Security Engine.
+    Setup-MediaStackCaddyServer.ps1 - Primary Caddy Reverse Proxy & Dual-Node Ingress Security Engine.
 
 .DESCRIPTION
-    Fully secures and deploys the Master Caddy Reverse Proxy server across the MediaStack cluster:
+    Fully secures and deploys the Primary Caddy Reverse Proxy server across the MediaStack cluster:
     1. Directs ALL root incoming web & streaming traffic to JELLYFIN (:80, :443, :8096).
     2. Enforces HTTPS & HSTS encryption across ALL external requests (waltdakind.xubi.org)
        AND ALL internal LAN requests (*.voltaireun.local, *.voltairedeux.local, 192.168.4.21, 192.168.4.30).
@@ -105,13 +105,13 @@ if ($InstallRootCA -and (Test-Path $caCrt)) {
 }
 
 # ==============================================================================
-# STAGE 2: GENERATE MASTER OPTIMIZED CADDYFILE (FULL HTTPS ENFORCEMENT)
+# STAGE 2: GENERATE PRIMARY OPTIMIZED CADDYFILE (FULL HTTPS ENFORCEMENT)
 # ==============================================================================
-Write-Host "`n[STAGE 2/5] Synthesizing Master Caddyfile with Full Internal/External HTTPS Enforcement..." -ForegroundColor Yellow
+Write-Host "`n[STAGE 2/5] Synthesizing Primary Caddyfile with Full Internal/External HTTPS Enforcement..." -ForegroundColor Yellow
 
 $template = @'
 # =============================================================================
-# Caddyfile - MediaStack Master Reverse Proxy
+# Caddyfile - MediaStack Primary Reverse Proxy
 # Supports Multi-Server Load Balancing, Failover, LAN (*.voltaireun.local / *.voltairedeux.local) & DDNS (__EXTERNAL_DOMAIN__)
 # Full End-to-End TLS / HTTPS (:443) with Custom Root CA & Wildcard SANs
 # Default Policy: Direct ALL root incoming traffic to JELLYFIN Media Streaming
@@ -409,7 +409,7 @@ https://db.ordinateur.local, https://db.voltaireun.local, https://db.voltairedeu
 
 $caddyfileContent = $template.Replace("__PRIMARY_IP__", $PrimaryServerIP).Replace("__SECONDARY_IP__", $SecondaryServerIP).Replace("__EXTERNAL_DOMAIN__", $ExternalDomain)
 $caddyfileContent | Set-Content -Path $CaddyfilePath -Encoding UTF8
-Write-Host "  [OK] Master Caddyfile generated: $CaddyfilePath" -ForegroundColor Green
+Write-Host "  [OK] Primary Caddyfile generated: $CaddyfilePath" -ForegroundColor Green
 
 # ==============================================================================
 # STAGE 3: VALIDATE CADDYFILE SYNTAX & DEPLOY / RELOAD
@@ -497,7 +497,7 @@ $reportTag = Get-Date -Format "yyyyMMdd_HHmmss"
 $reportPath = Join-Path $HandoffsDir "Caddy_Ingress_Report_${reportTag}.md"
 
 $md = @()
-$md += "# Caddy Master Ingress & End-to-End HTTPS Security Report"
+$md += "# Caddy Primary Ingress & End-to-End HTTPS Security Report"
 $md += ""
 $md += "- **Execution Timestamp:** $timestamp"
 $md += "- **Primary Server IP (VoltaireUn):** $PrimaryServerIP"

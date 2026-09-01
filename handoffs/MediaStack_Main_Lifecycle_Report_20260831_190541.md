@@ -1,15 +1,15 @@
-# MediaStack Master Lifecycle Execution Report
+﻿# MediaStack Primary Lifecycle Execution Report
 **Timestamp:** 2026-08-31 19:05:41 | **Host:** VOLTAIREDEUX | **Engine:** `Invoke-MediaStackMainLifecycle.ps1`
 
 ## 1. Lifecycle Stage Execution Matrix
 | Stage | Status | Details |
 | :--- | :--- | :--- |
-| **Analysis** | PASS (3 issues detected) | Verified in master pipeline |
-| **Backup** | SKIPPED | Verified in master pipeline |
-| **Repair** | SKIPPED | Verified in master pipeline |
-| **Containers** | SKIPPED | Verified in master pipeline |
-| **MusicBrainzSync** | SKIPPED | Verified in master pipeline |
-| **AutoHeal** | STANDBY | Verified in master pipeline |
+| **Analysis** | PASS (3 issues detected) | Verified in primary pipeline |
+| **Backup** | SKIPPED | Verified in primary pipeline |
+| **Repair** | SKIPPED | Verified in primary pipeline |
+| **Containers** | SKIPPED | Verified in primary pipeline |
+| **MusicBrainzSync** | SKIPPED | Verified in primary pipeline |
+| **AutoHeal** | STANDBY | Verified in primary pipeline |
 
 ## 2. Diagnostics & Repairs Summary
 - **Issues Diagnosed:** 3

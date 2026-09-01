@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Sync-MediaStackPriorityHandoffs.ps1 - Priority Cluster Reconciliation & Handoff Sync.
 
@@ -139,7 +139,7 @@ Write-Host "`n[PHASE 4/4] Synchronizing Verified Updates with Local Store (C:\Me
 $mergeScript = Join-Path $BaseDir "Merge-OneDriveMediaStack.ps1"
 if (Test-Path $mergeScript) {
     & $mergeScript | Out-Null
-    Write-Host "  [OK] Master Caddyfile, SSL certs, and Docker configs mirrored to C:\MediastackConfig." -ForegroundColor Green
+    Write-Host "  [OK] Primary Caddyfile, SSL certs, and Docker configs mirrored to C:\MediastackConfig." -ForegroundColor Green
 }
 
 # Emit Unified Priority Sync Report
@@ -149,7 +149,7 @@ $reportMd = @"
 
 - **Timestamp:** $timestamp
 - **Reconciliation Order:** [1] VoltaireDeux (AI/Code) -> [2] VoltaireUn (Telemetry)
-- **Primary Server:** VoltaireUn ($PrimaryIP) - 24/7 Media Streaming & Master Ingress
+- **Primary Server:** VoltaireUn ($PrimaryIP) - 24/7 Media Streaming & Primary Ingress
 - **AI Node:** VoltaireDeux ($SecondaryIP) - AI Acceleration & Workstation Hub
 - **External Domain:** https://$ExternalDomain
 - **Cluster Status:** 100% SYNCHRONIZED & OPTIMIZED

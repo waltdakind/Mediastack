@@ -1,11 +1,11 @@
-<#
+﻿<#
 .SYNOPSIS
     Repair-TransmissionDaemon.ps1 - BitTorrent Transmission Daemon Diagnostic & Repair Engine.
 
 .DESCRIPTION
     Diagnoses and repairs Transmission download client issues:
     1. Audits container status on port 9091/tcp (Web UI/RPC) and 51413/tcp+udp (Peer transfer).
-    2. Inspects settings.json RPC authentication credentials against Master Secrets Vault.
+    2. Inspects settings.json RPC authentication credentials against Primary Secrets Vault.
     3. Clears corrupted .resume torrent state files.
     4. Validates download directory permissions and disk capacity.
 

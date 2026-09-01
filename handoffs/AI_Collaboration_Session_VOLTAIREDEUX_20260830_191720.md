@@ -37,11 +37,11 @@
 
 ### Recent System Incidents Analyzed:
 - [latest_ai_advice_for_voltaireun.md] ### 3. Caddy Reverse Proxy & Active/Passive Failover
-- [latest_ai_advice_for_voltaireun.md] - **Upstream Failover Tuning:** Configure master `Caddyfile` with `lb_try_duration 4s` and `fail_duration 15s` on streaming routes, enabling seamless failover to VoltaireDeux if primary server transcoding bottlenecks.
-- [latest_ai_advice_for_voltaireun.md] - [x] Synchronize master Caddyfile with dynamic host routing and HA failover
+- [latest_ai_advice_for_voltaireun.md] - **Upstream Failover Tuning:** Configure primary `Caddyfile` with `lb_try_duration 4s` and `fail_duration 15s` on streaming routes, enabling seamless failover to VoltaireDeux if primary server transcoding bottlenecks.
+- [latest_ai_advice_for_voltaireun.md] - [x] Synchronize primary Caddyfile with dynamic host routing and HA failover
 - [AI_Expert_Advice_FOR_VOLTAIREUN_20260830_191740.md] ### 3. Caddy Reverse Proxy & Active/Passive Failover
-- [AI_Expert_Advice_FOR_VOLTAIREUN_20260830_191740.md] - **Upstream Failover Tuning:** Configure master `Caddyfile` with `lb_try_duration 4s` and `fail_duration 15s` on streaming routes, enabling seamless failover to VoltaireDeux if primary server transcoding bottlenecks.
-- [AI_Expert_Advice_FOR_VOLTAIREUN_20260830_191740.md] - [x] Synchronize master Caddyfile with dynamic host routing and HA failover
+- [AI_Expert_Advice_FOR_VOLTAIREUN_20260830_191740.md] - **Upstream Failover Tuning:** Configure primary `Caddyfile` with `lb_try_duration 4s` and `fail_duration 15s` on streaming routes, enabling seamless failover to VoltaireDeux if primary server transcoding bottlenecks.
+- [AI_Expert_Advice_FOR_VOLTAIREUN_20260830_191740.md] - [x] Synchronize primary Caddyfile with dynamic host routing and HA failover
 - [Api_Verification_Report_20260830_191702.md] | MusicBrainz WS2 | http://localhost:80/ws/2/artist/5b11f4ce-a62d-471e-81fc-a69a8278c7da?fmt=json | STANDBY | FAIL | 67ms | STANDBY (Database dump import pending on port 5001) |
 - [Api_Verification_Report_20260830_191702.md] | HDHomeRun Tuner | http://localhost:80/discover.json | STANDBY | FAIL | 3004ms | STANDBY (Hardware Tuner Standby / 192.168.4.45) |
 - [Proxy_Port_Diagnostic_Report_20260830_191636.md] - **Critical Failures Remaining:** 0

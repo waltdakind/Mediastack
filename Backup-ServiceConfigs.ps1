@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Backup-ServiceConfigs.ps1 - Atomic Hot Backup Engine for Individual MediaStack Services.
 
@@ -48,7 +48,7 @@ $servicesToBackup = if ($TargetService -eq "All") {
     @($TargetService)
 }
 
-# 1. Master Secrets Vault Backup
+# 1. Primary Secrets Vault Backup
 if ($servicesToBackup -contains "Secrets") {
     $secDst = Join-Path $StagingDir "config\secrets"
     New-Item -ItemType Directory -Force -Path $secDst | Out-Null
@@ -56,7 +56,7 @@ if ($servicesToBackup -contains "Secrets") {
     $secEnv  = Join-Path $BaseDir "config\secrets\secrets.env"
     if (Test-Path $secFile) { Copy-Item -Path $secFile -Destination $secDst -Force }
     if (Test-Path $secEnv)  { Copy-Item -Path $secEnv -Destination $secDst -Force }
-    Write-Host "  [OK] Staged Master Secrets Vault." -ForegroundColor Green
+    Write-Host "  [OK] Staged Primary Secrets Vault." -ForegroundColor Green
 }
 
 # 2. Caddy Gateway Backup

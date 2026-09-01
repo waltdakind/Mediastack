@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Replicate-MediaStackX64Improvements.ps1 - Cross-Architecture x64 Performance & Resiliency Replicator.
 
@@ -91,7 +91,7 @@ $toolkits = @(
     @{ Name = "Optimize-MediaStackPerformance.ps1"; Role = "End-to-End Latency & Load Time Accelerator" },
     @{ Name = "Optimize-LocalLcp.ps1"; Role = "Sub-Second LCP Core Web Vitals Optimizer" },
     @{ Name = "Test-LocalNetworkSwitch.ps1"; Role = "Physical Switch, MTU & Port Blocking Diagnostic Suite" },
-    @{ Name = "Setup-MediaStackCaddyServer.ps1"; Role = "Master Caddy Edge Caching & HTTPS Generator" },
+    @{ Name = "Setup-MediaStackCaddyServer.ps1"; Role = "Primary Caddy Edge Caching & HTTPS Generator" },
     @{ Name = "start-x64.ps1"; Role = "x64 Main Server Orchestration Launcher" }
 )
 
@@ -205,7 +205,7 @@ This handoff packages and verifies the replication of all latest **Performance A
  ├────────────────────────────────────────┤       ├────────────────────────────────────────┤
  │ • 24/7 Media Server Hub (Ingress)      │  ◄──► │ • AI Acceleration & Push Source (Ollama│
  │ • HDHomeRun Dual ATSC Tuner Proxy      │  SYNC │ • MusicBrainz Secondary Mirror (:5001) │
- │ • Master Caddy Proxy (HTTPS :443)      │       │ • x64 High-Performance Docker Compose  │
+ │ • Primary Caddy Proxy (HTTPS :443)      │       │ • x64 High-Performance Docker Compose  │
  │ • Real-Time Switch Radar HUD           │       │ • Self-Healing Diagnostic Engine       │
  └────────────────────────────────────────┘       └────────────────────────────────────────┘
 ```
@@ -222,7 +222,7 @@ This handoff packages and verifies the replication of all latest **Performance A
 | [`Optimize-LocalLcp.ps1`](file:///c:/Users/waltd/OneDrive/Mediastack/Optimize-LocalLcp.ps1) | Core Web Vitals Optimizer | Enforces DNS preconnects, font-display swap, script deferrals, and CSS `content-visibility: auto`. |
 | [`Test-LocalNetworkSwitch.ps1`](file:///c:/Users/waltd/OneDrive/Mediastack/Test-LocalNetworkSwitch.ps1) | Switch & MTU Diagnostics | Audits switch latency (1.9ms), unfragmented 1500 MTU, and all 15 core service ports. |
 | [`dashboard/`](file:///c:/Users/waltd/OneDrive/Mediastack/dashboard/index.html) | Mission Control Web Interface | Real-time switch radar, cluster node health, application hub, and instant launchers. |
-| [`Caddyfile`](file:///c:/Users/waltd/OneDrive/Mediastack/Caddyfile) | Master Reverse Proxy | Zstandard dual-stream compression, 30-day web bundle cache, and 7-day media poster caching. |
+| [`Caddyfile`](file:///c:/Users/waltd/OneDrive/Mediastack/Caddyfile) | Primary Reverse Proxy | Zstandard dual-stream compression, 30-day web bundle cache, and 7-day media poster caching. |
 | [`docker-compose.x64.yml`](file:///c:/Users/waltd/OneDrive/Mediastack/docker-compose.x64.yml) | x64 Compose Stack | Updated with `./certs` and `./dashboard` volume mappings. |
 
 ---

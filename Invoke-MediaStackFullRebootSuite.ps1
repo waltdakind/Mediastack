@@ -1,9 +1,9 @@
-<#
+﻿<#
 .SYNOPSIS
     Invoke-MediaStackFullRebootSuite.ps1 - End-to-End Diagnostic, Backup, Clean Shutdown, Repull, Restart & AI Sentinel.
 
 .DESCRIPTION
-    Executes a complete 7-stage master maintenance and reboot cycle:
+    Executes a complete 7-stage primary maintenance and reboot cycle:
     1. DIAGNOSE: Deep diagnostic sweep of host hardware, Docker engine, 18+ containers, SQLite/PostgreSQL DBs, L7 routing, and secrets vault.
     2. BACKUP: Full atomic compressed archive of configs, databases, compose manifests, and scripts to backups/.
     3. CLEAN SHUTDOWN: Graceful, dependency-ordered shutdown of all containers with SQLite journal flushing.
@@ -124,10 +124,10 @@ Write-Host ("  * Hardware Tuner  [192.168.4.45] : {0}" -f $(if ($pingTuner) { "O
 # 1.3 Secrets Vault Check
 if (Test-Path $SecretsFile) {
     $diag.SecretsStatus = "SECURED (Vault Present)"
-    Write-Host "  * Master Secrets Vault           : OK ($SecretsFile)" -ForegroundColor Green
+    Write-Host "  * Primary Secrets Vault           : OK ($SecretsFile)" -ForegroundColor Green
 } else {
     $diag.SecretsStatus = "MISSING"
-    Write-Host "  * Master Secrets Vault           : NOT FOUND" -ForegroundColor Red
+    Write-Host "  * Primary Secrets Vault           : NOT FOUND" -ForegroundColor Red
 }
 
 # 1.4 Database Lock & Journal Diagnostics

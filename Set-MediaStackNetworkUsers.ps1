@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Set-MediaStackNetworkUsers.ps1 - Multi-Node Network User Accounts & Reciprocal Read-Write SMB Share Provisioner.
 
@@ -149,7 +149,7 @@ foreach ($u in $nodeUsers) {
 
     $userStatusTable += [PSCustomObject]@{
         Username    = $u
-        Role        = if ($u -eq $ClusterUser) { "Master Cluster Sync" } else { "Node Network Peer" }
+        Role        = if ($u -eq $ClusterUser) { "Primary Cluster Sync" } else { "Node Network Peer" }
         Status      = $status
         PasswordSet = "Configured in Vault"
     }

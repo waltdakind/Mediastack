@@ -44,11 +44,11 @@
 - [Proxy_Port_Diagnostic_Report_20260830_182528.md] | **Jellyfin Subdomain** | http://jellyfin.voltaireun.local | 0 WARN | 835 ms | HTTP 0 via curl |
 - [Proxy_Port_Diagnostic_Report_20260830_182528.md] | **Radarr Subdomain** | http://radarr.voltaireun.local | 0 WARN | 813 ms | HTTP 0 via curl |
 - [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182514.md] - [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182225.md] - [latest_ai_advice_for_voltaireun.md] ### 3. Caddy Reverse Proxy & Active/Passive Failover
-- [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182514.md] - [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182225.md] - [latest_ai_advice_for_voltaireun.md] - **Upstream Failover Tuning:** Configure master `Caddyfile` with `lb_try_duration 4s` and `fail_duration 15s` on streaming routes, enabling seamless failover to VoltaireDeux if primary server transcoding bottlenecks.
-- [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182514.md] - [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182225.md] - [latest_ai_advice_for_voltaireun.md] - [x] Synchronize master Caddyfile with dynamic host routing and HA failover
+- [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182514.md] - [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182225.md] - [latest_ai_advice_for_voltaireun.md] - **Upstream Failover Tuning:** Configure primary `Caddyfile` with `lb_try_duration 4s` and `fail_duration 15s` on streaming routes, enabling seamless failover to VoltaireDeux if primary server transcoding bottlenecks.
+- [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182514.md] - [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182225.md] - [latest_ai_advice_for_voltaireun.md] - [x] Synchronize primary Caddyfile with dynamic host routing and HA failover
 - [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182225.md] - [latest_ai_advice_for_voltaireun.md] ### 3. Caddy Reverse Proxy & Active/Passive Failover
-- [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182225.md] - [latest_ai_advice_for_voltaireun.md] - **Upstream Failover Tuning:** Configure master `Caddyfile` with `lb_try_duration 4s` and `fail_duration 15s` on streaming routes, enabling seamless failover to VoltaireDeux if primary server transcoding bottlenecks.
-- [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182225.md] - [latest_ai_advice_for_voltaireun.md] - [x] Synchronize master Caddyfile with dynamic host routing and HA failover
+- [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182225.md] - [latest_ai_advice_for_voltaireun.md] - **Upstream Failover Tuning:** Configure primary `Caddyfile` with `lb_try_duration 4s` and `fail_duration 15s` on streaming routes, enabling seamless failover to VoltaireDeux if primary server transcoding bottlenecks.
+- [AI_Collaboration_Session_VOLTAIREDEUX_20260830_182225.md] - [latest_ai_advice_for_voltaireun.md] - [x] Synchronize primary Caddyfile with dynamic host routing and HA failover
 
 ---
 

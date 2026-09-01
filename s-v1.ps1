@@ -1,11 +1,11 @@
-<#
+﻿<#
 .SYNOPSIS
     s-v1.ps1 - Instant Shortcut Launcher for VoltaireUn (Main 24/7 Media Server Node).
 
 .DESCRIPTION
-    Launches VoltaireUn Master Execution Suite with full error remediation,
+    Launches VoltaireUn Main Execution Suite with full error remediation,
     Kestrel socket deadlock clearance, SQLite WAL performance tuning,
-    master Caddy edge caching, and service liveness verification.
+    primary Caddy edge caching, and service liveness verification.
 
 .EXAMPLE
     .\s-v1.ps1

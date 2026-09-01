@@ -1,9 +1,9 @@
-<#
+﻿<#
 .SYNOPSIS
     s-v2.ps1 - Instant Shortcut Launcher for VoltaireDeux (AI Acceleration & Workstation Node).
 
 .DESCRIPTION
-    Launches VoltaireDeux Master Execution Suite with Ollama AI model verification,
+    Launches VoltaireDeux Main Execution Suite with Ollama AI model verification,
     MusicBrainz secondary mirror (:5001), Picard batch tagger, sub-second LCP optimization,
     and cluster update synchronization.
 

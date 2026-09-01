@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Start-VoltaireDeuxMainExecution.ps1 - Main Orchestration & AI Execution Suite for VoltaireDeux.
 
@@ -98,7 +98,7 @@ if (Test-Path $mbCheckScript) {
 }
 
 # ==============================================================================
-# STAGE 4: MASTER CADDY INGRESS FOR VOLTAIREDEUX (:443)
+# STAGE 4: PRIMARY CADDY INGRESS FOR VOLTAIREDEUX (:443)
 # ==============================================================================
 Write-Host "`n[STAGE 4/7] Synthesizing & Verifying Caddy HTTPS Ingress..." -ForegroundColor Yellow
 
@@ -134,7 +134,7 @@ Write-Host "`n[STAGE 6/7] Synchronizing Changes with VoltaireUn Cluster..." -For
 
 $publishScript = Join-Path $PSScriptRoot "Publish-VoltaireDeuxUpdates.ps1"
 if (Test-Path $publishScript) {
-    & $publishScript -Message "VoltaireDeux Master Execution Synchronization" -SkipPortTest | Out-Null
+    & $publishScript -Message "VoltaireDeux Main Execution Synchronization" -SkipPortTest | Out-Null
     Write-Host "  [OK] Updates staged, verified, and broadcasted to VoltaireUn via OneDrive." -ForegroundColor Green
 }
 

@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Invoke-MediaStackMainLifecycle.ps1 - Main End-to-End MediaStack Lifecycle Orchestrator.
 
@@ -379,7 +379,7 @@ function Invoke-StageStart {
     # Verification Pause
     Start-Sleep -Seconds 3
     $runningCount = (docker ps -q 2>$null).Count
-    Write-Host "  [OK] Master Fleet Launch Complete: $runningCount active containers." -ForegroundColor Green
+    Write-Host "  [OK] Primary Fleet Launch Complete: $runningCount active containers." -ForegroundColor Green
     $global:LifecycleResults['Containers'] = "RUNNING ($runningCount containers active)"
 }
 
@@ -556,7 +556,7 @@ $tick = [char]96
 [void]$sb.AppendLine("| :--- | :--- | :--- |")
 foreach ($stage in $global:LifecycleResults.Keys) {
     $stVal = $global:LifecycleResults[$stage]
-    [void]$sb.AppendLine(("| **" + $stage + "** | " + $stVal + " | Verified in master pipeline |"))
+    [void]$sb.AppendLine(("| **" + $stage + "** | " + $stVal + " | Verified in primary pipeline |"))
 }
 [void]$sb.AppendLine("")
 [void]$sb.AppendLine("## 2. Diagnostics & Repairs Summary")

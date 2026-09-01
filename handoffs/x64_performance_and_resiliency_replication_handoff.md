@@ -19,7 +19,7 @@ This handoff packages and verifies the replication of all latest **Performance A
  â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤       â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
  â”‚ â€¢ 24/7 Media Server Hub (Ingress)      â”‚  â—„â”€â”€â–º â”‚ â€¢ AI Acceleration & Push Source (Ollamaâ”‚
  â”‚ â€¢ HDHomeRun Dual ATSC Tuner Proxy      â”‚  SYNC â”‚ â€¢ MusicBrainz Secondary Mirror (:5001) â”‚
- â”‚ â€¢ Master Caddy Proxy (HTTPS :443)      â”‚       â”‚ â€¢ x64 High-Performance Docker Compose  â”‚
+ â”‚ â€¢ Primary Caddy Proxy (HTTPS :443)      â”‚       â”‚ â€¢ x64 High-Performance Docker Compose  â”‚
  â”‚ â€¢ Real-Time Switch Radar HUD           â”‚       â”‚ â€¢ Self-Healing Diagnostic Engine       â”‚
  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜       â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 `
@@ -36,7 +36,7 @@ This handoff packages and verifies the replication of all latest **Performance A
 | [Optimize-LocalLcp.ps1](file:///c:/Users/waltd/OneDrive/Mediastack/Optimize-LocalLcp.ps1) | Core Web Vitals Optimizer | Enforces DNS preconnects, font-display swap, script deferrals, and CSS content-visibility: auto. |
 | [Test-LocalNetworkSwitch.ps1](file:///c:/Users/waltd/OneDrive/Mediastack/Test-LocalNetworkSwitch.ps1) | Switch & MTU Diagnostics | Audits switch latency (1.9ms), unfragmented 1500 MTU, and all 15 core service ports. |
 | [dashboard/](file:///c:/Users/waltd/OneDrive/Mediastack/dashboard/index.html) | Mission Control Web Interface | Real-time switch radar, cluster node health, application hub, and instant launchers. |
-| [Caddyfile](file:///c:/Users/waltd/OneDrive/Mediastack/Caddyfile) | Master Reverse Proxy | Zstandard dual-stream compression, 30-day web bundle cache, and 7-day media poster caching. |
+| [Caddyfile](file:///c:/Users/waltd/OneDrive/Mediastack/Caddyfile) | Primary Reverse Proxy | Zstandard dual-stream compression, 30-day web bundle cache, and 7-day media poster caching. |
 | [docker-compose.x64.yml](file:///c:/Users/waltd/OneDrive/Mediastack/docker-compose.x64.yml) | x64 Compose Stack | Updated with ./certs and ./dashboard volume mappings. |
 
 ---

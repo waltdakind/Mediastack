@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Start-VoltaireUnMainExecution.ps1 - Main Orchestration, Self-Healing & Error Remediation for VoltaireUn.
 
@@ -166,14 +166,14 @@ Write-Host "  [*] Stabilizing container networking..." -ForegroundColor Cyan
 Start-Sleep -Seconds 4
 
 # ==============================================================================
-# STAGE 5: MASTER CADDY INGRESS & ROUTING ERROR REMEDIATION
+# STAGE 5: PRIMARY CADDY INGRESS & ROUTING ERROR REMEDIATION
 # ==============================================================================
-Write-Host "`n[STAGE 5/8] Deploying Master Caddy Ingress (Zero-503 Failover & Edge Caching)..." -ForegroundColor Yellow
+Write-Host "`n[STAGE 5/8] Deploying Primary Caddy Ingress (Zero-503 Failover & Edge Caching)..." -ForegroundColor Yellow
 
 $setupCaddyScript = Join-Path $PSScriptRoot "Setup-MediaStackCaddyServer.ps1"
 if (Test-Path $setupCaddyScript) {
     & $setupCaddyScript -NonInteractive | Out-Null
-    Write-Host "  [OK] Master Caddy Proxy hot-reloaded with Zstandard compression, edge caching, and HTTPS :443." -ForegroundColor Green
+    Write-Host "  [OK] Primary Caddy Proxy hot-reloaded with Zstandard compression, edge caching, and HTTPS :443." -ForegroundColor Green
 }
 
 # ==============================================================================

@@ -1,4 +1,4 @@
-# MediaStack VoltaireUn Deep Systems Analysis & Claude AI Handoff
+﻿# MediaStack VoltaireUn Deep Systems Analysis & Claude AI Handoff
 **Document Version:** 2.0-ENTERPRISE  
 **Target AI Agent:** Claude (Anthropic) & Cluster AI Collaborators  
 **Primary Subject:** `VoltaireUn` (formerly `ORDINATEURDEVOL` / `ordinateur.local`)  
@@ -31,13 +31,13 @@ The MediaStack ecosystem operates as a **coordinated dual-node cluster** designe
          * Jellyfin Streaming (:8096)                              * MusicBrainz Picard (:5001)
          * Servarr Suite (8989/7878/9696/6767/5055)                * Git Push & Staging Hub
          * MusicBrainz Primary (:5000)                             * AI Collaboration Watcher
-         * SQLite Master DBs (WAL Mode)                            * Development & AST Tester
+         * SQLite Primary DBs (WAL Mode)                            * Development & AST Tester
 ```
 
 ### Node Identity Mapping:
 1. **VoltaireUn (Main 24/7 Server)**:
    * **Hostnames**: `voltaireun.local`, `ordinateur.local`, `mediaserver.local`, `192.168.4.21`
-   * **Primary Responsibilities**: 24/7 Jellyfin media streaming, Servarr automation (`Sonarr`, `Radarr`, `Prowlarr`, `Bazarr`, `Jellyseerr`), Transmission torrents, TVHeadend live TV, MusicBrainz mirror (`:5000`), and Master Caddy edge gateway (`:80`/`:443`).
+   * **Primary Responsibilities**: 24/7 Jellyfin media streaming, Servarr automation (`Sonarr`, `Radarr`, `Prowlarr`, `Bazarr`, `Jellyseerr`), Transmission torrents, TVHeadend live TV, MusicBrainz mirror (`:5000`), and Primary Caddy edge gateway (`:80`/`:443`).
    * **Ingestion Schedule**: Automatically polls for cluster updates daily at 04:00 AM via Windows Scheduled Task (`Invoke-VoltaireUnDailyPoller.ps1`).
 
 2. **VoltaireDeux (AI Workstation & Push Node)**:
@@ -80,7 +80,7 @@ A forensic audit of all historical telemetry and recent incident reports (`Volta
 * **Observed Symptom**: Mixed HTTP/HTTPS traffic caused insecure browser warnings, CORS blocks on API Gateway, and plain-text transmission across the LAN.
 * **Remediation & Best Practices Implemented**:
   1. **4096-bit Multi-Domain Certificate**: Generated with SANs covering DDNS (`waltdakind.xubi.org`), LAN (`*.voltaireun.local`, `*.voltairedeux.local`, `*.ordinateur.local`), and direct IPs.
-  2. **Master Caddyfile Hardening**: Configured reverse proxy blocks on `:443` with HSTS, strict security headers, and seamless HTTP ➔ HTTPS automatic redirection.
+  2. **Primary Caddyfile Hardening**: Configured reverse proxy blocks on `:443` with HSTS, strict security headers, and seamless HTTP ➔ HTTPS automatic redirection.
   3. **Jellyfin Authentication**: Linked newly created Jellyfin API key (`aa8e...a219`) into automated REST validation suites.
 
 ---
@@ -135,17 +135,17 @@ sync.cmd
 powershell.exe -ExecutionPolicy Bypass -File ".\Sync-MediaStackPriorityHandoffs.ps1"
 ```
 
-### C. Node Master Execution Suites & Shortcuts
+### C. Node Main Execution Suites & Shortcuts
 ```bat
 # Fast Shortcuts
-s-v1.cmd    # Launches VoltaireUn Master Execution Suite (192.168.4.21)
-s-v2.cmd    # Launches VoltaireDeux Master Execution Suite (192.168.4.30)
-s.cmd       # Launches Master Interactive Single-Key HUD Menu
+s-v1.cmd    # Launches VoltaireUn Main Execution Suite (192.168.4.21)
+s-v2.cmd    # Launches VoltaireDeux Main Execution Suite (192.168.4.30)
+s.cmd       # Launches Primary Interactive Single-Key HUD Menu
 ```
 ```powershell
 .\s-v1.ps1  # VoltaireUn Primary Server Hub (Main Ingress & Media Streaming)
 .\s-v2.ps1  # VoltaireDeux AI Workstation Hub (Ollama :11434 & MusicBrainz :5001)
-.\s.ps1     # Master Interactive Control Menu
+.\s.ps1     # Primary Interactive Control Menu
 ```
 
 ---

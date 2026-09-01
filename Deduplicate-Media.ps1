@@ -48,9 +48,9 @@ foreach ($group in $sizeGroups) {
         $files = $hashGroups[$hash]
         if ($files.Count -gt 1) {
             $files = $files | Sort-Object { $_.FullName.Length }
-            $master = $files[0]
+            $primary = $files[0]
             $masterUser = "System"
-            if ($master.FullName -match "^C:\\Users\\([^\\]+)") { $masterUser = $matches[1] }
+            if ($primary.FullName -match "^C:\\Users\\([^\\]+)") { $masterUser = $matches[1] }
             
             for ($i = 1; $i -lt $files.Count; $i++) {
                 $dupe = $files[$i]

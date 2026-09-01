@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Invoke-MediaStackAiCollaboration.ps1 - Dual-Node AI Collaboration & Cross-Healing Nexus.
 
@@ -59,7 +59,7 @@ $BaseDir = $PSScriptRoot
 $HandoffsDir = Join-Path $BaseDir "handoffs"
 if (-not (Test-Path $HandoffsDir)) { New-Item -ItemType Directory -Force -Path $HandoffsDir | Out-Null }
 
-# Load Master Operations Module
+# Load Primary Operations Module
 $opsModule = Join-Path $BaseDir "MediaStackOps.psm1"
 if (Test-Path $opsModule) {
     Import-Module $opsModule -Force

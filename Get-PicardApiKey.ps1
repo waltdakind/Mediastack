@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Get-PicardApiKey.ps1 - Retrieves, Audits & Manages MusicBrainz Picard & AcoustID API Keys.
 
@@ -74,7 +74,7 @@ if ($Save) {
     $secretObj | ConvertTo-Json -Depth 5 | Set-Content -Path $secretsJsonPath -Encoding UTF8
     Write-Host ("  [OK] Saved to: {0}" -f $secretsJsonPath) -ForegroundColor Green
 
-    # Also update master secrets vault
+    # Also update primary secrets vault
     $masterSecrets = "$PSScriptRoot\config\secrets\secrets.json"
     if (Test-Path $masterSecrets) {
         try {

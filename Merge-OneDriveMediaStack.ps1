@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # Merge-OneDriveMediaStack.ps1 - OneDrive & Local Configuration Merger & Reconciliation Engine
 # ==============================================================================
 [CmdletBinding()]
@@ -45,7 +45,7 @@ Write-Host "`n[2/4] Merging Root Service & Ingress Configurations..." -Foregroun
 # A. Reconcile Caddyfile
 $mainCaddy = Join-Path $OneDrivePath "Caddyfile"
 if (Test-Path $mainCaddy) {
-    Write-Host "  [OK] Master Caddyfile verified as unified cross-node proxy with HA upstream failover" -ForegroundColor Green
+    Write-Host "  [OK] Primary Caddyfile verified as unified cross-node proxy with HA upstream failover" -ForegroundColor Green
     if (Test-Path $LocalConfigPath) {
         Copy-Item $mainCaddy (Join-Path $LocalConfigPath "Caddyfile") -Force -ErrorAction SilentlyContinue
     }
@@ -54,7 +54,7 @@ if (Test-Path $mainCaddy) {
 # B. Reconcile docker-compose.yml
 $mainDc = Join-Path $OneDrivePath "docker-compose.yml"
 if (Test-Path $mainDc) {
-    Write-Host "  [OK] Master docker-compose.yml synchronized" -ForegroundColor Green
+    Write-Host "  [OK] Primary docker-compose.yml synchronized" -ForegroundColor Green
     if (Test-Path $LocalConfigPath) {
         Copy-Item $mainDc (Join-Path $LocalConfigPath "docker-compose.yml") -Force -ErrorAction SilentlyContinue
     }

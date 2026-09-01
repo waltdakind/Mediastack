@@ -1,6 +1,6 @@
-<#
+﻿<#
 .SYNOPSIS
-    Deploy-MediaStackFleet.ps1 - Master Enterprise Multi-Node MediaStack Deployer & Lifecycle Engine.
+    Deploy-MediaStackFleet.ps1 - Primary Enterprise Multi-Node MediaStack Deployer & Lifecycle Engine.
 
 .DESCRIPTION
     Architected for high availability and maximum uptime, this deployer provisions persistent
@@ -173,7 +173,7 @@ MUSICBRAINZ_FALLBACK_PORT=5000
 HDHOMERUN_IP=192.168.4.45
 "@
     Set-Content -Path $envFile -Value $envTemplate -Encoding UTF8
-    Write-Host "  [OK] Generated master .env configuration" -ForegroundColor Green
+    Write-Host "  [OK] Generated primary .env configuration" -ForegroundColor Green
 }
 
 # Synchronize Caddyfile
@@ -181,7 +181,7 @@ $caddySrc = Join-Path $PSScriptRoot "Caddyfile"
 $caddyDest = Join-Path $ConfigDir "Caddyfile"
 if (Test-Path $caddySrc) {
     Copy-Item -Path $caddySrc -Destination $caddyDest -Force -ErrorAction SilentlyContinue
-    Write-Host "  [OK] Master Caddyfile synchronized to runtime root" -ForegroundColor Green
+    Write-Host "  [OK] Primary Caddyfile synchronized to runtime root" -ForegroundColor Green
 }
 
 # Ensure Named Docker Volumes Exist

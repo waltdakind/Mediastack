@@ -36,11 +36,11 @@
 
 
 ### Recent System Incidents Analyzed:
-- [Caddy_Ingress_Report_20260831_152241.md] - **Master Policy:** Direct ALL incoming HTTP/HTTPS root traffic to Jellyfin with automatic failover.
-- [Caddy_Ingress_Report_20260831_152225.md] - **Master Policy:** Direct ALL incoming HTTP/HTTPS root traffic to Jellyfin with automatic failover.
-- [Caddy_Ingress_Report_20260831_152123.md] - **Master Policy:** Direct ALL incoming HTTP/HTTPS root traffic to Jellyfin with automatic failover.
-- [Caddy_Ingress_Report_20260831_152052.md] - **Master Policy:** Direct ALL incoming HTTP/HTTPS root traffic to Jellyfin with automatic failover.
-- [Caddy_Ingress_Report_20260831_152006.md] - **Master Policy:** Direct ALL incoming HTTP/HTTPS root traffic to Jellyfin with automatic failover.
+- [Caddy_Ingress_Report_20260831_152241.md] - **Primary Policy:** Direct ALL incoming HTTP/HTTPS root traffic to Jellyfin with automatic failover.
+- [Caddy_Ingress_Report_20260831_152225.md] - **Primary Policy:** Direct ALL incoming HTTP/HTTPS root traffic to Jellyfin with automatic failover.
+- [Caddy_Ingress_Report_20260831_152123.md] - **Primary Policy:** Direct ALL incoming HTTP/HTTPS root traffic to Jellyfin with automatic failover.
+- [Caddy_Ingress_Report_20260831_152052.md] - **Primary Policy:** Direct ALL incoming HTTP/HTTPS root traffic to Jellyfin with automatic failover.
+- [Caddy_Ingress_Report_20260831_152006.md] - **Primary Policy:** Direct ALL incoming HTTP/HTTPS root traffic to Jellyfin with automatic failover.
 
 ---
 

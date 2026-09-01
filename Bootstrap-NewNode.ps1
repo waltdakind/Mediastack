@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Bootstrap-NewNode.ps1 - Automated Cluster Node Provisioning & Replication Setup.
 
@@ -8,7 +8,7 @@
 
     Executes 6 automated onboarding stages:
     1. Environment & Architecture Audit (x64 / ARM64 / Windows Build / Docker Engine)
-    2. Secrets Vault & Token Initialization (from master or interactive template)
+    2. Secrets Vault & Token Initialization (from primary or interactive template)
     3. Dedicated Network Service Accounts & SMB File Sharing Setup (Music, TV, Videos, Radio, Podcasts)
     4. Windows Firewall & Network Discovery Rules Enforcement
     5. Peer Node Interconnect & Reciprocal SMB Mounts (VoltaireUn 192.168.4.21 <-> VoltaireDeux 192.168.4.30)
@@ -99,7 +99,7 @@ if ($dockerVer) {
 # ==============================================================================
 # STAGE 2: SECRETS VAULT INITIALIZATION
 # ==============================================================================
-Write-Host "`n[STAGE 2/6] Initializing Master Secrets Vault & Credentials..." -ForegroundColor Yellow
+Write-Host "`n[STAGE 2/6] Initializing Primary Secrets Vault & Credentials..." -ForegroundColor Yellow
 
 $secretsDir = Join-Path $BaseDir "config\secrets"
 $secretsJson = Join-Path $secretsDir "secrets.json"
@@ -195,7 +195,7 @@ Write-Host "   B O O T S T R A P   O N B O A R D I N G   C O M P L E T E" -Foreg
 Write-Host "================================================================================" -ForegroundColor Cyan
 
 Write-Host "`nQuick Management Commands for this Node:" -ForegroundColor Yellow
-Write-Host "  - Master Menu & Shortcuts : .\s.ps1" -ForegroundColor White
+Write-Host "  - Primary Menu & Shortcuts : .\s.ps1" -ForegroundColor White
 Write-Host "  - End-to-End Lifecycle    : .\Invoke-MediaStackMainLifecycle.ps1" -ForegroundColor White
 Write-Host "  - API & Health Tests      : .\Test-MediaStackApis.ps1" -ForegroundColor White
 Write-Host "  - Network Share Mounter   : .\Mount-MediaStackNetworkShares.ps1" -ForegroundColor White

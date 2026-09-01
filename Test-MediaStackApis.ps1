@@ -1,4 +1,4 @@
-# Test-MediaStackApis.ps1 - Comprehensive API Verification, Health & Key Discovery Engine
+﻿# Test-MediaStackApis.ps1 - Comprehensive API Verification, Health & Key Discovery Engine
 param(
     [string]$ConfigDir = "$env:SystemDrive\MediastackConfig",
     [switch]$AutoUpdateEnv,
@@ -31,7 +31,7 @@ $apiKeys = [ordered]@{
     "MetaBrainz"  = $null
 }
 
-# Scan Master Secrets Vault first
+# Scan Primary Secrets Vault first
 $masterSecrets = "$PSScriptRoot\config\secrets\secrets.json"
 if (Test-Path $masterSecrets) {
     try {

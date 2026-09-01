@@ -1,10 +1,10 @@
-﻿# Caddy Master Ingress & HTTPS Configuration Report
+﻿# Caddy Primary Ingress & HTTPS Configuration Report
 
 - **Execution Timestamp:** 2026-08-31 15:22:39
 - **Primary Server IP (VoltaireUn):** 192.168.4.21
 - **Secondary Server IP (VoltaireDeux):** 192.168.4.30
 - **External DDNS Domain:** https://waltdakind.xubi.org
-- **Master Policy:** Direct ALL incoming HTTP/HTTPS root traffic to Jellyfin with automatic failover.
+- **Primary Policy:** Direct ALL incoming HTTP/HTTPS root traffic to Jellyfin with automatic failover.
 
 ---
 

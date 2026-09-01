@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [Alias("u", "1")][switch]$VoltaireUn,
     [Alias("d", "2")][switch]$VoltaireDeux,
@@ -21,7 +21,7 @@ param(
 
 <#
 .SYNOPSIS
-    s.ps1 - MediaStack Dual-Node Master Quick Command Shortcut.
+    s.ps1 - MediaStack Dual-Node Main Quick Command Shortcut.
 .DESCRIPTION
     Ultra-fast single-command / single-key shortcut for managing, starting, and optimizing
     both VoltaireUn (192.168.4.21) and VoltaireDeux (192.168.4.30).
@@ -140,22 +140,22 @@ Write-Host "Full Suite: Diagnose, Backup, Shutdown, Repull, Restart & AI Sentine
 Write-Host "`n--- 4-PILLAR ENTERPRISE OPERATIONAL HUBS ---" -ForegroundColor Cyan
 
 Write-Host "  [R] " -NoNewline -ForegroundColor Yellow
-Write-Host "Master Fleet Repair (Auto-Heal All 12 Services) -> Shortcut: .\s.ps1 -rp" -ForegroundColor Cyan
+Write-Host "Primary Fleet Repair (Auto-Heal All 12 Services) -> Shortcut: .\s.ps1 -rp" -ForegroundColor Cyan
 
 Write-Host "  [B] " -NoNewline -ForegroundColor Yellow
-Write-Host "Master Fleet Backup (Atomic Snapshot & Retention) -> Shortcut: .\s.ps1 -bk" -ForegroundColor Green
+Write-Host "Primary Fleet Backup (Atomic Snapshot & Retention) -> Shortcut: .\s.ps1 -bk" -ForegroundColor Green
 
 Write-Host "  [C] " -NoNewline -ForegroundColor Yellow
-Write-Host "Master Fleet Connectivity (L4/L7 & Authenticated API Probes) -> Shortcut: .\s.ps1 -chk" -ForegroundColor Yellow
+Write-Host "Primary Fleet Connectivity (L4/L7 & Authenticated API Probes) -> Shortcut: .\s.ps1 -chk" -ForegroundColor Yellow
 
 Write-Host "  [S] " -NoNewline -ForegroundColor Yellow
-Write-Host "Master Fleet Replication (MetaBrainz, Syncthing & SMB Mesh) -> Shortcut: .\s.ps1 -rep" -ForegroundColor Magenta
+Write-Host "Primary Fleet Replication (MetaBrainz, Syncthing & SMB Mesh) -> Shortcut: .\s.ps1 -rep" -ForegroundColor Magenta
 
 Write-Host "  [V] " -NoNewline -ForegroundColor Yellow
-Write-Host "Master Fleet Verification (Health Index Certification) -> Shortcut: .\s.ps1 -v" -ForegroundColor Green
+Write-Host "Primary Fleet Verification (Health Index Certification) -> Shortcut: .\s.ps1 -v" -ForegroundColor Green
 
 Write-Host "  [D] " -NoNewline -ForegroundColor Yellow
-Write-Host "Master Deep Analysis & Expert Handoffs Generator -> Shortcut: .\s.ps1 -da" -ForegroundColor Magenta
+Write-Host "Primary Deep Analysis & Expert Handoffs Generator -> Shortcut: .\s.ps1 -da" -ForegroundColor Magenta
 
 Write-Host "  [Q] " -NoNewline -ForegroundColor DarkGray
 Write-Host "Quit" -ForegroundColor DarkGray

@@ -1,6 +1,6 @@
-<#
+﻿<#
 .SYNOPSIS
-    Test-MediaStackFleetConnectivity.ps1 - Master Multi-Service Connectivity & Authenticated Handshake Probe.
+    Test-MediaStackFleetConnectivity.ps1 - Primary Multi-Service Connectivity & Authenticated Handshake Probe.
 
 .DESCRIPTION
     Comprehensive connectivity, network reachability, and authenticated API verification suite:
@@ -14,7 +14,7 @@
     Target service to probe: "All", "Jellyfin", "MusicBrainz", "Servarr", "Caddy", "Syncthing", "LiveTV", "Jellyseerr", "Transmission", "PeerNode". Default: "All".
 
 .PARAMETER DeepAuth
-    Executes authenticated REST API queries using keys from the Master Secrets Vault.
+    Executes authenticated REST API queries using keys from the Primary Secrets Vault.
 
 .EXAMPLE
     .\Test-MediaStackFleetConnectivity.ps1 -All

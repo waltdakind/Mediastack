@@ -1,6 +1,6 @@
-<#
+﻿<#
 .SYNOPSIS
-    Sync-MediaStackSecrets.ps1 - Master Secrets Manager and Cross-Node Credential Synchronizer.
+    Sync-MediaStackSecrets.ps1 - Primary Secrets Manager and Cross-Node Credential Synchronizer.
 
 .DESCRIPTION
     Audits, secures, isolates, and synchronizes all MediaStack service API keys and the
@@ -79,7 +79,7 @@ if (Test-Path $SecretsJson) {
 
 if (-not $vault) {
     $vault = [ordered]@{
-        '_notice'       = 'MediaStack Master Secrets Store - NEVER COMMIT TO GIT OR STORE ONLINE'
+        '_notice'       = 'MediaStack Primary Secrets Store - NEVER COMMIT TO GIT OR STORE ONLINE'
         'version'       = '1.0.0'
         'updated_at'    = $timestamp
         'cluster_nodes' = [ordered]@{

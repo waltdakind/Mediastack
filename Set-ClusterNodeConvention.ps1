@@ -1,10 +1,10 @@
-<#
+﻿<#
 .SYNOPSIS
     Set-ClusterNodeConvention.ps1 - MediaStack Multi-Node Naming Convention & Topology Enforcer.
 
 .DESCRIPTION
     Applies the standardized 'Voltaire<N>' cluster naming convention across the local machine:
-    - Primary 24/7 Master Server: VoltaireUn (192.168.4.21) [Formerly ORDINATEURDEVOL / prinateurdevol]
+    - Primary 24/7 Primary Server: VoltaireUn (192.168.4.21) [Formerly ORDINATEURDEVOL / prinateurdevol]
     - Secondary AI Workstation:   VoltaireDeux (192.168.4.30) [This Machine]
     - Future Cluster Nodes:       VoltaireTrois (192.168.4.31), VoltaireQuatre (192.168.4.32), etc.
 
@@ -57,7 +57,7 @@ if (Test-Path $RegistryFile) {
 Write-Host "`n[STAGE 1/4] MediaStack Node Topology Mapping:" -ForegroundColor Yellow
 
 $nodeTable = @(
-    [PSCustomObject]@{ CanonicalName = "VoltaireUn";    IP = "192.168.4.21"; Role = "Primary 24/7 Master & DB";  LegacyAliases = "ORDINATEURDEVOL, prinateurdevol, ordinateur.local" },
+    [PSCustomObject]@{ CanonicalName = "VoltaireUn";    IP = "192.168.4.21"; Role = "Primary 24/7 Primary & DB";  LegacyAliases = "ORDINATEURDEVOL, prinateurdevol, ordinateur.local" },
     [PSCustomObject]@{ CanonicalName = "VoltaireDeux";  IP = "192.168.4.30"; Role = "Secondary AI & Mirror";     LegacyAliases = "VOLTAIREDEUX, voltairedeux.local" },
     [PSCustomObject]@{ CanonicalName = "VoltaireTrois"; IP = "192.168.4.31"; Role = "Expansion (Transcoder)";   LegacyAliases = "Future Cluster Node" },
     [PSCustomObject]@{ CanonicalName = "VoltaireQuatre";IP = "192.168.4.32"; Role = "Expansion (Backup Node)";  LegacyAliases = "Future Cluster Node" }

@@ -1,7 +1,7 @@
-# ==============================================================================
+﻿# ==============================================================================
 # Set-PicardLocalMirror.ps1 - Automated Picard Configurator for Local Mirror & Tagging
 # Configures Picard.ini to target local PostgreSQL/Solr mirror, unlocks 50 req/s rate,
-# and installs the master high-fidelity naming & tagging script.
+# and installs the primary high-fidelity naming & tagging script.
 # ==============================================================================
 
 [CmdletBinding()]

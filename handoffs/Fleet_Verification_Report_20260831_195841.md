@@ -49,4 +49,4 @@
 
 
 ---
-*Certified by MediaStack Master Fleet Verification Suite.*
+*Certified by MediaStack Primary Fleet Verification Suite.*

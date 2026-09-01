@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Repair-ServarrFleet.ps1 - Automated Diagnostic & Recovery Engine for Servarr Applications.
 
@@ -6,7 +6,7 @@
     Comprehensive diagnostic and repair toolkit for Sonarr, Radarr, Prowlarr, and Bazarr:
     1. Detects and purges SQLite database locks (*.db-journal, *.db-shm, *.db-wal).
     2. Inspects and repairs corrupted config.xml files (port bindings, URL base, auth disabled flags).
-    3. Re-synchronizes API keys from the Master Secrets Vault (config/secrets/secrets.json).
+    3. Re-synchronizes API keys from the Primary Secrets Vault (config/secrets/secrets.json).
     4. Clears orphaned PID locks and terminates crash loops.
     5. Verifies container health and REST API reachability.
 
@@ -50,7 +50,7 @@ Write-Host "   S E R V A R R   F L E E T   D I A G N O S T I C   &   R E P A I R
 Write-Host "   Target: $TargetService | Timestamp: $timestamp" -ForegroundColor White
 Write-Host "================================================================================" -ForegroundColor Cyan
 
-# Load Master Secrets Vault for API Key reconciliation
+# Load Primary Secrets Vault for API Key reconciliation
 $vault = $null
 if (Test-Path $SecretsFile) {
     try {
@@ -131,11 +131,11 @@ foreach ($svc in $services) {
                 if ($vault -and $vault.secrets.$apiKeyField.api_key) {
                     $vaultKey = $vault.secrets.$apiKeyField.api_key
                     if ($currentKey -ne $vaultKey -and $AutoFix -and -not $DiagOnly) {
-                        Write-Host "    [REPAIR] Syncing API key from Master Vault to config.xml..." -ForegroundColor Cyan
+                        Write-Host "    [REPAIR] Syncing API key from Primary Vault to config.xml..." -ForegroundColor Cyan
                         $xmlDoc.Config.ApiKey = $vaultKey
                         $xmlDoc.Save($xmlPath)
                         Write-Host "    [OK] API key synchronized with vault." -ForegroundColor Green
-                        $remediationLog += "$svc : Realigned API key with Master Secrets Vault."
+                        $remediationLog += "$svc : Realigned API key with Primary Secrets Vault."
                     }
                 }
             } catch {

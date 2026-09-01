@@ -1,4 +1,4 @@
-﻿# MediaStack Deep Diagnostic Analysis & Master Handoff Report
+﻿# MediaStack Deep Diagnostic Analysis & Primary Handoff Report
 
 | Executive Metric | Measured Value |
 | :--- | :--- |

@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Repair-JellyseerrServer.ps1 - Jellyseerr Request Gateway Diagnostic & Repair Engine.
 
@@ -6,7 +6,7 @@
     Diagnoses and repairs Jellyseerr media discovery & request issues:
     1. Audits Jellyseerr container status on port 5055/tcp.
     2. Purges stale SQLite database locks in db/db.sqlite.
-    3. Re-aligns API key with Master Secrets Vault.
+    3. Re-aligns API key with Primary Secrets Vault.
     4. Validates Jellyfin media server connectivity handshake.
     5. Probes REST API (/api/v1/status).
 

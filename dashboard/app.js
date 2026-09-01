@@ -1,4 +1,4 @@
-/* =============================================================================
+﻿/* =============================================================================
    MediaStack Mission Control - Interactive Application Engine
    Manages Live Probing, Full Suite Actions, Image Registry & Handoff Explorer
    ============================================================================= */
@@ -254,7 +254,7 @@ const SUITES = [
     },
     {
         id: "repair",
-        title: "Master Fleet Repair",
+        title: "Primary Fleet Repair",
         shortcut: "R",
         cliCmd: ".\\s.ps1 -rp",
         script: "Repair-MediaStackFleet.ps1 -All -AutoFix",
@@ -265,7 +265,7 @@ const SUITES = [
     },
     {
         id: "backup",
-        title: "Master Fleet Backup",
+        title: "Primary Fleet Backup",
         shortcut: "B",
         cliCmd: ".\\s.ps1 -bk",
         script: "Backup-MediaStackFleet.ps1 -All",
@@ -298,7 +298,7 @@ const SUITES = [
     },
     {
         id: "fullsuite",
-        title: "Master Full Reboot Suite",
+        title: "Primary Full Reboot Suite",
         shortcut: "F",
         cliCmd: ".\\s.ps1 -f",
         script: "Invoke-MediaStackFullRebootSuite.ps1",

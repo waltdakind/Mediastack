@@ -1,16 +1,11 @@
 ﻿{
-    "last_synced":  "2026-08-31 20:00:35",
-    "analysis_host":  "VOLTAIREDEUX",
+    "last_session_timestamp":  "2026-08-31 20:33:54",
+    "last_session_node":  "VOLTAIREDEUX",
     "local_ip":  "192.168.4.30",
+    "peer_node":  "VOLTAIREUN",
     "peer_ip":  "192.168.4.21",
-    "cluster_scheme":  "FrenchOrdinal (VoltaireUn, VoltaireDeux, VoltaireTrois...)",
-    "host_cpu_load":  57,
-    "host_ram_used_gb":  13.26,
-    "host_ram_total_gb":  15.6,
-    "host_disk_free_gb":  29.51,
-    "active_services":  9,
-    "total_services":  13,
-    "peer_ping_ms":  9.67,
-    "handoffs_directory":  "C:\\Users\\waltd\\OneDrive\\Mediastack\\handoffs\\services",
-    "analysis_status":  "COMPLETED_OPTIMAL"
+    "databases_healthy":  true,
+    "anomalies_detected":  0,
+    "remediations_applied":  18,
+    "latest_report_path":  "C:\\Users\\waltd\\OneDrive\\Mediastack\\handoffs\\AI_Remediation_Execution_Report_20260831_203354.md"
 }

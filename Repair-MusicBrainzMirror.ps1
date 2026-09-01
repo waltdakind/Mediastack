@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Repair-MusicBrainzMirror.ps1 - MusicBrainz Database, Mirror & Picard Integration Repair Engine.
 
@@ -61,7 +61,7 @@ if (Test-Path $SecretsFile) {
 }
 
 if ($vaultToken) {
-    Write-Host "  * Master Secrets Vault Token : PRESENT" -ForegroundColor Green
+    Write-Host "  * Primary Secrets Vault Token : PRESENT" -ForegroundColor Green
     $tokenDir = Split-Path -Parent $TokenFile
     if (-not (Test-Path $tokenDir)) { New-Item -ItemType Directory -Force -Path $tokenDir | Out-Null }
     

@@ -29,7 +29,7 @@
 - **Weekly Vacuum Window:** Run `VACUUM;` and `PRAGMA optimize;` during the low-traffic window (03:30 AM) prior to the daily sync cycle.
 
 ### 3. Caddy Reverse Proxy & Active/Passive Failover
-- **Upstream Failover Tuning:** Configure master `Caddyfile` with `lb_try_duration 4s` and `fail_duration 15s` on streaming routes, enabling seamless failover to VoltaireDeux if primary server transcoding bottlenecks.
+- **Upstream Failover Tuning:** Configure primary `Caddyfile` with `lb_try_duration 4s` and `fail_duration 15s` on streaming routes, enabling seamless failover to VoltaireDeux if primary server transcoding bottlenecks.
 - **Internal Subdomain Resolution:** Ensure `*.voltaireun.local` and `*.voltairedeux.local` domain host headers are dynamically forwarded with preserved client IPs.
 
 ### 4. Workload Partitioning & AI Amplification
@@ -45,7 +45,7 @@
 ## Action Plan to be Executed on VoltaireUn:
 - [x] Purge snapshot archives older than 7 days in db-backup/snapshots/
 - [x] Apply PRAGMA wal_autocheckpoint=1000 and PRAGMA busy_timeout=5000 across core DBs
-- [x] Synchronize master Caddyfile with dynamic host routing and HA failover
+- [x] Synchronize primary Caddyfile with dynamic host routing and HA failover
 - [x] Route AI model offloading and Picard batch jobs to VoltaireDeux (192.168.4.30)
 - [x] Enforce atomic pre-sync database snapshotting before every code or config merge
 

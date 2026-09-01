@@ -19,7 +19,7 @@
 ```
 
 ### Code & Configuration Layout:
-- **Ingress Proxy:** Master `Caddyfile` with dynamic `Host` header routing (`*.voltaireun.local` and `*.voltairedeux.local`).
+- **Ingress Proxy:** Primary `Caddyfile` with dynamic `Host` header routing (`*.voltaireun.local` and `*.voltairedeux.local`).
 - **Orchestration:** `docker-compose.yml` with host volume mounts and bridge network `mediastack`.
 - **Database Sentinel:** Lock-free integrity checks via `MediaStackOps.psm1` (`PRAGMA quick_check;`).
 - **Cluster Push-Pull:** Git commits pushed from VoltaireDeux and ingested once per day via VoltaireUn daily poller.

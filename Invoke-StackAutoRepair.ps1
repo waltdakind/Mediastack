@@ -1,5 +1,5 @@
-# ==============================================================================
-# Invoke-StackAutoRepair.ps1 - Master Autonomous Self-Healing, Code-Writing & Troubleshooting Engine
+﻿# ==============================================================================
+# Invoke-StackAutoRepair.ps1 - Primary Autonomous Self-Healing, Code-Writing & Troubleshooting Engine
 # Automatically detects issues, autowrites custom PowerShell remediation scripts,
 # generates AI Markdown RCA diagnostic handoffs, and executes targeted fixes.
 [CmdletBinding()]

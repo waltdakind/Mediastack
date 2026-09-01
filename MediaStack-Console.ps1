@@ -1,5 +1,5 @@
-# ==============================================================================
-# MediaStack-Console.ps1 - Master Systems Engineering CLI Console & Operations Hub
+﻿# ==============================================================================
+# MediaStack-Console.ps1 - Primary Systems Engineering CLI Console & Operations Hub
 # Unified logical management interface for Live Monitoring, Autohealing,
 # Database Persistence, Read-Only Listener Access, and Disaster Recovery.
 # ==============================================================================

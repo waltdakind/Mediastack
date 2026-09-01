@@ -1,6 +1,6 @@
-<#
+﻿<#
 .SYNOPSIS
-    Backup-MediaStackFleet.ps1 - Master Atomic Backup Orchestrator with Integrity Hashing & Retention.
+    Backup-MediaStackFleet.ps1 - Primary Atomic Backup Orchestrator with Integrity Hashing & Retention.
 
 .DESCRIPTION
     Comprehensive backup orchestrator for the entire MediaStack multi-node cluster:

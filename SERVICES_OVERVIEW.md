@@ -1,10 +1,10 @@
-# MediaStack Complete Services Overview & Default Port Specifications
+﻿# MediaStack Complete Services Overview & Default Port Specifications
 
 This guide provides explicit directions for the default network ports, internal container ports, host port bindings, and Docker DNS communication across the entire MediaStack fleet.
 
 ---
 
-## 1. Master Service & Default Port Matrix
+## 1. Primary Service & Default Port Matrix
 
 All services in the MediaStack ecosystem are pre-configured to use their official, industry-standard default ports. Whether communicating through Docker's internal bridge network or accessing services directly via the host LAN IP, refer to the table below:
 
@@ -117,7 +117,7 @@ C:\MediastackConfig\ (or ./config/)
 ├── jellyfin\data\data\        # Jellyfin library SQLite database (jellyfin.db)
 ├── transmission\settings.json # Transmission download limits & watch dirs
 ├── tvheadend\                 # TVHeadend channels & muxes
-├── db-backup\                 # Master SQLite archive (mediastack_backup.db)
+├── db-backup\                 # Primary SQLite archive (mediastack_backup.db)
 └── homepage\                  # Dashboard widgets & layout configurations
 ```
 

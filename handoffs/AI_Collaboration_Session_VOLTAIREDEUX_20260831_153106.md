@@ -39,7 +39,7 @@
 - [Caddy_Ingress_Report_20260831_152844.md] - **Routing Policy:** Direct ALL incoming root traffic to Jellyfin with automatic dual-node failover.
 - [AI_Collaboration_Session_VOLTAIREDEUX_20260831_152811.md] - [Caddy_Ingress_Report_20260831_152724.md] - **Routing Policy:** Direct ALL incoming root traffic to Jellyfin with automatic dual-node failover.
 - [AI_Collaboration_Session_VOLTAIREDEUX_20260831_152811.md] - [Caddy_Ingress_Report_20260831_152601.md] - **Routing Policy:** Direct ALL incoming root traffic to Jellyfin with automatic dual-node failover.
-- [AI_Collaboration_Session_VOLTAIREDEUX_20260831_152811.md] - [AI_Collaboration_Session_VOLTAIREDEUX_20260831_152517.md] - [AI_Collaboration_Session_VOLTAIREDEUX_20260831_152222.md] - [Caddy_Ingress_Report_20260831_152241.md] - **Master Policy:** Direct ALL incoming HTTP/HTTPS root traffic to Jellyfin with automatic failover.
+- [AI_Collaboration_Session_VOLTAIREDEUX_20260831_152811.md] - [AI_Collaboration_Session_VOLTAIREDEUX_20260831_152517.md] - [AI_Collaboration_Session_VOLTAIREDEUX_20260831_152222.md] - [Caddy_Ingress_Report_20260831_152241.md] - **Primary Policy:** Direct ALL incoming HTTP/HTTPS root traffic to Jellyfin with automatic failover.
 - [Caddy_Ingress_Report_20260831_152724.md] - **Routing Policy:** Direct ALL incoming root traffic to Jellyfin with automatic dual-node failover.
 - [Caddy_Ingress_Report_20260831_152601.md] - **Routing Policy:** Direct ALL incoming root traffic to Jellyfin with automatic dual-node failover.
 

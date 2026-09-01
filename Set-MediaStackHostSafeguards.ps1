@@ -1,6 +1,6 @@
-<#
+﻿<#
 .SYNOPSIS
-    Set-MediaStackHostSafeguards.ps1 - Master System Safeguard & 24/7 Resilience Provisioner.
+    Set-MediaStackHostSafeguards.ps1 - Primary System Safeguard & 24/7 Resilience Provisioner.
 
 .DESCRIPTION
     Applies comprehensive host power, Docker lifecycle, port routing, and auto-healing safeguards
@@ -178,13 +178,13 @@ foreach ($td in $transcodeDirs) {
 Write-Host "  [OK] Stale video transcode fragments older than 2 hours purged." -ForegroundColor Green
 
 # ==============================================================================
-# SAFEGUARD 5: MASTER CADDY INGRESS & ROUTE HEALTH
+# SAFEGUARD 5: PRIMARY CADDY INGRESS & ROUTE HEALTH
 # ==============================================================================
-Write-Host "`n[SAFEGUARD 5/6] Master Caddy Reverse Proxy & Route Liveness..." -ForegroundColor Yellow
+Write-Host "`n[SAFEGUARD 5/6] Primary Caddy Reverse Proxy & Route Liveness..." -ForegroundColor Yellow
 
 $caddyPs = docker ps --filter "name=caddy" --format "{{.Status}}" 2>$null
 if ($caddyPs -match "Up") {
-    Write-Host "  [OK] Master Caddy Ingress container is UP and healthy." -ForegroundColor Green
+    Write-Host "  [OK] Primary Caddy Ingress container is UP and healthy." -ForegroundColor Green
 } else {
     Write-Host "  [RECOVERY] Caddy container is offline. Initializing..." -ForegroundColor Yellow
     docker compose up -d caddy 2>&1 | Out-Null

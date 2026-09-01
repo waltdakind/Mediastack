@@ -1,6 +1,6 @@
-<#
+﻿<#
 .SYNOPSIS
-    Set-MediaStackIngressPolicy.ps1 - Master Ingress Policy & Remote Desktop Guarantee Suite.
+    Set-MediaStackIngressPolicy.ps1 - Primary Ingress Policy & Remote Desktop Guarantee Suite.
 
 .DESCRIPTION
     Enforces the primary cluster ingress policy:

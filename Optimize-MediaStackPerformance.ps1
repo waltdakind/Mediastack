@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Optimize-MediaStackPerformance.ps1 - End-to-End Performance & Load Time Accelerator for Jellyfin & Cluster.
 
@@ -202,7 +202,7 @@ Write-Host "`n[PHASE 5/5] Recompiling Caddy Reverse Proxy with Edge Caching & Zs
 $setupCaddyScript = Join-Path $PSScriptRoot "Setup-MediaStackCaddyServer.ps1"
 if (Test-Path $setupCaddyScript) {
     & $setupCaddyScript -NonInteractive | Out-Null
-    Write-Host "  [OK] Master Caddy Reverse Proxy hot-reloaded with Edge Caching & HTTP/2 Acceleration." -ForegroundColor Green
+    Write-Host "  [OK] Primary Caddy Reverse Proxy hot-reloaded with Edge Caching & HTTP/2 Acceleration." -ForegroundColor Green
 }
 
 # ==============================================================================

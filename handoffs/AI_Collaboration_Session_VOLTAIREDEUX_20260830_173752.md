@@ -14,7 +14,7 @@
 ```
   [VoltaireDeux - AI Node (192.168.4.30)] <=================> [VoltaireUn - Main Server (192.168.4.21)]
   Role: AI Model Inference, Code Synthesis, Tagging    Role: 24/7 Streaming, Media Ingestion, Servarr
-  GPU/AI: Ollama (:11434), Local Picard Mirror (:5001)  Ingress: Master Caddy Proxy (:80/:443), Primary MB (:5000)
+  GPU/AI: Ollama (:11434), Local Picard Mirror (:5001)  Ingress: Primary Caddy Proxy (:80/:443), Primary MB (:5000)
 ```
 
 ### Mutual Collaboration Responsibilities:

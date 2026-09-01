@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Repair-SyncthingCluster.ps1 - Syncthing P2P Mesh & Cluster Folder Repair Engine.
 
@@ -6,7 +6,7 @@
     Diagnoses and repairs Syncthing cluster synchronization:
     1. Audits container status (port 8384/tcp web UI, port 22000/tcp transfer).
     2. Re-creates missing .stfolder markers across all synchronized media directories.
-    3. Re-aligns Syncthing API key with Master Secrets Vault.
+    3. Re-aligns Syncthing API key with Primary Secrets Vault.
     4. Clears database index locks.
     5. Verifies REST API status and cluster device discovery.
 
@@ -103,7 +103,7 @@ if (Test-Path $xmlFile) {
         if ($vaultKey -and $curApiKey -ne $vaultKey -and $AutoFix -and -not $DiagOnly) {
             $xDoc.configuration.gui.apikey = $vaultKey
             $xDoc.Save($xmlFile)
-            Write-Host "  [REPAIR] Synced Syncthing API key with Master Vault." -ForegroundColor Green
+            Write-Host "  [REPAIR] Synced Syncthing API key with Primary Vault." -ForegroundColor Green
             $remediations += "Synced Syncthing API key in config.xml."
         } else {
             Write-Host "  [OK] Syncthing API key is aligned with vault." -ForegroundColor Green

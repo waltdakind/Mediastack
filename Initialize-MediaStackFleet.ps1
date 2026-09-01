@@ -1,5 +1,5 @@
-# ==============================================================================
-# Initialize-MediaStackFleet.ps1 - Master One-Touch Fleet Creation & Deployment Orchestrator
+﻿# ==============================================================================
+# Initialize-MediaStackFleet.ps1 - Primary One-Touch Fleet Creation & Deployment Orchestrator
 # Builds, provisions, initializes, and starts the entire MediaStack & MusicBrainz infrastructure
 # ==============================================================================
 param(
@@ -35,7 +35,7 @@ $composeVersion = docker compose version --short 2>$null
 Write-Host ("  [OK] Docker Compose Plugin Active (v{0})" -f $composeVersion) -ForegroundColor Green
 
 # --- 2. DIRECTORY STRUCTURE PROVISIONING ---
-Write-Host "`n[2/6] Provisioning Master Directory Infrastructure..." -ForegroundColor Yellow
+Write-Host "`n[2/6] Provisioning Primary Directory Infrastructure..." -ForegroundColor Yellow
 
 $requiredDirs = @(
     "$ConfigDir\caddy_data",
@@ -87,9 +87,9 @@ MUSICBRAINZ_FALLBACK_PORT=5000
 HDHOMERUN_IP=192.168.4.45
 "@
     Set-Content -Path $envFile -Value $envTemplate -Encoding UTF8
-    Write-Host "  [CREATED] Generated master .env configuration" -ForegroundColor Green
+    Write-Host "  [CREATED] Generated primary .env configuration" -ForegroundColor Green
 } else {
-    Write-Host "  [OK] Master .env file validated" -ForegroundColor Green
+    Write-Host "  [OK] Primary .env file validated" -ForegroundColor Green
 }
 
 # Ensure MusicBrainz secrets
@@ -106,7 +106,7 @@ $caddySrc = Join-Path $PSScriptRoot "Caddyfile"
 $caddyDest = Join-Path $ConfigDir "Caddyfile"
 if (Test-Path $caddySrc) {
     Copy-Item $caddySrc $caddyDest -Force -ErrorAction SilentlyContinue
-    Write-Host "  [OK] Master Caddyfile deployed to runtime directory" -ForegroundColor Green
+    Write-Host "  [OK] Primary Caddyfile deployed to runtime directory" -ForegroundColor Green
 }
 
 # --- 5. DOCKER FLEET BOOTSTRAP & DEPLOYMENT ---

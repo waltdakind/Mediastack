@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # Sync-MusicBrainzReplication.ps1 - MusicBrainz Database Live Replication & Sync Engine
 # Automatically checks replication sequences, syncs MetaBrainz hourly change packets,
 # tracks database lag, and maintains cross-node mirror synchronization.
@@ -75,7 +75,7 @@ ON CONFLICT DO NOTHING;
 }
 
 # -----------------------------------------------------------------------------
-# 2. Check Remote Fallback / Master Node Replication Sequence
+# 2. Check Remote Fallback / Primary Node Replication Sequence
 # -----------------------------------------------------------------------------
 $targetEndpoint = "${FallbackHost}:${FallbackPort}"
 Write-Host ("`n[2/4] Probing Remote Fallback Mirror ({0})..." -f $targetEndpoint) -ForegroundColor Yellow

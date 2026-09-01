@@ -2,7 +2,7 @@
 
 - **Timestamp:** 2026-08-31 17:07:02
 - **Reconciliation Order:** [1] VoltaireDeux (AI/Code) -> [2] VoltaireUn (Telemetry)
-- **Primary Server:** VoltaireUn (192.168.4.21) - 24/7 Media Streaming & Master Ingress
+- **Primary Server:** VoltaireUn (192.168.4.21) - 24/7 Media Streaming & Primary Ingress
 - **AI Node:** VoltaireDeux (192.168.4.30) - AI Acceleration & Workstation Hub
 - **External Domain:** https://waltdakind.xubi.org
 - **Cluster Status:** 100% SYNCHRONIZED & OPTIMIZED

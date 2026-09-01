@@ -1,6 +1,6 @@
-<#
+﻿<#
 .SYNOPSIS
-    Test-MediaStackFleetVerification.ps1 - Master Post-Repair Fleet Verification & Certification Suite.
+    Test-MediaStackFleetVerification.ps1 - Primary Post-Repair Fleet Verification & Certification Suite.
 
 .DESCRIPTION
     Comprehensive verification engine designed to complement the Repair Suite:
@@ -183,7 +183,7 @@ if (Test-Path $cfgRoot) {
     Assert-Verification -Category "Databases" -Item "SQLite Lock Verification" -Condition $true -Details "Clean on disk" -Weight 1
 }
 
-# Master Database Web Container
+# Primary Database Web Container
 $dbWeb = curl.exe -s -o NUL -w "%{http_code}" --max-time 3 "http://localhost:8080/" 2>$null
 Assert-Verification -Category "Databases" -Item "SQLite Web Interface (:8080)" -Condition ($dbWeb -ge 200 -and $dbWeb -lt 500) -Details "HTTP $dbWeb" -Weight 1
 
@@ -243,7 +243,7 @@ $rep = @"
 $($verificationLog | ForEach-Object { "| $($_.Category) | $($_.Item) | $($_.Status) | $($_.Details) |" } | Out-String)
 
 ---
-*Certified by MediaStack Master Fleet Verification Suite.*
+*Certified by MediaStack Primary Fleet Verification Suite.*
 "@
 Set-Content -Path $reportFile -Value $rep -Encoding UTF8
 Write-Host "`n[COMPLETE] Fleet certification report generated: $reportFile`n" -ForegroundColor Green
