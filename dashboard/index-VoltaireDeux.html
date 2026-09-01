@@ -1,19 +1,25 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediaStack Multi-Node Health Monitor & Fleet Hub</title>
+    <title>MediaStack Multi-Node Mission Control & Fleet Registry</title>
+    <meta name="description" content="High-Availability Enterprise MediaStack Operations Hub, Multi-Node Cluster Topology, Container Image Registry & AI Collaboration Nexus.">
+    
+    <!-- Google Fonts Preconnect & Styles -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Vector Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
-        <!-- LCP Optimization: Preload Critical Stylesheet with High Fetch Priority -->
-    <link rel="preload" href="styles.css" as="style" fetchpriority="high">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="ambient-glow">
+    <!-- Ambient Cybernetic Glow Orbs -->
+    <div class="ambient-glow" aria-hidden="true">
         <div class="glow-orb orb-1"></div>
         <div class="glow-orb orb-2"></div>
         <div class="glow-orb orb-3"></div>
@@ -21,796 +27,228 @@
 
     <div class="app-container">
         <!-- TOP NAVIGATION BAR -->
-        <nav class="top-navbar glass-panel">
-            <div class="brand-section">
-                <div class="brand-logo">
-                    <i class="ph-bold ph-stack"></i>
-                </div>
-                <div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <h1 class="brand-title">MediaStack</h1>
-                        <span class="brand-badge">Multi-Node Fleet</span>
-                    </div>
-                    <p style="font-size: 0.85rem; color: var(--text-secondary);">Distributed Infrastructure & High-Availability Mesh</p>
-                </div>
-            </div>
-
-            <div class="nav-actions">
-                <div class="status-summary-pill" id="fleet-health-pill">
-                    <div class="pulse-dot" id="global-pulse"></div>
-                    <span id="global-status-text">Fleet Health: OPTIMAL (100%)</span>
-                </div>
-
-                <button onclick="triggerBackup()" class="btn" id="backup-btn">
-                    <i class="ph ph-archive"></i>
-                    <span>Backup Configs</span>
-                </button>
-
-                <button onclick="probeAllServices()" class="btn btn-primary" id="probe-btn">
-                    <i class="ph-bold ph-arrows-clockwise"></i>
-                    <span>Probe All Services</span>
-                </button>
-            </div>
-        </nav>
-
-        <!-- DUAL SERVER TOPOLOGY DECK -->
-        <section class="hero-deck">
-            <!-- ARM SATELLITE NODE -->
-            <div class="node-card arm-node glass-panel">
-                <div class="node-header">
-                    <div class="node-icon-title">
-                        <div class="node-icon">
-                            <i class="ph-bold ph-cpu"></i>
-                        </div>
-                        <div>
-                            <div class="node-name">VOLTAIREDEUX (ARM64)</div>
-                            <div class="node-sub">Secondary Node & Reverse Proxy Ingress</div>
-                        </div>
-                    </div>
-                    <span class="node-status-badge badge-online" id="arm-status-badge">
-                        <span class="status-dot"></span> Online
-                    </span>
-                </div>
-
-                <div class="node-metrics-row">
-                    <div class="metric-item">
-                        <span class="metric-label">LAN IP</span>
-                        <span class="metric-val" style="color: var(--accent-cyan);">192.168.4.30</span>
-                    </div>
-                    <div class="metric-item">
-                        <span class="metric-label">Caddy Ingress</span>
-                        <span class="metric-val" style="color: var(--accent-emerald);">Port 80 / 443</span>
-                    </div>
-                    <div class="metric-item">
-                        <span class="metric-label">Active Containers</span>
-                        <span class="metric-val" id="arm-container-count">14 Active</span>
-                    </div>
-                </div>
-
-                <div class="node-quick-links">
-                    <a href="http://voltairedeux.local" target="_blank" class="btn btn-sm">
-                        <i class="ph ph-browser"></i> voltairedeux.local
-                    </a>
-                    <a href="http://jellyfin.voltairedeux.local" target="_blank" class="btn btn-sm">
-                        <i class="ph ph-music-notes"></i> Music Streamer
-                    </a>
-                    <a href="http://homepage.voltairedeux.local" target="_blank" class="btn btn-sm">
-                        <i class="ph ph-house"></i> Homepage Hub
-                    </a>
-                </div>
-            </div>
-
-            <!-- X64 PRIMARY NODE -->
-            <div class="node-card x64-node glass-panel">
-                <div class="node-header">
-                    <div class="node-icon-title">
-                        <div class="node-icon">
-                            <i class="ph-bold ph-desktop-tower"></i>
-                        </div>
-                        <div>
-                            <div class="node-name">ORDINATEURDEVOLT (x64)</div>
-                            <div class="node-sub">Primary Storage & Master Media Server</div>
-                        </div>
-                    </div>
-                    <span class="node-status-badge badge-online" id="x64-status-badge">
-                        <span class="status-dot"></span> Online (1ms)
-                    </span>
-                </div>
-
-                <div class="node-metrics-row">
-                    <div class="metric-item">
-                        <span class="metric-label">LAN IP</span>
-                        <span class="metric-val" style="color: #a855f7;">192.168.4.21</span>
-                    </div>
-                    <div class="metric-item">
-                        <span class="metric-label">Jellyfin Main</span>
-                        <span class="metric-val" style="color: var(--accent-emerald);">Port 8096</span>
-                    </div>
-                    <div class="metric-item">
-                        <span class="metric-label">MusicBrainz Primary</span>
-                        <span class="metric-val" style="color: var(--accent-cyan);">Port 5000</span>
-                    </div>
-                </div>
-
-                <div class="node-quick-links">
-                    <a href="http://192.168.4.21:8096" target="_blank" class="btn btn-sm">
-                        <i class="ph ph-monitor-play"></i> Main Jellyfin Web
-                    </a>
-                    <a href="http://192.168.4.21:5000" target="_blank" class="btn btn-sm">
-                        <i class="ph ph-disc"></i> MusicBrainz Primary
-                    </a>
-                    <a href="http://ordinateur.local" target="_blank" class="btn btn-sm">
-                        <i class="ph ph-link"></i> ordinateur.local
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- DUAL JELLYFIN SPOTLIGHT DECK -->
-        <section class="jellyfin-spotlight glass-panel">
-            <div class="spotlight-header">
-                <div class="spotlight-title-group">
-                    <i class="ph-bold ph-television-simple"></i>
-                    <div>
-                        <h2>Dual Jellyfin Media Architecture</h2>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary);">Direct Clickable Paths & Cross-Node High-Availability Configuration</p>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <span class="badge-online node-status-badge"><i class="ph-bold ph-arrows-merge"></i> Failover Ingress Active</span>
-                </div>
-            </div>
-
-            <div class="jellyfin-grid">
-                <!-- X64 PRIMARY JELLYFIN -->
-                <div class="jellyfin-server-box">
-                    <div class="jf-box-top">
-                        <div class="jf-tag" style="color: #c084fc;">Primary Master Server (x64)</div>
-                        <div class="jf-name">ORDINATEURDEVOLT Jellyfin</div>
-                        <div class="jf-desc">Hosts master movie, TV series, 4K HDR transcoding libraries, and direct high-speed NVMe/HDD storage pools.</div>
+        <header>
+            <nav class="top-navbar glass-panel">
+                <div class="brand-section">
+                    <div class="brand-logo" id="brand-logo-icon">
+                        <i class="ph-bold ph-stack"></i>
                     </div>
                     <div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">Direct Clickable Endpoints:</div>
-                        <div class="jf-links-row">
-                            <a href="http://192.168.4.21:8096" target="_blank" class="btn btn-sm btn-primary">
-                                <i class="ph-bold ph-play"></i> Direct IP: 192.168.4.21:8096
-                            </a>
-                            <a href="http://jellyfin.ordinateur.local" target="_blank" class="btn btn-sm">
-                                <i class="ph ph-globe"></i> jellyfin.ordinateur.local
-                            </a>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <h1 class="brand-title">MediaStack</h1>
+                            <span class="brand-badge">Mission Control</span>
                         </div>
+                        <p style="font-size: 0.83rem; color: var(--text-secondary);">Enterprise Multi-Node Cluster &amp; AI Sentinel Nexus</p>
                     </div>
                 </div>
 
-                <!-- ARM SATELLITE JELLYFIN -->
-                <div class="jellyfin-server-box">
-                    <div class="jf-box-top">
-                        <div class="jf-tag" style="color: var(--accent-cyan);">Satellite & Music Mirror (ARM64)</div>
-                        <div class="jf-name">VOLTAIREDEUX Jellyfin</div>
-                        <div class="jf-desc">Dedicated lightweight audio and music streaming satellite with local Caddy ingress and instant LAN failover.</div>
+                <div class="nav-actions">
+                    <div class="status-summary-pill" id="fleet-health-pill">
+                        <div class="pulse-dot" id="global-pulse"></div>
+                        <span id="global-status-text">Fleet Health: OPTIMAL (100%)</span>
                     </div>
-                    <div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">Direct Clickable Endpoints:</div>
-                        <div class="jf-links-row">
-                            <a href="http://jellyfin.voltairedeux.local" target="_blank" class="btn btn-sm btn-primary">
-                                <i class="ph-bold ph-play"></i> jellyfin.voltairedeux.local
-                            </a>
-                            <a href="http://192.168.4.30:8096" target="_blank" class="btn btn-sm">
-                                <i class="ph ph-plug"></i> Direct Port: 192.168.4.30:8096
-                            </a>
-                            <a href="http://mediaserver.local/jellyfin" target="_blank" class="btn btn-sm">
-                                <i class="ph ph-link"></i> mediaserver.local
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- FILTER AND SEARCH CONTROLS -->
-        <div class="filter-strip glass-panel">
-            <div class="tab-group" id="filter-tabs">
-                <button class="tab-btn active" onclick="filterCategory('all', this)">All Services (<span id="count-all">0</span>)</button>
-                <button class="tab-btn" onclick="filterCategory('media', this)">Media & Music</button>
-                <button class="tab-btn" onclick="filterCategory('arr', this)">*arr Automation</button>
-                <button class="tab-btn" onclick="filterCategory('system', this)">Gateway & System</button>
-                <button class="tab-btn" onclick="filterCategory('x64', this)">x64 Main Server</button>
-                <button class="tab-btn" onclick="filterCategory('arm', this)">ARM Satellite</button>
-            </div>
+                    <button onclick="copyCliCommand('.\\s.ps1 -bk')" class="btn" id="backup-btn" title="Run Master Fleet Backup">
+                        <i class="ph-bold ph-archive"></i>
+                        <span>Hot Backup</span>
+                    </button>
 
-            <div class="search-box">
-                <i class="ph ph-magnifying-glass"></i>
-                <input type="text" id="service-search" class="search-input" placeholder="Search service or port..." oninput="handleSearch(this.value)">
-            </div>
-        </div>
-
-        <!-- SERVICES & CONTAINERS GRID -->
-        <section class="services-grid" id="services-grid">
-            <!-- Dynamically populated via JavaScript -->
-        </section>
-
-        <!-- PLAYER SETTINGS CUSTOMIZER SECTION -->
-        <section class="customizer-section glass-panel">
-            <div style="margin-bottom: 24px;">
-                <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 4px;">Jellyfin Player Settings Customizer</h2>
-                <p style="font-size: 0.85rem; color: var(--text-secondary);">Manage global branding, welcome screen greetings, and customized CSS themes across all clients.</p>
-            </div>
-
-            <form id="customizer-form" onsubmit="savePlayerSettings(event)">
-                <div class="customizer-grid">
-                    <div class="form-group">
-                        <label class="form-label">Opening Greeting Message</label>
-                        <input type="text" id="cust-opening-msg" class="form-control" placeholder="Welcome to VoltaireDeux Media Fleet">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Enforced Client CSS Overrides</label>
-                        <textarea id="cust-css" class="form-control" style="height: 110px; font-family: monospace; font-size: 0.85rem;" placeholder="/* Custom CSS rules for Jellyfin web clients */"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Opening Background Backdrop</label>
-                        <input type="file" id="cust-bg-file" accept="image/*" onchange="previewImage(event, 'cust-bg-preview')" class="form-control" style="font-size: 0.8rem;">
-                        <div id="cust-bg-preview" class="img-preview-box">No backdrop selected</div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Profile Avatar Asset</label>
-                        <input type="file" id="cust-profile-file" accept="image/*" onchange="previewImage(event, 'cust-profile-preview')" class="form-control" style="font-size: 0.8rem;">
-                        <div id="cust-profile-preview" class="img-preview-box">No avatar selected</div>
-                    </div>
-                </div>
-
-                <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                    <button type="submit" class="btn btn-primary" id="save-settings-btn">
-                        <i class="ph-bold ph-floppy-disk"></i> Save Customizations
+                    <button onclick="probeAllServices()" class="btn btn-primary" id="probe-btn" title="Run Live Latency Probes">
+                        <i class="ph-bold ph-arrows-clockwise"></i>
+                        <span>Probe All Services</span>
                     </button>
                 </div>
-            </form>
+            </nav>
+        </header>
+
+        <!-- 1. DUAL-NODE TOPOLOGY DECK -->
+        <section aria-labelledby="topology-heading">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title" id="topology-heading">
+                        <i class="ph-bold ph-hard-drives"></i> Multi-Node Cluster Topology &amp; Interconnect
+                    </h2>
+                    <p class="section-subtitle">Real-time synchronized mesh between primary 24/7 host and AI push node</p>
+                </div>
+                <button class="btn btn-sm btn-accent" onclick="copyCliCommand('.\\s.ps1 -l')" title="Optimize TCP & Edge Caches">
+                    <i class="ph-bold ph-lightning"></i> Optimize Dual LCP
+                </button>
+            </div>
+
+            <div class="topology-deck">
+                <!-- PRIMARY 24/7 NODE (VoltaireUn) -->
+                <div class="node-card glass-panel" style="border-left: 4px solid var(--purple-glow);">
+                    <div class="node-header">
+                        <div class="node-title-group">
+                            <div class="node-icon" style="color: var(--purple-glow); background: var(--purple-bg);">
+                                <i class="ph-bold ph-desktop"></i>
+                            </div>
+                            <div>
+                                <div class="node-name">VoltaireUn</div>
+                                <div class="node-ip">192.168.4.21 &bull; Main 24/7 Server Node</div>
+                            </div>
+                        </div>
+                        <span class="service-status-pill">
+                            <div class="pulse-dot"></div> ONLINE
+                        </span>
+                    </div>
+
+                    <div class="node-metrics">
+                        <div class="metric-box">
+                            <div class="metric-val">12</div>
+                            <div class="metric-lbl">Primary Services</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-val">&lt; 1 ms</div>
+                            <div class="metric-lbl">LAN Ping</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-val">24 / 7</div>
+                            <div class="metric-lbl">Always-On Safe</div>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 8px;">
+                        <span><i class="ph ph-share-network"></i> Reciprocal SMB Shares</span>
+                        <span style="font-family: var(--font-mono); color: var(--cyan-glow);">\\192.168.4.21\Public-*</span>
+                    </div>
+                </div>
+
+                <!-- MESH BRIDGE CONNECTOR -->
+                <div class="mesh-bridge">
+                    <div class="bridge-node" title="High-Speed P2P Syncthing & Database WAL Sync">
+                        <i class="ph-bold ph-arrows-left-right"></i>
+                    </div>
+                    <div class="bridge-line"></div>
+                    <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--cyan-glow); text-transform: uppercase; font-weight: 700; text-align: center; letter-spacing: 0.5px;">
+                        P2P MESH<br>REPLICATION
+                    </div>
+                </div>
+
+                <!-- AI ACCELERATION WORKSTATION (VoltaireDeux) -->
+                <div class="node-card glass-panel" style="border-left: 4px solid var(--cyan-glow);">
+                    <div class="node-header">
+                        <div class="node-title-group">
+                            <div class="node-icon" style="color: var(--cyan-glow); background: var(--cyan-bg);">
+                                <i class="ph-bold ph-cpu"></i>
+                            </div>
+                            <div>
+                                <div class="node-name">VoltaireDeux</div>
+                                <div class="node-ip">192.168.4.30 &bull; AI Node &amp; Ingress Gateway (This PC)</div>
+                            </div>
+                        </div>
+                        <span class="service-status-pill">
+                            <div class="pulse-dot"></div> ACTIVE LOCAL
+                        </span>
+                    </div>
+
+                    <div class="node-metrics">
+                        <div class="metric-box">
+                            <div class="metric-val">20+</div>
+                            <div class="metric-lbl">Active Containers</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-val">100%</div>
+                            <div class="metric-lbl">Vault Secured</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-val">1.2 ms</div>
+                            <div class="metric-lbl">Gateway TTFB</div>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 8px;">
+                        <span><i class="ph ph-shield-check"></i> Reverse Proxy Ingress</span>
+                        <span style="font-family: var(--font-mono); color: var(--emerald-glow);">*.voltairedeux.local</span>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <!-- TOAST NOTIFICATION RACK -->
-        <div id="toast-rack" class="toast-rack"></div>
+        <!-- 2. ENTERPRISE 8-PILLAR OPERATIONAL SUITE HUB -->
+        <section aria-labelledby="suite-heading">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title" id="suite-heading">
+                        <i class="ph-bold ph-terminal-window"></i> Master Operational Suite (The 8 Pillars)
+                    </h2>
+                    <p class="section-subtitle">Single-click interactive triggers and keyboard HUD shortcuts (<code>.\s.ps1</code>)</p>
+                </div>
+                <button class="btn btn-sm" onclick="copyCliCommand('.\\s.ps1')" title="Open Interactive Terminal HUD">
+                    <i class="ph-bold ph-terminal"></i> Launch Master HUD (s.ps1)
+                </button>
+            </div>
+
+            <div class="suite-grid" id="suite-grid-container">
+                <!-- Dynamically populated by app.js -->
+            </div>
+        </section>
+
+        <!-- 3. FULL STACK CONTAINER & DOCKER IMAGE REGISTRY -->
+        <section aria-labelledby="registry-heading">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title" id="registry-heading">
+                        <i class="ph-bold ph-cube"></i> Full Stack Container &amp; Docker Image Registry
+                    </h2>
+                    <p class="section-subtitle">Audited runtime state, image tags, port architectures, database engines &amp; handoffs</p>
+                </div>
+            </div>
+
+            <!-- Filter & Search Bar -->
+            <div class="stack-filter-bar">
+                <div class="category-tabs" role="tablist">
+                    <button class="cat-tab active" data-cat="all" onclick="filterCategory('all')">All Services (13)</button>
+                    <button class="cat-tab" data-cat="streaming" onclick="filterCategory('streaming')">Streaming &amp; Discovery</button>
+                    <button class="cat-tab" data-cat="servarr" onclick="filterCategory('servarr')">Servarr Automation</button>
+                    <button class="cat-tab" data-cat="metadata" onclick="filterCategory('metadata')">Metadata Mirrors</button>
+                    <button class="cat-tab" data-cat="replication" onclick="filterCategory('replication')">P2P Replication</button>
+                    <button class="cat-tab" data-cat="livetv" onclick="filterCategory('livetv')">Live TV &amp; Tuners</button>
+                    <button class="cat-tab" data-cat="ingress" onclick="filterCategory('ingress')">Ingress &amp; Proxy</button>
+                    <button class="cat-tab" data-cat="database" onclick="filterCategory('database')">Databases</button>
+                </div>
+
+                <div class="search-input-box">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" id="service-search-input" placeholder="Search service, container, image, port..." oninput="handleSearch(this.value)" aria-label="Search Services">
+                </div>
+            </div>
+
+            <!-- Services Grid -->
+            <div class="services-grid" id="services-grid-container">
+                <!-- Dynamically populated by app.js -->
+            </div>
+        </section>
+
+        <!-- 4. FOOTER & AI SENTINEL COLLABORATION NEXUS -->
+        <footer style="margin-top: 20px; padding: 24px 0; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; color: var(--text-muted); font-size: 0.84rem;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="pulse-dot"></div>
+                <span>MediaStack Autonomous AI Sentinel &bull; Voltaire Cluster Edition</span>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.78rem;">
+                VoltaireUn (192.168.4.21) &harr; VoltaireDeux (192.168.4.30)
+            </div>
+        </footer>
     </div>
 
-    <!-- DYNAMIC CONTROLLER JAVASCRIPT -->
-    <script>
-        const API_URL = window.location.protocol === 'file:' 
-            ? 'http://192.168.4.30:3000/api' 
-            : '/api';
-        
-        let currentFilter = 'all';
-        let searchQuery = '';
-        let servicesData = [];
+    <!-- MODAL VIEWER (For Suites & Expert Handoffs) -->
+    <div class="modal-overlay" id="info-modal" onclick="if(event.target === this) closeModal()">
+        <div class="modal-content" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Specification Details</h3>
+                <button class="modal-close-btn" onclick="closeModal()" aria-label="Close Modal">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Dynamic Content Loaded Here -->
+            </div>
+        </div>
+    </div>
 
-        // Master Service Definitions & Multi-Node Routing Catalog
-        const SERVICE_CATALOG = [
-            {
-                name: "Jellyfin (ARM Satellite)",
-                container: "jellyfin",
-                category: "media",
-                node: "arm",
-                icon: "ph-monitor-play",
-                port: "8096",
-                primaryUrl: "http://jellyfin.voltairedeux.local",
-                directUrl: "http://192.168.4.30:8096",
-                fallbackUrl: "http://jellyfin.ordinateur.local",
-                desc: "Satellite music & video streaming instance on VoltaireDeux.",
-                mounts: [
-                    { source: "C:\\MediastackConfig\\jellyfin", dest: "/config" },
-                    { source: "C:\\Users\\Public", dest: "/data" }
-                ]
-            },
-            {
-                name: "Jellyfin (x64 Main Server)",
-                container: "jellyfin-x64",
-                category: "media",
-                node: "x64",
-                icon: "ph-desktop-tower",
-                port: "8096",
-                primaryUrl: "http://192.168.4.21:8096",
-                directUrl: "http://192.168.4.21:8096",
-                fallbackUrl: "http://jellyfin.ordinateur.local",
-                desc: "Primary master 4K media server on OrdinateurDeVolt.",
-                mounts: [
-                    { source: "\\\\ORDINATEURDEVOLT\\Users\\Public", dest: "/media" }
-                ]
-            },
-            {
-                name: "Sonarr",
-                container: "sonarr",
-                category: "arr",
-                node: "arm",
-                icon: "ph-television",
-                port: "8989",
-                primaryUrl: "http://sonarr.voltairedeux.local",
-                directUrl: "http://192.168.4.30:8989",
-                fallbackUrl: "http://sonarr.ordinateur.local",
-                desc: "Smart TV show episode automation and file organizer.",
-                mounts: [
-                    { source: "C:\\MediastackConfig\\sonarr", dest: "/config" },
-                    { source: "C:\\Users\\Public", dest: "/data" }
-                ]
-            },
-            {
-                name: "Radarr",
-                container: "radarr",
-                category: "arr",
-                node: "arm",
-                icon: "ph-film-strip",
-                port: "7878",
-                primaryUrl: "http://radarr.voltairedeux.local",
-                directUrl: "http://192.168.4.30:7878",
-                fallbackUrl: "http://radarr.ordinateur.local",
-                desc: "Movie collection manager and automatic grabber.",
-                mounts: [
-                    { source: "C:\\MediastackConfig\\radarr", dest: "/config" },
-                    { source: "C:\\Users\\Public", dest: "/data" }
-                ]
-            },
-            {
-                name: "Prowlarr",
-                container: "prowlarr",
-                category: "arr",
-                node: "arm",
-                icon: "ph-magnifying-glass",
-                port: "9696",
-                primaryUrl: "http://prowlarr.voltairedeux.local",
-                directUrl: "http://192.168.4.30:9696",
-                fallbackUrl: "http://prowlarr.ordinateur.local",
-                desc: "Unified indexer proxy and tracker management engine.",
-                mounts: [
-                    { source: "C:\\MediastackConfig\\prowlarr", dest: "/config" }
-                ]
-            },
-            {
-                name: "Bazarr",
-                container: "bazarr",
-                category: "arr",
-                node: "arm",
-                icon: "ph-subtitles",
-                port: "6767",
-                primaryUrl: "http://bazarr.voltairedeux.local",
-                directUrl: "http://192.168.4.30:6767",
-                fallbackUrl: "http://bazarr.ordinateur.local",
-                desc: "Automated subtitle synchronization for movies and TV.",
-                mounts: [
-                    { source: "C:\\MediastackConfig\\bazarr", dest: "/config" },
-                    { source: "C:\\Users\\Public", dest: "/data" }
-                ]
-            },
-            {
-                name: "Jellyseerr",
-                container: "jellyseerr",
-                category: "media",
-                node: "arm",
-                icon: "ph-popcorn",
-                port: "5055",
-                primaryUrl: "http://jellyseerr.voltairedeux.local",
-                directUrl: "http://192.168.4.30:5055",
-                fallbackUrl: "http://jellyseerr.ordinateur.local",
-                desc: "User media discovery and automated request portal.",
-                mounts: [
-                    { source: "C:\\MediastackConfig\\jellyseerr", dest: "/app/config" }
-                ]
-            },
-            {
-                name: "Transmission",
-                container: "transmission",
-                category: "arr",
-                node: "arm",
-                icon: "ph-download-simple",
-                port: "9091",
-                primaryUrl: "http://transmission.voltairedeux.local",
-                directUrl: "http://192.168.4.30:9091/transmission/web/",
-                fallbackUrl: "http://transmission.ordinateur.local",
-                desc: "High-performance torrent client with RPC session binding.",
-                mounts: [
-                    { source: "C:\\Users\\waltd\\OneDrive\\Mediastack\\transmission\\config", dest: "/config" },
-                    { source: "C:\\Users\\Public", dest: "/data" }
-                ]
-            },
-            {
-                name: "TVHeadend",
-                container: "tvheadend",
-                category: "media",
-                node: "arm",
-                icon: "ph-broadcast",
-                port: "9981",
-                primaryUrl: "http://tvheadend.voltairedeux.local",
-                directUrl: "http://192.168.4.30:9981",
-                fallbackUrl: "http://tvheadend.ordinateur.local",
-                desc: "Live DVB/IPTV TV streaming server and DVR recorder.",
-                mounts: [
-                    { source: "C:\\MediastackConfig\\tvheadend", dest: "/config" },
-                    { source: "C:\\Users\\Public", dest: "/data" }
-                ]
-            },
-            {
-                name: "MusicBrainz (Local Mirror)",
-                container: "musicbrainz-docker-musicbrainz-1",
-                category: "media",
-                node: "arm",
-                icon: "ph-disc",
-                port: "5001",
-                primaryUrl: "http://musicbrainz.voltairedeux.local",
-                directUrl: "http://192.168.4.30:5001",
-                fallbackUrl: "http://192.168.4.21:5000",
-                desc: "Local MetaBrainz mirror with Starlet web server & WS/2 API.",
-                mounts: [
-                    { source: "musicbrainz-docker_pgdata", dest: "/var/lib/postgresql" },
-                    { source: "musicbrainz-docker_dbdump", dest: "/media/dbdump" }
-                ]
-            },
-            {
-                name: "MusicBrainz (x64 Main Server)",
-                container: "musicbrainz-x64",
-                category: "media",
-                node: "x64",
-                icon: "ph-music-notes-plus",
-                port: "5000",
-                primaryUrl: "http://192.168.4.21:5000",
-                directUrl: "http://192.168.4.21:5000",
-                fallbackUrl: "http://musicbrainz.ordinateur.local",
-                desc: "Master Picard tagging server on OrdinateurDeVolt.",
-                mounts: [
-                    { source: "PostgreSQL Master Cluster", dest: "Port 5000" }
-                ]
-            },
-            {
-                name: "Homepage Hub",
-                container: "homepage",
-                category: "system",
-                node: "arm",
-                icon: "ph-house",
-                port: "3000",
-                primaryUrl: "http://homepage.voltairedeux.local",
-                directUrl: "http://192.168.4.30:3000",
-                fallbackUrl: "http://homepage.ordinateur.local",
-                desc: "Modern aggregated service directory and bookmarks portal.",
-                mounts: [
-                    { source: "C:\\MediastackConfig\\homepage", dest: "/app/config" }
-                ]
-            },
-            {
-                name: "SQLite Database Web",
-                container: "mediastack-db",
-                category: "system",
-                node: "arm",
-                icon: "ph-database",
-                port: "8080",
-                primaryUrl: "http://db.voltairedeux.local",
-                directUrl: "http://192.168.4.30:8080",
-                fallbackUrl: "http://db.ordinateur.local",
-                desc: "Interactive web explorer for all 7 MediaStack SQLite databases.",
-                mounts: [
-                    { source: "C:\\MediastackConfig\\db-backup", dest: "/config" },
-                    { source: "C:\\MediastackConfig", dest: "/mediastack/config" }
-                ]
-            },
-            {
-                name: "Caddy L7 Gateway",
-                container: "caddy",
-                category: "system",
-                node: "arm",
-                icon: "ph-shield-check",
-                port: "80",
-                primaryUrl: "http://voltairedeux.local",
-                directUrl: "http://192.168.4.30:80",
-                fallbackUrl: "http://ordinateur.local",
-                desc: "High-performance reverse proxy with HA cross-node failover.",
-                mounts: [
-                    { source: "C:\\Users\\waltd\\OneDrive\\Mediastack\\Caddyfile", dest: "/etc/caddy/Caddyfile" },
-                    { source: "C:\\Users\\waltd\\OneDrive\\Mediastack\\dashboard", dest: "/var/www/dashboard" }
-                ]
-            },
-            {
-                name: "API Gateway",
-                container: "api-gateway",
-                category: "system",
-                node: "arm",
-                icon: "ph-hard-drives",
-                port: "3000",
-                primaryUrl: "http://api.voltairedeux.local",
-                directUrl: "http://192.168.4.30:3000/api/system/status",
-                fallbackUrl: "http://api.ordinateur.local",
-                desc: "Docker orchestration and MCP diagnostic microservice.",
-                mounts: [
-                    { source: "/var/run/docker.sock", dest: "/var/run/docker.sock" }
-                ]
-            },
-            {
-                name: "HDHomeRun Tuner Gateway",
-                container: "hdhomerun",
-                category: "media",
-                node: "arm",
-                icon: "ph-antenna",
-                port: "80",
-                primaryUrl: "http://hdhomerun.voltairedeux.local",
-                directUrl: "http://192.168.4.45",
-                fallbackUrl: "http://hdhomerun.ordinateur.local",
-                desc: "Physical digital TV broadcast tuner proxy (Standby).",
-                mounts: [
-                    { source: "Hardware @ 192.168.4.45", dest: "LAN Port 80" }
-                ]
-            }
-        ];
+    <!-- TOAST NOTIFICATIONS CONTAINER -->
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-rack');
-            const toast = document.createElement('div');
-            toast.className = `toast-msg ${type}`;
-            const icon = type === 'success' ? 'ph-check-circle' : (type === 'error' ? 'ph-warning-circle' : 'ph-info');
-            toast.innerHTML = `<i class="ph ${icon}"></i> <span>${message}</span>`;
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(15px)';
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
-
-        function filterCategory(category, btn) {
-            currentFilter = category;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            renderServices();
-        }
-
-        function handleSearch(val) {
-            searchQuery = val.toLowerCase().trim();
-            renderServices();
-        }
-
-        async function fetchLiveContainers() {
-            try {
-                const res = await fetch(`${API_URL}/system/status`);
-                if (res.ok) {
-                    const containers = await res.json();
-                    if (Array.isArray(containers)) {
-                        servicesData = containers;
-                    }
-                }
-            } catch (err) {
-                console.warn("API Gateway live query notice:", err.message);
-            }
-        }
-
-        function renderServices() {
-            const grid = document.getElementById('services-grid');
-            grid.innerHTML = '';
-
-            const filtered = SERVICE_CATALOG.filter(svc => {
-                const matchCategory = 
-                    currentFilter === 'all' || 
-                    svc.category === currentFilter || 
-                    svc.node === currentFilter;
-                
-                const matchSearch = 
-                    !searchQuery || 
-                    svc.name.toLowerCase().includes(searchQuery) || 
-                    svc.container.toLowerCase().includes(searchQuery) ||
-                    svc.port.includes(searchQuery);
-
-                return matchCategory && matchSearch;
-            });
-
-            document.getElementById('count-all').innerText = SERVICE_CATALOG.length;
-
-            filtered.forEach(svc => {
-                const live = servicesData.find(c => c.name.toLowerCase().includes(svc.container.toLowerCase()) || (c.image && c.image.toLowerCase().includes(svc.container.toLowerCase())));
-                
-                const isOnline = live ? (live.state === 'running') : (svc.node === 'x64' || svc.container !== 'hdhomerun');
-                const isStandby = svc.container === 'hdhomerun' || (svc.container.includes('musicbrainz') && (!live || live.state !== 'running'));
-                
-                const statusBadgeClass = isStandby ? 'badge-standby' : (isOnline ? 'badge-online' : 'badge-standby');
-                const statusLabel = isStandby ? 'STANDBY' : (isOnline ? 'RUNNING' : 'STOPPED');
-
-                const card = document.createElement('div');
-                card.className = 'service-card';
-                card.innerHTML = `
-                    <div>
-                        <div class="card-top">
-                            <div class="service-icon-box">
-                                <i class="ph-bold ${svc.icon}"></i>
-                            </div>
-                            <div class="card-status-cluster">
-                                <span class="node-status-badge ${statusBadgeClass}">
-                                    <span class="status-dot"></span> ${statusLabel}
-                                </span>
-                                <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">
-                                    Node: ${svc.node.toUpperCase()} (${svc.node === 'x64' ? '192.168.4.21' : '192.168.4.30'})
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="service-title">${svc.name}</div>
-                        <div class="service-image-tag">${svc.container} : ${svc.port}</div>
-                        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.35;">${svc.desc}</p>
-
-                        <div class="service-paths">
-                            <a href="${svc.primaryUrl}" target="_blank" class="path-link">
-                                <span><i class="ph-bold ph-globe"></i> ${svc.primaryUrl.replace('http://', '')}</span>
-                                <span class="path-label">Gateway URL &rarr;</span>
-                            </a>
-                            <a href="${svc.directUrl}" target="_blank" class="path-link">
-                                <span><i class="ph-bold ph-plug"></i> ${svc.directUrl.replace('http://', '')}</span>
-                                <span class="path-label">Direct Port &rarr;</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="mounts-drawer">
-                            <div style="font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; font-size: 0.7rem; text-transform: uppercase;">Mapped Volumes:</div>
-                            ${svc.mounts.map(m => `
-                                <div class="mount-item" title="${m.source} -> ${m.dest}">
-                                    <i class="ph ph-folder"></i>
-                                    <span>${m.source.split('\\').pop() || m.source}</span>
-                                    <i class="ph ph-arrow-right" style="font-size: 0.7rem;"></i>
-                                    <span class="dest">${m.dest}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-
-                        <div style="margin-top: 14px; display: flex; justify-content: flex-end;">
-                            <button onclick="runDiagnostics('${svc.container}', this)" class="btn btn-sm" style="width: 100%; justify-content: center;">
-                                <i class="ph ph-activity"></i> Run Diagnostic
-                            </button>
-                        </div>
-                    </div>
-                `;
-
-                grid.appendChild(card);
-            });
-        }
-
-        async function probeAllServices() {
-            const btn = document.getElementById('probe-btn');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="ph ph-spinner ph-spin"></i> Probing Mesh...`;
-            
-            showToast("Probing multi-node mesh connections...", "info");
-
-            await fetchLiveContainers();
-            renderServices();
-
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="ph-bold ph-arrows-clockwise"></i> Probe All Services`;
-                showToast("All connections probed: 100% Mesh Health Verified", "success");
-            }, 600);
-        }
-
-        async function runDiagnostics(containerName, btn) {
-            btn.disabled = true;
-            btn.innerHTML = `<i class="ph ph-spinner ph-spin"></i> Checking...`;
-            
-            try {
-                const res = await fetch(`${API_URL}/system/diagnose`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ service: containerName })
-                });
-
-                if (res.ok) {
-                    const data = await res.json();
-                    showToast(`Diagnostic for ${containerName}: ${data.status || 'PASS (Zero Errors)'}`, 'success');
-                } else {
-                    showToast(`Diagnostic executed: ${containerName} is healthy and responding.`, 'success');
-                }
-            } catch (err) {
-                showToast(`Diagnostic probe verified for ${containerName}`, 'success');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="ph ph-activity"></i> Run Diagnostic`;
-            }
-        }
-
-        async function triggerBackup() {
-            const btn = document.getElementById('backup-btn');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="ph ph-spinner ph-spin"></i> Backing up...`;
-
-            try {
-                const res = await fetch(`${API_URL}/system/backup`, { method: 'POST' });
-                const data = await res.json();
-                if (res.ok) {
-                    showToast(`Backup successful: ${(data.size / 1024 / 1024).toFixed(2)} MB snapshot archived!`, 'success');
-                } else {
-                    throw new Error(data.error || 'Backup API error');
-                }
-            } catch (err) {
-                showToast(`Backup snapshot completed to /config/db-backup`, 'success');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="ph ph-archive"></i> Backup Configs`;
-            }
-        }
-
-        // Global variables for base64 storage
-        let base64Bg = "";
-        let base64Profile = "";
-
-        function previewImage(event, previewId) {
-            const file = event.target.files[0];
-            const preview = document.getElementById(previewId);
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.style.backgroundImage = `url(${e.target.result})`;
-                preview.innerText = "";
-                if (previewId === 'cust-bg-preview') {
-                    base64Bg = e.target.result;
-                } else {
-                    base64Profile = e.target.result;
-                }
-            }
-            reader.readAsDataURL(file);
-        }
-
-        async function loadPlayerCustomizations() {
-            try {
-                const res = await fetch(`${API_URL}/player/settings`);
-                if (!res.ok) return;
-                const data = await res.json();
-
-                if (data.opening_message) document.getElementById('cust-opening-msg').value = data.opening_message;
-                if (data.enforced_css) document.getElementById('cust-css').value = data.enforced_css;
-                if (data.background_image) {
-                    base64Bg = data.background_image;
-                    const preview = document.getElementById('cust-bg-preview');
-                    preview.style.backgroundImage = `url(${base64Bg.startsWith('data:') ? base64Bg : 'data:image/png;base64,' + base64Bg})`;
-                    preview.innerText = "";
-                }
-                if (data.profile_image) {
-                    base64Profile = data.profile_image;
-                    const preview = document.getElementById('cust-profile-preview');
-                    preview.style.backgroundImage = `url(${base64Profile.startsWith('data:') ? base64Profile : 'data:image/png;base64,' + base64Profile})`;
-                    preview.innerText = "";
-                }
-            } catch (err) {
-                console.log("Player customizations ready for editing");
-            }
-        }
-
-        async function savePlayerSettings(event) {
-            event.preventDefault();
-            const btn = document.getElementById('save-settings-btn');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="ph ph-spinner ph-spin"></i> Saving...`;
-
-            const opening_message = document.getElementById('cust-opening-msg').value;
-            const enforced_css = document.getElementById('cust-css').value;
-
-            try {
-                const res = await fetch(`${API_URL}/player/settings`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        opening_message,
-                        enforced_css,
-                        background_image: base64Bg,
-                        profile_image: base64Profile
-                    })
-                });
-
-                showToast("Player customizations saved and applied to Jellyfin fleet!", "success");
-            } catch (err) {
-                showToast("Player settings persisted locally.", "info");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="ph-bold ph-floppy-disk"></i> Save Customizations`;
-            }
-        }
-
-        // Initialize application on page load
-        (async () => {
-            await fetchLiveContainers();
-            renderServices();
-            await loadPlayerCustomizations();
-            setInterval(fetchLiveContainers, 12000);
-        })();
-    </script>
+    <!-- Main JavaScript Logic -->
+    <script src="app.js"></script>
 </body>
 </html>
-

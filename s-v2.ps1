@@ -21,9 +21,9 @@ param(
     [Parameter(Mandatory = $false)][switch]$SkipAiWatcher
 )
 
-$targetScript = Join-Path $PSScriptRoot "Start-VoltaireDeuxMasterExecution.ps1"
+$targetScript = Join-Path $PSScriptRoot "Start-VoltaireDeuxMainExecution.ps1"
 if (Test-Path $targetScript) {
     & $targetScript -ExternalDomain $ExternalDomain -LocalIP $LocalIP -PrimaryIP $PrimaryIP -NonInteractive:$NonInteractive -SkipAiWatcher:$SkipAiWatcher
 } else {
-    Write-Error "Start-VoltaireDeuxMasterExecution.ps1 not found in $PSScriptRoot"
+    Write-Error "Start-VoltaireDeuxMainExecution.ps1 not found in $PSScriptRoot"
 }

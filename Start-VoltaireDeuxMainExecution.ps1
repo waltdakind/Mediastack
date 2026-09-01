@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Start-VoltaireDeuxMasterExecution.ps1 - Master Orchestration & AI Execution Suite for VoltaireDeux.
+    Start-VoltaireDeuxMainExecution.ps1 - Main Orchestration & AI Execution Suite for VoltaireDeux.
 
 .DESCRIPTION
     VoltaireDeux (192.168.4.30 / voltairedeux.local) AI Acceleration & Workstation Hub Engine.
@@ -22,8 +22,8 @@
     Bypasses launching the background AI collaboration watcher.
 
 .EXAMPLE
-    .\Start-VoltaireDeuxMasterExecution.ps1
-    .\Start-VoltaireDeuxMasterExecution.ps1 -NonInteractive
+    .\Start-VoltaireDeuxMainExecution.ps1
+    .\Start-VoltaireDeuxMainExecution.ps1 -NonInteractive
 #>
 
 [CmdletBinding()]
@@ -40,10 +40,9 @@ $ErrorActionPreference = "Continue"
 [System.Console]::InputEncoding  = [System.Text.Encoding]::UTF8
 
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-$fileTag   = Get-Date -Format "yyyyMMdd_HHmmss"
 
 Write-Host "`n================================================================================" -ForegroundColor Cyan
-Write-Host "   V O L T A I R E D E U X   M A S T E R   E X E C U T I O N   E N G I N E" -ForegroundColor DarkCyan
+Write-Host "   V O L T A I R E D E U X   M A I N   E X E C U T I O N   E N G I N E" -ForegroundColor DarkCyan
 Write-Host "   AI Acceleration, MusicBrainz Mirror & Push Node ($LocalIP)" -ForegroundColor White
 Write-Host "   Primary Server Peer: $PrimaryIP (VoltaireUn)" -ForegroundColor DarkGray
 Write-Host "   Timestamp          : $timestamp" -ForegroundColor DarkGray

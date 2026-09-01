@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Start-VoltaireUnMasterExecution.ps1 - Master Orchestration, Self-Healing & Error Remediation for VoltaireUn.
+    Start-VoltaireUnMainExecution.ps1 - Main Orchestration, Self-Healing & Error Remediation for VoltaireUn.
 
 .DESCRIPTION
     VoltaireUn (192.168.4.21 / voltaireun.local) Primary 24/7 Server Engine.
@@ -22,8 +22,8 @@
     Bypasses continuous background watcher launch.
 
 .EXAMPLE
-    .\Start-VoltaireUnMasterExecution.ps1
-    .\Start-VoltaireUnMasterExecution.ps1 -NonInteractive
+    .\Start-VoltaireUnMainExecution.ps1
+    .\Start-VoltaireUnMainExecution.ps1 -NonInteractive
 #>
 
 [CmdletBinding()]
@@ -41,10 +41,9 @@ $ErrorActionPreference = "Continue"
 [System.Console]::InputEncoding  = [System.Text.Encoding]::UTF8
 
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-$fileTag   = Get-Date -Format "yyyyMMdd_HHmmss"
 
 Write-Host "`n================================================================================" -ForegroundColor Cyan
-Write-Host "   V O L T A I R E U N   M A S T E R   E X E C U T I O N   E N G I N E" -ForegroundColor DarkCyan
+Write-Host "   V O L T A I R E U N   M A I N   E X E C U T I O N   E N G I N E" -ForegroundColor DarkCyan
 Write-Host "   24/7 Primary Media Server & Ingress Hub ($PrimaryIP)" -ForegroundColor White
 Write-Host "   Addressing All System, Database, Socket, and Routing Errors" -ForegroundColor Yellow
 Write-Host "   Timestamp: $timestamp" -ForegroundColor DarkGray

@@ -1,6 +1,6 @@
 # ==============================================================================
 # Start-MediaStackAutohealer.ps1 - Master Multi-Node Continuous Autohealing Sentinel
-# Nodes: VOLTAIREDEUX (192.168.4.30) <---> ORDINATEURDEVOLT (192.168.4.21)
+# Nodes: VOLTAIREDEUX (192.168.4.30) <---> VOLTAIREUN (192.168.4.21)
 # ==============================================================================
 param(
     [int]$IntervalSeconds = 25,
@@ -20,11 +20,10 @@ $global:FailureCounts   = @{}
 $global:EventStream     = [System.Collections.ArrayList]::new()
 
 $PrimaryNodeIp   = "192.168.4.21"
-$SecondaryNodeIp = "192.168.4.30"
 $HdhomerunIp     = "192.168.4.45"
 
 # --- HELPER: Ingest Autoheal Incident to Database & HUD Stream ---
-function Log-AutohealIncident {
+function Write-AutohealIncident {
     param(
         [string]$Target,
         [string]$Reason,
@@ -73,7 +72,7 @@ function Invoke-AutohealAction {
     if ($history.Count -ge 4) {
         $global:CircuitBreakers[$Container] = $true
         $global:GracePeriods[$Container] = $now.AddMinutes(5)
-        Log-AutohealIncident -Target $Container -Reason $Reason -Action "Circuit Breaker Tripped (5m backoff applied)" -Status "BLOCKED"
+        Write-AutohealIncident -Target $Container -Reason $Reason -Action "Circuit Breaker Tripped (5m backoff applied)" -Status "BLOCKED"
         return
     }
 
@@ -87,7 +86,7 @@ function Invoke-AutohealAction {
 
     # 3. Apply Targeted Remediation
     if ($Container -eq "caddy") {
-        $caddyReload = docker exec caddy caddy reload --config /etc/caddy/Caddyfile 2>&1
+        docker exec caddy caddy reload --config /etc/caddy/Caddyfile 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             $actionTaken = "Caddy Zero-Downtime Reload"
         } else {
@@ -135,7 +134,7 @@ $recentLogs
     $global:GracePeriods[$Container] = $now.AddSeconds(60)
     $global:FailureCounts[$Container] = 0
 
-    Log-AutohealIncident -Target $Container -Reason $Reason -Action $actionTaken -Status "HEALED" -Details "RCA saved to $rcaFile"
+    Write-AutohealIncident -Target $Container -Reason $Reason -Action $actionTaken -Status "HEALED" -Details "RCA saved to $rcaFile"
 }
 
 # --- MASTER SWEEP FUNCTION ---
@@ -295,7 +294,7 @@ while ($running) {
 
         Write-Host "`n--- MULTI-NODE INFRASTRUCTURE MATRIX ---" -ForegroundColor Cyan
         Write-Host "  Local Node    [192.168.4.30]  (VOLTAIREDEUX)   : ACTIVE (Gateway Port 80/443)" -ForegroundColor Green
-        Write-Host ("  Primary Node  [192.168.4.21]  (ORDINATEURDEVOL): {0} (MB Port 5000: HTTP {1})" -f $pStat, $sweep.PrimaryMbCode) -ForegroundColor $pCol
+        Write-Host ("  Primary Node  [192.168.4.21]  (VOLTAIREUN)     : {0} (MB Port 5000: HTTP {1})" -f $pStat, $sweep.PrimaryMbCode) -ForegroundColor $pCol
         Write-Host ("  Hardware Tuner[192.168.4.45]  (HDHomeRun)      : {0}" -f $tStat) -ForegroundColor $tCol
 
         Write-Host "`n--- LOCAL CONTAINER & L7 ROUTE HEALTH ---" -ForegroundColor Cyan

@@ -2,7 +2,7 @@
 param(
     [string]$ConfigDir = "$env:SystemDrive\MediastackConfig",
     [switch]$AutoUpdateEnv,
-    [switch]$ExportReport = $true
+    [switch]$SkipReport
 )
 
 $ErrorActionPreference = "Continue"
@@ -31,11 +31,29 @@ $apiKeys = [ordered]@{
     "MetaBrainz"  = $null
 }
 
-# Scan Locations
+# Scan Master Secrets Vault first
+$masterSecrets = "$PSScriptRoot\config\secrets\secrets.json"
+if (Test-Path $masterSecrets) {
+    try {
+        $vault = Get-Content $masterSecrets -Raw -Encoding UTF8 | ConvertFrom-Json
+        if ($vault.secrets.sonarr.api_key) { $apiKeys["Sonarr"] = $vault.secrets.sonarr.api_key }
+        if ($vault.secrets.radarr.api_key) { $apiKeys["Radarr"] = $vault.secrets.radarr.api_key }
+        if ($vault.secrets.prowlarr.api_key) { $apiKeys["Prowlarr"] = $vault.secrets.prowlarr.api_key }
+        if ($vault.secrets.bazarr.api_key) { $apiKeys["Bazarr"] = $vault.secrets.bazarr.api_key }
+        if ($vault.secrets.jellyseerr.api_key) { $apiKeys["Jellyseerr"] = $vault.secrets.jellyseerr.api_key }
+        if ($vault.secrets.jellyfin.api_key) { $apiKeys["Jellyfin"] = $vault.secrets.jellyfin.api_key }
+        if ($vault.secrets.musicbrainz.acoustid_apikey) { $apiKeys["AcoustID"] = $vault.secrets.musicbrainz.acoustid_apikey }
+        if ($vault.secrets.musicbrainz.picard_oauth_access_token) { $apiKeys["PicardOAuth"] = $vault.secrets.musicbrainz.picard_oauth_access_token }
+        if ($vault.secrets.musicbrainz.metabrainz_access_token) { $apiKeys["MetaBrainz"] = $vault.secrets.musicbrainz.metabrainz_access_token }
+    } catch {}
+}
+
+# Scan Fallback Locations
 $scanPaths = @("$PSScriptRoot\config", $ConfigDir, "$PSScriptRoot\musicbrainz-docker\local\secrets")
 
 # A. Scan Sonarr
 foreach ($p in $scanPaths) {
+    if ($apiKeys["Sonarr"]) { break }
     $cfg = Join-Path $p "sonarr\config.xml"
     if (Test-Path $cfg) {
         $xml = [xml](Get-Content $cfg -ErrorAction SilentlyContinue)
@@ -269,7 +287,8 @@ $testResults += Test-Endpoint -ServiceName "MusicBrainz WS2" -Url "http://localh
 
 # 8. AcoustID Web Service (Fingerprinting Verification)
 if ($apiKeys["AcoustID"]) {
-    $testResults += Test-Endpoint -ServiceName "AcoustID API" -Url "https://api.acoustid.org/v2/user/lookup?user=$($apiKeys['AcoustID'])" -TimeoutMs 5000 -ExpectedContentField "status"
+    $acoustUser = $apiKeys["AcoustID"]
+    $testResults += Test-Endpoint -ServiceName "AcoustID API" -Url "https://api.acoustid.org/v2/user/lookup?user=$acoustUser" -TimeoutMs 5000 -ExpectedContentField "status"
 }
 
 # 9. API Gateway Health
@@ -293,7 +312,10 @@ try {
     foreach ($t in $testResults) {
         $cName = $t.Service -replace "'", "''"
         $cDet  = $t.Details -replace "'", "''"
-        $inserts += "INSERT INTO api_verification_log (test_timestamp, service_name, http_code, latency, status, details) VALUES ('$timestamp', '$cName', '$($t.HTTPCode)', '$($t.Latency)', '$($t.Status)', '$cDet'); "
+        $tCode = $t.HTTPCode
+        $tLat  = $t.Latency
+        $tStat = $t.Status
+        $inserts += "INSERT INTO api_verification_log (test_timestamp, service_name, http_code, latency, status, details) VALUES ('$timestamp', '$cName', '$tCode', '$tLat', '$tStat', '$cDet'); "
     }
     docker exec mediastack-db sqlite3 /config/mediastack_backup.db "$sqlInit $inserts" 2>$null
     Write-Host "  [OK] Ingested $($testResults.Count) verification records into /config/mediastack_backup.db" -ForegroundColor Green
@@ -301,7 +323,7 @@ try {
     # Fallback
 }
 
-if ($ExportReport) {
+if (-not $SkipReport) {
     $handoffsDir = "$PSScriptRoot\handoffs"
     if (-not (Test-Path $handoffsDir)) { New-Item -ItemType Directory -Force -Path $handoffsDir | Out-Null }
 
@@ -322,7 +344,12 @@ if ($ExportReport) {
 
     foreach ($k in $apiKeys.Keys) {
         $v = $apiKeys[$k]
-        $masked = if ($v) { $v.Substring(0, [Math]::Min(6, $v.Length)) + "... (Length: $($v.Length))" } else { "Not Set / Public" }
+        $masked = if ($v) {
+            $prefixLen = [Math]::Min(6, $v.Length)
+            $v.Substring(0, $prefixLen) + "... (Length: " + $v.Length + ")"
+        } else {
+            "Not Set / Public"
+        }
         $statusIcon = if ($v) { "Found" } else { "Public" }
         $lines += "| $k | $masked | $statusIcon |"
     }
@@ -335,7 +362,13 @@ if ($ExportReport) {
     $lines += "| :--- | :--- | :--- | :--- | :--- | :--- |"
 
     foreach ($r in $testResults) {
-        $lines += "| $($r.Service) | $($r.URL) | $($r.Status) | $($r.HTTPCode) | $($r.Latency) | $($r.Details) |"
+        $rSvc  = $r.Service
+        $rUrl  = $r.URL
+        $rStat = $r.Status
+        $rCode = $r.HTTPCode
+        $rLat  = $r.Latency
+        $rDet  = $r.Details
+        $lines += "| $rSvc | $rUrl | $rStat | $rCode | $rLat | $rDet |"
     }
 
     $lines += ""

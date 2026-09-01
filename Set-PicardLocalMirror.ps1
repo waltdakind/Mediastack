@@ -71,10 +71,10 @@ if (-not $foundPort) { $newLines += "server_port = $TargetPort" }
 Set-Content -Path $picardIni -Value $newLines -Encoding UTF8
 Write-Host "  [OK] Updated Picard server target to $TargetHost`:$TargetPort" -ForegroundColor Green
 
-Write-Host "`n[3/3] Master Tagging Script Configuration..." -ForegroundColor Yellow
-$scriptFile = Join-Path $PSScriptRoot "Picard-Master-Tagging.txt"
+Write-Host "`n[3/3] Main Tagging Script Configuration..." -ForegroundColor Yellow
+$scriptFile = Join-Path $PSScriptRoot "Picard-Main-Tagging.txt"
 if (Test-Path $scriptFile) {
-    Write-Host "  [OK] Master tagging & file naming script ready at: $scriptFile" -ForegroundColor Green
+    Write-Host "  [OK] Main tagging & file naming script ready at: $scriptFile" -ForegroundColor Green
     Write-Host "  -> Features enabled: Multi-value cleaning ($clean_multi), Audio routing ($is_audio)," -ForegroundColor DarkCyan
     Write-Host "     Alphabetical bucketing ($firstalphachar), and Jellyfin-compliant naming." -ForegroundColor DarkCyan
 }

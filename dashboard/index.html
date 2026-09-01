@@ -3,769 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="MediaStack Mission Control - Real-Time Switch Radar, Service Telemetry and Ingress Hub">
-    <title>MediaStack Mission Control • Live Switch & Ingress NOC</title>
+    <title>MediaStack Multi-Node Mission Control & Fleet Registry</title>
+    <meta name="description" content="High-Availability Enterprise MediaStack Operations Hub, Multi-Node Cluster Topology, Container Image Registry & AI Collaboration Nexus.">
     
-    <!-- LCP Optimization: DNS & TLS Preconnect to Font CDNs -->
+    <!-- Google Fonts Preconnect & Styles -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- LCP Optimization: Preload Critical Stylesheet with High Fetch Priority -->
-    <link rel="preload" href="styles.css" as="style" fetchpriority="high">
-    <link rel="stylesheet" href="styles.css">
-    
-    <!-- LCP Optimization: Webfonts with font-display: swap to eliminate render blocking -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- LCP Optimization: Defer External Icon Scripts -->
+    <!-- Phosphor Vector Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Background Ambient Glow & Neural Grid -->
-    <div class="ambient-glow-bg">
-        <div class="ambient-blob blob-1"></div>
-        <div class="ambient-blob blob-2"></div>
-        <div class="ambient-blob blob-3"></div>
+    <!-- Ambient Cybernetic Glow Orbs -->
+    <div class="ambient-glow" aria-hidden="true">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
     </div>
 
     <div class="app-container">
-        <!-- Top App Bar -->
-        <header class="top-bar glass-panel">
-            <div class="brand-section">
-                <div class="brand-logo">
-                    <i class="ph ph-stack"></i>
-                </div>
-                <div class="brand-info">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <h1>MediaStack</h1>
-                        <span class="brand-badge">Mission Control NOC</span>
-                        <span class="live-pill"><span class="pulse-dot"></span> LIVE TELEMETRY</span>
+        <!-- TOP NAVIGATION BAR -->
+        <header>
+            <nav class="top-navbar glass-panel">
+                <div class="brand-section">
+                    <div class="brand-logo" id="brand-logo-icon">
+                        <i class="ph-bold ph-stack"></i>
                     </div>
-                    <p style="font-size: 0.8rem; color: var(--text-muted);">Real-Time Network Switch Radar • Ingress Port Monitor • Dual-Node Cluster</p>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <h1 class="brand-title">MediaStack</h1>
+                            <span class="brand-badge">Mission Control</span>
+                        </div>
+                        <p style="font-size: 0.83rem; color: var(--text-secondary);">Enterprise Multi-Node Cluster &amp; AI Sentinel Nexus</p>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Ingress Target Mode Selector -->
-            <div class="ingress-mode-selector">
-                <span class="selector-label"><i class="ph ph-globe"></i> Ingress:</span>
-                <div class="mode-pill-group">
-                    <button class="mode-pill active" onclick="setIngressMode('lan-dns', this)" title="Use LAN hostnames (e.g. *.voltaireun.local)">LAN DNS</button>
-                    <button class="mode-pill" onclick="setIngressMode('lan-ip', this)" title="Use Direct LAN IP (192.168.4.21)">LAN IP</button>
-                    <button class="mode-pill" onclick="setIngressMode('ddns', this)" title="Use External HTTPS (waltdakind.xubi.org)">WAN (DDNS)</button>
-                </div>
-            </div>
+                <div class="nav-actions">
+                    <div class="status-summary-pill" id="fleet-health-pill">
+                        <div class="pulse-dot" id="global-pulse"></div>
+                        <span id="global-status-text">Fleet Health: OPTIMAL (100%)</span>
+                    </div>
 
-            <!-- Header KPIs & Clock -->
-            <div class="live-stats-bar">
-                <div class="stat-pill">
-                    <i class="ph ph-wifi-high" style="color: var(--emerald-glow); font-size: 1.1rem;"></i>
-                    <span>Switch Loss: <strong id="kpi-loss" style="color: var(--emerald-glow);">0.0%</strong></span>
+                    <button onclick="copyCliCommand('.\\s.ps1 -bk')" class="btn" id="backup-btn" title="Run Master Fleet Backup">
+                        <i class="ph-bold ph-archive"></i>
+                        <span>Hot Backup</span>
+                    </button>
+
+                    <button onclick="probeAllServices()" class="btn btn-primary" id="probe-btn" title="Run Live Latency Probes">
+                        <i class="ph-bold ph-arrows-clockwise"></i>
+                        <span>Probe All Services</span>
+                    </button>
                 </div>
-                <div class="stat-pill">
-                    <i class="ph ph-timer" style="color: var(--cyan-glow); font-size: 1.1rem;"></i>
-                    <span>Avg Latency: <strong id="kpi-latency" style="color: var(--cyan-glow);">1.9 ms</strong></span>
-                </div>
-                <div id="clock" class="header-clock">00:00:00</div>
-            </div>
+            </nav>
         </header>
 
-        <!-- Navigation Tabs -->
-        <nav class="display-nav">
-            <button class="display-tab active" onclick="switchDisplay('display-radar', this)">
-                <i class="ph ph-broadcast"></i>
-                <span>Live Switch Radar</span>
-            </button>
-            <button class="display-tab" onclick="switchDisplay('display-portal', this)">
-                <i class="ph ph-squares-four"></i>
-                <span>Application Hub</span>
-            </button>
-            <button class="display-tab" onclick="switchDisplay('display-topology', this)">
-                <i class="ph ph-tree-structure"></i>
-                <span>Dual-Node Topology</span>
-            </button>
-            <button class="display-tab" onclick="switchDisplay('display-autoheal', this)">
-                <i class="ph ph-heartbeat"></i>
-                <span>Sentinel HUD</span>
-            </button>
-            <button class="display-tab" onclick="window.location.href='/autologin'">
-                <i class="ph ph-headphones"></i>
-                <span>Guest Listener Login</span>
-            </button>
-        </nav>
-
-        <!-- ================================================================= -->
-        <!-- DISPLAY 1: REAL-TIME NETWORK SWITCH & INGRESS RADAR -->
-        <!-- ================================================================= -->
-        <main id="display-radar" class="display-view active">
-            <!-- Top Metric Banner -->
-            <section class="radar-summary-grid">
-                <!-- Card 1: Switch Health -->
-                <div class="summary-kpi-card glass-panel">
-                    <div class="kpi-header">
-                        <span class="kpi-tag">PHYSICAL LAYER</span>
-                        <i class="ph ph-hard-drives kpi-icon cyan-glow"></i>
-                    </div>
-                    <div class="kpi-main-val" style="color: var(--emerald-glow);">GOOD (B+)</div>
-                    <div class="kpi-sub-desc">Score: <strong>88/100</strong> • Switch Fabric Passing</div>
-                    <div class="kpi-meter-bar">
-                        <div class="kpi-fill" style="width: 88%; background: linear-gradient(90deg, #10b981, #00f0ff);"></div>
-                    </div>
+        <!-- 1. DUAL-NODE TOPOLOGY DECK -->
+        <section aria-labelledby="topology-heading">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title" id="topology-heading">
+                        <i class="ph-bold ph-hard-drives"></i> Multi-Node Cluster Topology &amp; Interconnect
+                    </h2>
+                    <p class="section-subtitle">Real-time synchronized mesh between primary 24/7 host and AI push node</p>
                 </div>
+                <button class="btn btn-sm btn-accent" onclick="copyCliCommand('.\\s.ps1 -l')" title="Optimize TCP & Edge Caches">
+                    <i class="ph-bold ph-lightning"></i> Optimize Dual LCP
+                </button>
+            </div>
 
-                <!-- Card 2: Packet Loss & Jitter -->
-                <div class="summary-kpi-card glass-panel">
-                    <div class="kpi-header">
-                        <span class="kpi-tag">FRAME INTEGRITY</span>
-                        <i class="ph ph-chart-line-up kpi-icon emerald-glow"></i>
-                    </div>
-                    <div class="kpi-main-val" style="color: var(--emerald-glow);">0.0% LOSS</div>
-                    <div class="kpi-sub-desc">Jitter: <strong>4.0 ms</strong> • Gateway: <strong>1.9 ms</strong></div>
-                    <div class="kpi-meter-bar">
-                        <div class="kpi-fill" style="width: 100%; background: #10b981;"></div>
-                    </div>
-                </div>
-
-                <!-- Card 3: MTU Clamping Status -->
-                <div class="summary-kpi-card glass-panel">
-                    <div class="kpi-header">
-                        <span class="kpi-tag">MTU CLAMPING</span>
-                        <i class="ph ph-arrows-out-cardinal kpi-icon purple-glow"></i>
-                    </div>
-                    <div class="kpi-main-val" style="color: var(--purple-glow);">1500 MTU</div>
-                    <div class="kpi-sub-desc">Do Not Fragment: <strong>PASSED (1472B)</strong></div>
-                    <div class="kpi-meter-bar">
-                        <div class="kpi-fill" style="width: 100%; background: linear-gradient(90deg, #8b5cf6, #a855f7);"></div>
-                    </div>
-                </div>
-
-                <!-- Card 4: Active Port Ingress Ratio -->
-                <div class="summary-kpi-card glass-panel">
-                    <div class="kpi-header">
-                        <span class="kpi-tag">PORT ACCESSIBILITY</span>
-                        <i class="ph ph-shield-check kpi-icon amber-glow"></i>
-                    </div>
-                    <div class="kpi-main-val" id="kpi-open-ports" style="color: var(--cyan-glow);">14 / 15 ACTIVE</div>
-                    <div class="kpi-sub-desc">Caddy Reverse Proxy: <strong>100% UNBLOCKED</strong></div>
-                    <div class="kpi-meter-bar">
-                        <div class="kpi-fill" style="width: 93%; background: linear-gradient(90deg, #00f0ff, #3b82f6);"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Interactive Port & Service Radar Matrix -->
-            <section class="glass-panel radar-table-container">
-                <div class="table-header-row">
-                    <div>
-                        <h2><i class="ph ph-radar" style="color: var(--cyan-glow);"></i> Real-Time Service & Port Reachability Matrix</h2>
-                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px;">Live socket response probes from this browser and local switch to primary node (192.168.4.21).</p>
-                    </div>
-                    <div class="table-actions">
-                        <button class="refresh-btn" onclick="probeAllRadarServices()">
-                            <i class="ph ph-arrows-clockwise" id="radar-refresh-icon"></i> Run Probe Sweep
-                        </button>
-                    </div>
-                </div>
-
-                <div class="radar-grid" id="radar-grid">
-                    <!-- Row 1: Caddy HTTP Ingress -->
-                    <div class="radar-row-card" data-port="80">
-                        <div class="radar-col-port"><span class="port-tag">80</span></div>
-                        <div class="radar-col-info">
-                            <div class="radar-service-name">HTTP Ingress (Caddy Edge)</div>
-                            <div class="radar-service-role">Global HTTP -> HTTPS 301/302 Redirect Gate</div>
-                        </div>
-                        <div class="radar-col-proto"><span class="proto-tag">TCP/HTTP</span></div>
-                        <div class="radar-col-latency"><span class="lat-box" id="radar-lat-80">-- ms</span></div>
-                        <div class="radar-col-status"><span class="status-badge online" id="radar-badge-80">OPEN / ACTIVE</span></div>
-                        <div class="radar-col-action"><a href="http://voltaireun.local" target="_blank" class="mini-launch-btn"><i class="ph ph-arrow-square-out"></i></a></div>
-                    </div>
-
-                    <!-- Row 2: Caddy HTTPS Ingress -->
-                    <div class="radar-row-card" data-port="443">
-                        <div class="radar-col-port"><span class="port-tag secure">443</span></div>
-                        <div class="radar-col-info">
-                            <div class="radar-service-name">HTTPS Ingress (4096-bit TLS)</div>
-                            <div class="radar-service-role">Master SSL Perimeter (*.voltaireun.local & waltdakind.xubi.org)</div>
-                        </div>
-                        <div class="radar-col-proto"><span class="proto-tag secure">HTTPS/TLS</span></div>
-                        <div class="radar-col-latency"><span class="lat-box" id="radar-lat-443">-- ms</span></div>
-                        <div class="radar-col-status"><span class="status-badge online" id="radar-badge-443">OPEN / ACTIVE</span></div>
-                        <div class="radar-col-action"><a href="https://voltaireun.local" target="_blank" class="mini-launch-btn"><i class="ph ph-arrow-square-out"></i></a></div>
-                    </div>
-
-                    <!-- Row 3: Jellyfin Media -->
-                    <div class="radar-row-card" data-port="8096">
-                        <div class="radar-col-port"><span class="port-tag">8096</span></div>
-                        <div class="radar-col-info">
-                            <div class="radar-service-name">Jellyfin Direct Streaming Socket</div>
-                            <div class="radar-service-role">Native Player Discovery & Real-Time Bufferless Streaming</div>
-                        </div>
-                        <div class="radar-col-proto"><span class="proto-tag">TCP/HTTP</span></div>
-                        <div class="radar-col-latency"><span class="lat-box" id="radar-lat-8096">-- ms</span></div>
-                        <div class="radar-col-status"><span class="status-badge online" id="radar-badge-8096">OPEN / PROXIED</span></div>
-                        <div class="radar-col-action"><a href="https://voltaireun.local" target="_blank" class="mini-launch-btn"><i class="ph ph-play"></i></a></div>
-                    </div>
-
-                    <!-- Row 4: Jellyseerr -->
-                    <div class="radar-row-card" data-port="5055">
-                        <div class="radar-col-port"><span class="port-tag">5055</span></div>
-                        <div class="radar-col-info">
-                            <div class="radar-service-name">Jellyseerr Media Requests</div>
-                            <div class="radar-service-role">Interactive Discovery & Automated Request Approval Engine</div>
-                        </div>
-                        <div class="radar-col-proto"><span class="proto-tag">TCP/HTTP</span></div>
-                        <div class="radar-col-latency"><span class="lat-box" id="radar-lat-5055">-- ms</span></div>
-                        <div class="radar-col-status"><span class="status-badge online" id="radar-badge-5055">OPEN / ACTIVE</span></div>
-                        <div class="radar-col-action"><a href="https://jellyseerr.voltaireun.local" target="_blank" class="mini-launch-btn"><i class="ph ph-arrow-square-out"></i></a></div>
-                    </div>
-
-                    <!-- Row 5: Sonarr -->
-                    <div class="radar-row-card" data-port="8989">
-                        <div class="radar-col-port"><span class="port-tag">8989</span></div>
-                        <div class="radar-col-info">
-                            <div class="radar-service-name">Sonarr TV Management</div>
-                            <div class="radar-service-role">Automated TV Series Monitoring, Grabbing & Renaming</div>
-                        </div>
-                        <div class="radar-col-proto"><span class="proto-tag">TCP/HTTP</span></div>
-                        <div class="radar-col-latency"><span class="lat-box" id="radar-lat-8989">-- ms</span></div>
-                        <div class="radar-col-status"><span class="status-badge online" id="radar-badge-8989">OPEN / ACTIVE</span></div>
-                        <div class="radar-col-action"><a href="https://sonarr.voltaireun.local" target="_blank" class="mini-launch-btn"><i class="ph ph-arrow-square-out"></i></a></div>
-                    </div>
-
-                    <!-- Row 6: Radarr -->
-                    <div class="radar-row-card" data-port="7878">
-                        <div class="radar-col-port"><span class="port-tag">7878</span></div>
-                        <div class="radar-col-info">
-                            <div class="radar-service-name">Radarr Movie Management</div>
-                            <div class="radar-service-role">Automated Movie Library Indexing & 4K Grabber</div>
-                        </div>
-                        <div class="radar-col-proto"><span class="proto-tag">TCP/HTTP</span></div>
-                        <div class="radar-col-latency"><span class="lat-box" id="radar-lat-7878">-- ms</span></div>
-                        <div class="radar-col-status"><span class="status-badge online" id="radar-badge-7878">OPEN / ACTIVE</span></div>
-                        <div class="radar-col-action"><a href="https://radarr.voltaireun.local" target="_blank" class="mini-launch-btn"><i class="ph ph-arrow-square-out"></i></a></div>
-                    </div>
-
-                    <!-- Row 7: Prowlarr -->
-                    <div class="radar-row-card" data-port="9696">
-                        <div class="radar-col-port"><span class="port-tag">9696</span></div>
-                        <div class="radar-col-info">
-                            <div class="radar-service-name">Prowlarr Indexer Proxy</div>
-                            <div class="radar-service-role">Unified BitTorrent & Usenet Indexer Sync Manager</div>
-                        </div>
-                        <div class="radar-col-proto"><span class="proto-tag">TCP/HTTP</span></div>
-                        <div class="radar-col-latency"><span class="lat-box" id="radar-lat-9696">-- ms</span></div>
-                        <div class="radar-col-status"><span class="status-badge online" id="radar-badge-9696">OPEN / ACTIVE</span></div>
-                        <div class="radar-col-action"><a href="https://prowlarr.voltaireun.local" target="_blank" class="mini-launch-btn"><i class="ph ph-arrow-square-out"></i></a></div>
-                    </div>
-
-                    <!-- Row 8: Bazarr -->
-                    <div class="radar-row-card" data-port="6767">
-                        <div class="radar-col-port"><span class="port-tag">6767</span></div>
-                        <div class="radar-col-info">
-                            <div class="radar-service-name">Bazarr Subtitles</div>
-                            <div class="radar-service-role">Automatic Subtitle Fetching & Synchronization</div>
-                        </div>
-                        <div class="radar-col-proto"><span class="proto-tag">TCP/HTTP</span></div>
-                        <div class="radar-col-latency"><span class="lat-box" id="radar-lat-6767">-- ms</span></div>
-                        <div class="radar-col-status"><span class="status-badge online" id="radar-badge-6767">OPEN / ACTIVE</span></div>
-                        <div class="radar-col-action"><a href="https://bazarr.voltaireun.local" target="_blank" class="mini-launch-btn"><i class="ph ph-arrow-square-out"></i></a></div>
-                    </div>
-
-                    <!-- Row 9: Transmission -->
-                    <div class="radar-row-card" data-port="9091">
-                        <div class="radar-col-port"><span class="port-tag">9091</span></div>
-                        <div class="radar-col-info">
-                            <div class="radar-service-name">Transmission BitTorrent</div>
-                            <div class="radar-service-role">High-Efficiency Torrent Downloader & Peer Coordinator</div>
-                        </div>
-                        <div class="radar-col-proto"><span class="proto-tag">TCP/HTTP</span></div>
-                        <div class="radar-col-latency"><span class="lat-box" id="radar-lat-9091">-- ms</span></div>
-                        <div class="radar-col-status"><span class="status-badge online" id="radar-badge-9091">OPEN / ACTIVE</span></div>
-                        <div class="radar-col-action"><a href="https://transmission.voltaireun.local" target="_blank" class="mini-launch-btn"><i class="ph ph-arrow-square-out"></i></a></div>
-                    </div>
-
-                    <!-- Row 10: Tvheadend -->
-                    <div class="radar-row-card" data-port="9981">
-                        <div class="radar-col-port"><span class="port-tag">9981</span></div>
-                        <div class="radar-col-info">
-                            <div class="radar-service-name">Tvheadend Live TV & DVR</div>
-                            <div class="radar-service-role">Broadcast Stream Multiplexing & Program Guide Recording</div>
-                        </div>
-                        <div class="radar-col-proto"><span class="proto-tag">TCP/HTTP</span></div>
-                        <div class="radar-col-latency"><span class="lat-box" id="radar-lat-9981">-- ms</span></div>
-                        <div class="radar-col-status"><span class="status-badge online" id="radar-badge-9981">OPEN / ACTIVE</span></div>
-                        <div class="radar-col-action"><a href="https://tvheadend.voltaireun.local" target="_blank" class="mini-launch-btn"><i class="ph ph-arrow-square-out"></i></a></div>
-                    </div>
-
-                    <!-- Row 11: MusicBrainz Mirror -->
-                    <div class="radar-row-card" data-port="5000">
-                        <div class="radar-col-port"><span class="port-tag">5000</span></div>
-                        <div class="radar-col-info">
-                            <div class="radar-service-name">MusicBrainz Local Mirror</div>
-                            <div class="radar-service-role">Unlimited Rate-Limit Free Audio Tagging (50 req/sec)</div>
-                        </div>
-                        <div class="radar-col-proto"><span class="proto-tag">TCP/HTTP</span></div>
-                        <div class="radar-col-latency"><span class="lat-box" id="radar-lat-5000">-- ms</span></div>
-                        <div class="radar-col-status"><span class="status-badge online" id="radar-badge-5000">OPEN / ACTIVE</span></div>
-                        <div class="radar-col-action"><a href="https://musicbrainz.voltaireun.local" target="_blank" class="mini-launch-btn"><i class="ph ph-arrow-square-out"></i></a></div>
-                    </div>
-
-                    <!-- Row 12: MediaStack Database -->
-                    <div class="radar-row-card" data-port="8080">
-                        <div class="radar-col-port"><span class="port-tag">8080</span></div>
-                        <div class="radar-col-info">
-                            <div class="radar-service-name">MediaStack Database Admin</div>
-                            <div class="radar-service-role">Live SQLite3 Fleet Administration & Schema Inspector</div>
-                        </div>
-                        <div class="radar-col-proto"><span class="proto-tag">TCP/HTTP</span></div>
-                        <div class="radar-col-latency"><span class="lat-box" id="radar-lat-8080">-- ms</span></div>
-                        <div class="radar-col-status"><span class="status-badge online" id="radar-badge-8080">OPEN / ACTIVE</span></div>
-                        <div class="radar-col-action"><a href="https://db.voltaireun.local" target="_blank" class="mini-launch-btn"><i class="ph ph-arrow-square-out"></i></a></div>
-                    </div>
-
-                    <!-- Row 13: Windows Remote Desktop -->
-                    <div class="radar-row-card" data-port="3389">
-                        <div class="radar-col-port"><span class="port-tag secure">3389</span></div>
-                        <div class="radar-col-info">
-                            <div class="radar-service-name">Windows Remote Desktop (RDP)</div>
-                            <div class="radar-service-role">Encrypted Administrative Workstation Access</div>
-                        </div>
-                        <div class="radar-col-proto"><span class="proto-tag secure">TCP/RDP</span></div>
-                        <div class="radar-col-latency"><span class="lat-box" id="radar-lat-3389">1.2 ms</span></div>
-                        <div class="radar-col-status"><span class="status-badge online" id="radar-badge-3389">OPEN / READY</span></div>
-                        <div class="radar-col-action"><span class="proto-tag">mstsc</span></div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- ================================================================= -->
-        <!-- DISPLAY 2: APPLICATION HUB & MATRIX -->
-        <!-- ================================================================= -->
-        <main id="display-portal" class="display-view">
-            <!-- Search & Filter Controls -->
-            <section class="portal-toolbar glass-panel">
-                <div class="search-box">
-                    <i class="ph ph-magnifying-glass search-icon"></i>
-                    <input type="text" id="service-search" placeholder="Filter apps (e.g. jellyfin, sonarr, music, tuner)..." oninput="filterServices()">
-                </div>
-                <div class="category-filters">
-                    <button class="filter-chip active" onclick="filterCategory('all', this)">All Apps</button>
-                    <button class="filter-chip" onclick="filterCategory('media', this)">Media & Requests</button>
-                    <button class="filter-chip" onclick="filterCategory('arr', this)">Servarr Automation</button>
-                    <button class="filter-chip" onclick="filterCategory('downloads', this)">Downloads & TV</button>
-                    <button class="filter-chip" onclick="filterCategory('metadata', this)">Metadata & DB</button>
-                </div>
-            </section>
-
-            <!-- Interactive Service Cards Matrix -->
-            <div class="service-matrix" id="service-matrix">
-                <!-- 1. Jellyfin -->
-                <div class="service-card glass-panel" data-category="media" data-name="jellyfin" data-port="8096" data-subdomain="jellyfin">
-                    <div class="card-top">
-                        <div class="service-icon-box jellyfin-glow"><i class="ph ph-film-slate"></i></div>
-                        <div class="service-meta">
-                            <div class="service-title-row">
-                                <h3>Jellyfin Media</h3>
-                                <span class="status-badge online">ONLINE</span>
+            <div class="topology-deck">
+                <!-- PRIMARY 24/7 NODE (VoltaireUn) -->
+                <div class="node-card glass-panel" style="border-left: 4px solid var(--purple-glow);">
+                    <div class="node-header">
+                        <div class="node-title-group">
+                            <div class="node-icon" style="color: var(--purple-glow); background: var(--purple-bg);">
+                                <i class="ph-bold ph-desktop"></i>
                             </div>
-                            <p class="service-desc">Primary 24/7 Media Streaming Server (Video, 4K HDR, Lossless Music)</p>
+                            <div>
+                                <div class="node-name">VoltaireUn</div>
+                                <div class="node-ip">192.168.4.21 &bull; Main 24/7 Server Node</div>
+                            </div>
+                        </div>
+                        <span class="service-status-pill">
+                            <div class="pulse-dot"></div> ONLINE
+                        </span>
+                    </div>
+
+                    <div class="node-metrics">
+                        <div class="metric-box">
+                            <div class="metric-val">12</div>
+                            <div class="metric-lbl">Primary Services</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-val">&lt; 1 ms</div>
+                            <div class="metric-lbl">LAN Ping</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-val">24 / 7</div>
+                            <div class="metric-lbl">Always-On Safe</div>
                         </div>
                     </div>
-                    <div class="card-details">
-                        <div class="detail-item"><span class="detail-label">Port:</span><span class="detail-val">8096 / 443</span></div>
-                        <div class="detail-item"><span class="detail-label">Upstream:</span><span class="detail-val">VoltaireUn (HA)</span></div>
-                        <div class="detail-item"><span class="detail-label">Latency:</span><span class="detail-val latency-val" id="lat-jellyfin">&lt; 3 ms</span></div>
-                    </div>
-                    <div class="card-actions">
-                        <a href="https://voltaireun.local" target="_blank" class="action-btn primary-action" id="link-jellyfin"><i class="ph ph-play-circle"></i> Launch App</a>
-                        <a href="/autologin" class="action-btn secondary-action"><i class="ph ph-user-circle"></i> Guest</a>
+
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 8px;">
+                        <span><i class="ph ph-share-network"></i> Reciprocal SMB Shares</span>
+                        <span style="font-family: var(--font-mono); color: var(--cyan-glow);">\\192.168.4.21\Public-*</span>
                     </div>
                 </div>
 
-                <!-- 2. Jellyseerr -->
-                <div class="service-card glass-panel" data-category="media" data-name="jellyseerr" data-port="5055" data-subdomain="jellyseerr">
-                    <div class="card-top">
-                        <div class="service-icon-box jellyseerr-glow"><i class="ph ph-bookmark-simple"></i></div>
-                        <div class="service-meta">
-                            <div class="service-title-row">
-                                <h3>Jellyseerr</h3>
-                                <span class="status-badge online">ONLINE</span>
-                            </div>
-                            <p class="service-desc">Interactive Media Request Management & Discovery Portal</p>
-                        </div>
+                <!-- MESH BRIDGE CONNECTOR -->
+                <div class="mesh-bridge">
+                    <div class="bridge-node" title="High-Speed P2P Syncthing & Database WAL Sync">
+                        <i class="ph-bold ph-arrows-left-right"></i>
                     </div>
-                    <div class="card-details">
-                        <div class="detail-item"><span class="detail-label">Port:</span><span class="detail-val">5055 / 443</span></div>
-                        <div class="detail-item"><span class="detail-label">Upstream:</span><span class="detail-val">192.168.4.21</span></div>
-                        <div class="detail-item"><span class="detail-label">Latency:</span><span class="detail-val latency-val" id="lat-jellyseerr">&lt; 4 ms</span></div>
-                    </div>
-                    <div class="card-actions">
-                        <a href="https://jellyseerr.voltaireun.local" target="_blank" class="action-btn primary-action" id="link-jellyseerr"><i class="ph ph-plus-circle"></i> Request Media</a>
+                    <div class="bridge-line"></div>
+                    <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--cyan-glow); text-transform: uppercase; font-weight: 700; text-align: center; letter-spacing: 0.5px;">
+                        P2P MESH<br>REPLICATION
                     </div>
                 </div>
 
-                <!-- 3. Sonarr -->
-                <div class="service-card glass-panel" data-category="arr" data-name="sonarr" data-port="8989" data-subdomain="sonarr">
-                    <div class="card-top">
-                        <div class="service-icon-box sonarr-glow"><i class="ph ph-television"></i></div>
-                        <div class="service-meta">
-                            <div class="service-title-row">
-                                <h3>Sonarr</h3>
-                                <span class="status-badge online">ONLINE</span>
+                <!-- AI ACCELERATION WORKSTATION (VoltaireDeux) -->
+                <div class="node-card glass-panel" style="border-left: 4px solid var(--cyan-glow);">
+                    <div class="node-header">
+                        <div class="node-title-group">
+                            <div class="node-icon" style="color: var(--cyan-glow); background: var(--cyan-bg);">
+                                <i class="ph-bold ph-cpu"></i>
                             </div>
-                            <p class="service-desc">Automated TV Series Indexing, Episode Tracking & Renaming</p>
+                            <div>
+                                <div class="node-name">VoltaireDeux</div>
+                                <div class="node-ip">192.168.4.30 &bull; AI Node &amp; Ingress Gateway (This PC)</div>
+                            </div>
                         </div>
+                        <span class="service-status-pill">
+                            <div class="pulse-dot"></div> ACTIVE LOCAL
+                        </span>
                     </div>
-                    <div class="card-details">
-                        <div class="detail-item"><span class="detail-label">Port:</span><span class="detail-val">8989 / 443</span></div>
-                        <div class="detail-item"><span class="detail-label">Upstream:</span><span class="detail-val">192.168.4.21</span></div>
-                        <div class="detail-item"><span class="detail-label">Latency:</span><span class="detail-val latency-val" id="lat-sonarr">&lt; 5 ms</span></div>
-                    </div>
-                    <div class="card-actions">
-                        <a href="https://sonarr.voltaireun.local" target="_blank" class="action-btn primary-action" id="link-sonarr"><i class="ph ph-arrow-square-out"></i> Open Sonarr</a>
-                    </div>
-                </div>
 
-                <!-- 4. Radarr -->
-                <div class="service-card glass-panel" data-category="arr" data-name="radarr" data-port="7878" data-subdomain="radarr">
-                    <div class="card-top">
-                        <div class="service-icon-box radarr-glow"><i class="ph ph-video-camera"></i></div>
-                        <div class="service-meta">
-                            <div class="service-title-row">
-                                <h3>Radarr</h3>
-                                <span class="status-badge online">ONLINE</span>
-                            </div>
-                            <p class="service-desc">Automated Movie Collection, Monitoring & 4K Grabber</p>
+                    <div class="node-metrics">
+                        <div class="metric-box">
+                            <div class="metric-val">20+</div>
+                            <div class="metric-lbl">Active Containers</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-val">100%</div>
+                            <div class="metric-lbl">Vault Secured</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-val">1.2 ms</div>
+                            <div class="metric-lbl">Gateway TTFB</div>
                         </div>
                     </div>
-                    <div class="card-details">
-                        <div class="detail-item"><span class="detail-label">Port:</span><span class="detail-val">7878 / 443</span></div>
-                        <div class="detail-item"><span class="detail-label">Upstream:</span><span class="detail-val">192.168.4.21</span></div>
-                        <div class="detail-item"><span class="detail-label">Latency:</span><span class="detail-val latency-val" id="lat-radarr">&lt; 5 ms</span></div>
-                    </div>
-                    <div class="card-actions">
-                        <a href="https://radarr.voltaireun.local" target="_blank" class="action-btn primary-action" id="link-radarr"><i class="ph ph-arrow-square-out"></i> Open Radarr</a>
-                    </div>
-                </div>
 
-                <!-- 5. Prowlarr -->
-                <div class="service-card glass-panel" data-category="arr" data-name="prowlarr" data-port="9696" data-subdomain="prowlarr">
-                    <div class="card-top">
-                        <div class="service-icon-box prowlarr-glow"><i class="ph ph-cloud-arrow-down"></i></div>
-                        <div class="service-meta">
-                            <div class="service-title-row">
-                                <h3>Prowlarr</h3>
-                                <span class="status-badge online">ONLINE</span>
-                            </div>
-                            <p class="service-desc">Unified Usenet & BitTorrent Indexer Proxy Manager</p>
-                        </div>
-                    </div>
-                    <div class="card-details">
-                        <div class="detail-item"><span class="detail-label">Port:</span><span class="detail-val">9696 / 443</span></div>
-                        <div class="detail-item"><span class="detail-label">Upstream:</span><span class="detail-val">192.168.4.21</span></div>
-                        <div class="detail-item"><span class="detail-label">Latency:</span><span class="detail-val latency-val" id="lat-prowlarr">&lt; 4 ms</span></div>
-                    </div>
-                    <div class="card-actions">
-                        <a href="https://prowlarr.voltaireun.local" target="_blank" class="action-btn primary-action" id="link-prowlarr"><i class="ph ph-arrow-square-out"></i> Open Prowlarr</a>
-                    </div>
-                </div>
-
-                <!-- 6. Bazarr -->
-                <div class="service-card glass-panel" data-category="arr" data-name="bazarr" data-port="6767" data-subdomain="bazarr">
-                    <div class="card-top">
-                        <div class="service-icon-box bazarr-glow"><i class="ph ph-subtitles"></i></div>
-                        <div class="service-meta">
-                            <div class="service-title-row">
-                                <h3>Bazarr</h3>
-                                <span class="status-badge online">ONLINE</span>
-                            </div>
-                            <p class="service-desc">Automatic High-Fidelity Subtitle Matching & Synchronization</p>
-                        </div>
-                    </div>
-                    <div class="card-details">
-                        <div class="detail-item"><span class="detail-label">Port:</span><span class="detail-val">6767 / 443</span></div>
-                        <div class="detail-item"><span class="detail-label">Upstream:</span><span class="detail-val">192.168.4.21</span></div>
-                        <div class="detail-item"><span class="detail-label">Latency:</span><span class="detail-val latency-val" id="lat-bazarr">&lt; 6 ms</span></div>
-                    </div>
-                    <div class="card-actions">
-                        <a href="https://bazarr.voltaireun.local" target="_blank" class="action-btn primary-action" id="link-bazarr"><i class="ph ph-arrow-square-out"></i> Open Bazarr</a>
-                    </div>
-                </div>
-
-                <!-- 7. Transmission -->
-                <div class="service-card glass-panel" data-category="downloads" data-name="transmission" data-port="9091" data-subdomain="transmission">
-                    <div class="card-top">
-                        <div class="service-icon-box transmission-glow"><i class="ph ph-download-simple"></i></div>
-                        <div class="service-meta">
-                            <div class="service-title-row">
-                                <h3>Transmission</h3>
-                                <span class="status-badge online">ONLINE</span>
-                            </div>
-                            <p class="service-desc">Fast, Lightweight BitTorrent Client with RPC Session Protection</p>
-                        </div>
-                    </div>
-                    <div class="card-details">
-                        <div class="detail-item"><span class="detail-label">Port:</span><span class="detail-val">9091 / 443</span></div>
-                        <div class="detail-item"><span class="detail-label">Upstream:</span><span class="detail-val">192.168.4.21</span></div>
-                        <div class="detail-item"><span class="detail-label">Latency:</span><span class="detail-val latency-val" id="lat-transmission">&lt; 4 ms</span></div>
-                    </div>
-                    <div class="card-actions">
-                        <a href="https://transmission.voltaireun.local" target="_blank" class="action-btn primary-action" id="link-transmission"><i class="ph ph-arrow-square-out"></i> Open Client</a>
-                    </div>
-                </div>
-
-                <!-- 8. Tvheadend -->
-                <div class="service-card glass-panel" data-category="downloads" data-name="tvheadend" data-port="9981" data-subdomain="tvheadend">
-                    <div class="card-top">
-                        <div class="service-icon-box tvheadend-glow"><i class="ph ph-broadcast"></i></div>
-                        <div class="service-meta">
-                            <div class="service-title-row">
-                                <h3>Tvheadend Live TV</h3>
-                                <span class="status-badge online">ONLINE</span>
-                            </div>
-                            <p class="service-desc">Over-The-Air Broadcast Tuner Server & Digital Video Recorder</p>
-                        </div>
-                    </div>
-                    <div class="card-details">
-                        <div class="detail-item"><span class="detail-label">Port:</span><span class="detail-val">9981 / 443</span></div>
-                        <div class="detail-item"><span class="detail-label">Upstream:</span><span class="detail-val">192.168.4.21</span></div>
-                        <div class="detail-item"><span class="detail-label">Latency:</span><span class="detail-val latency-val" id="lat-tvheadend">&lt; 5 ms</span></div>
-                    </div>
-                    <div class="card-actions">
-                        <a href="https://tvheadend.voltaireun.local" target="_blank" class="action-btn primary-action" id="link-tvheadend"><i class="ph ph-arrow-square-out"></i> Open DVR</a>
-                    </div>
-                </div>
-
-                <!-- 9. MusicBrainz Mirror -->
-                <div class="service-card glass-panel" data-category="metadata" data-name="musicbrainz" data-port="5000" data-subdomain="musicbrainz">
-                    <div class="card-top">
-                        <div class="service-icon-box musicbrainz-glow"><i class="ph ph-music-notes"></i></div>
-                        <div class="service-meta">
-                            <div class="service-title-row">
-                                <h3>MusicBrainz Mirror</h3>
-                                <span class="status-badge online">ONLINE</span>
-                            </div>
-                            <p class="service-desc">Local PostgreSQL/Solr Metadata Mirror (50 req/s, Zero Rate-Limits)</p>
-                        </div>
-                    </div>
-                    <div class="card-details">
-                        <div class="detail-item"><span class="detail-label">Port:</span><span class="detail-val">5000 / 5001</span></div>
-                        <div class="detail-item"><span class="detail-label">Picard Key:</span><span class="detail-val">4wzgif6hwM</span></div>
-                        <div class="detail-item"><span class="detail-label">Latency:</span><span class="detail-val latency-val" id="lat-musicbrainz">&lt; 3 ms</span></div>
-                    </div>
-                    <div class="card-actions">
-                        <a href="https://musicbrainz.voltaireun.local" target="_blank" class="action-btn primary-action" id="link-musicbrainz"><i class="ph ph-magnifying-glass"></i> Explore Mirror</a>
-                    </div>
-                </div>
-
-                <!-- 10. MediaStack Database Admin -->
-                <div class="service-card glass-panel" data-category="metadata" data-name="db" data-port="8080" data-subdomain="db">
-                    <div class="card-top">
-                        <div class="service-icon-box db-glow"><i class="ph ph-database"></i></div>
-                        <div class="service-meta">
-                            <div class="service-title-row">
-                                <h3>Database Fleet</h3>
-                                <span class="status-badge online">ONLINE</span>
-                            </div>
-                            <p class="service-desc">Multi-Database Administration Console (Jellyfin, Servarr, Telemetry)</p>
-                        </div>
-                    </div>
-                    <div class="card-details">
-                        <div class="detail-item"><span class="detail-label">Engine:</span><span class="detail-val">SQLite3 + WAL</span></div>
-                        <div class="detail-item"><span class="detail-label">Status:</span><span class="detail-val">PRAGMA OK</span></div>
-                        <div class="detail-item"><span class="detail-label">Latency:</span><span class="detail-val latency-val" id="lat-db">&lt; 4 ms</span></div>
-                    </div>
-                    <div class="card-actions">
-                        <a href="https://db.voltaireun.local" target="_blank" class="action-btn primary-action" id="link-db"><i class="ph ph-table"></i> Manage DBs</a>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 8px;">
+                        <span><i class="ph ph-shield-check"></i> Reverse Proxy Ingress</span>
+                        <span style="font-family: var(--font-mono); color: var(--emerald-glow);">*.voltairedeux.local</span>
                     </div>
                 </div>
             </div>
-        </main>
+        </section>
 
-        <!-- ================================================================= -->
-        <!-- DISPLAY 3: DUAL-NODE CLUSTER TOPOLOGY -->
-        <!-- ================================================================= -->
-        <main id="display-topology" class="display-view">
-            <div class="topology-container">
-                <div class="topology-node glass-panel primary-node-card">
-                    <div class="node-badge">PRIMARY 24/7 SERVER</div>
-                    <h2>VoltaireUn (192.168.4.21)</h2>
-                    <p class="node-subtitle">Main Core Streaming, Tuners & Servarr Hub</p>
-                    <ul class="node-service-list">
-                        <li><i class="ph ph-check-circle" style="color: var(--emerald-glow);"></i> Jellyfin Core Streaming Server (:8096)</li>
-                        <li><i class="ph ph-check-circle" style="color: var(--emerald-glow);"></i> Master Caddy Reverse Proxy (:80, :443)</li>
-                        <li><i class="ph ph-check-circle" style="color: var(--emerald-glow);"></i> Jellyseerr Media Requests (:5055)</li>
-                        <li><i class="ph ph-check-circle" style="color: var(--emerald-glow);"></i> Sonarr, Radarr, Prowlarr, Bazarr</li>
-                        <li><i class="ph ph-check-circle" style="color: var(--emerald-glow);"></i> Transmission & Tvheadend DVR</li>
-                        <li><i class="ph ph-check-circle" style="color: var(--emerald-glow);"></i> Primary MusicBrainz Mirror (:5000)</li>
-                    </ul>
+        <!-- 2. ENTERPRISE 8-PILLAR OPERATIONAL SUITE HUB -->
+        <section aria-labelledby="suite-heading">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title" id="suite-heading">
+                        <i class="ph-bold ph-terminal-window"></i> Master Operational Suite (The 8 Pillars)
+                    </h2>
+                    <p class="section-subtitle">Single-click interactive triggers and keyboard HUD shortcuts (<code>.\s.ps1</code>)</p>
                 </div>
+                <button class="btn btn-sm" onclick="copyCliCommand('.\\s.ps1')" title="Open Interactive Terminal HUD">
+                    <i class="ph-bold ph-terminal"></i> Launch Master HUD (s.ps1)
+                </button>
+            </div>
 
-                <div class="topology-connector">
-                    <i class="ph ph-arrows-left-right"></i>
-                    <span>HA Failover & AI Handoff</span>
-                </div>
+            <div class="suite-grid" id="suite-grid-container">
+                <!-- Dynamically populated by app.js -->
+            </div>
+        </section>
 
-                <div class="topology-node glass-panel secondary-node-card">
-                    <div class="node-badge" style="background: rgba(168, 85, 247, 0.2); color: var(--purple-glow); border-color: var(--purple-glow);">AI & PUSH NODE</div>
-                    <h2>VoltaireDeux (192.168.4.30)</h2>
-                    <p class="node-subtitle">AI Model Acceleration, Batch Picard & OneDrive Source</p>
-                    <ul class="node-service-list">
-                        <li><i class="ph ph-check-circle" style="color: var(--purple-glow);"></i> Ollama AI & Knowledge Synthesis Engine</li>
-                        <li><i class="ph ph-check-circle" style="color: var(--purple-glow);"></i> Secondary MusicBrainz Mirror (:5001)</li>
-                        <li><i class="ph ph-check-circle" style="color: var(--purple-glow);"></i> Picard Heavy Batch Tagger</li>
-                        <li><i class="ph ph-check-circle" style="color: var(--purple-glow);"></i> MediaStack AI Collaboration Sentinel</li>
-                        <li><i class="ph ph-check-circle" style="color: var(--purple-glow);"></i> Master OneDrive Codebase Push Origin</li>
-                    </ul>
+        <!-- 3. FULL STACK CONTAINER & DOCKER IMAGE REGISTRY -->
+        <section aria-labelledby="registry-heading">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title" id="registry-heading">
+                        <i class="ph-bold ph-cube"></i> Full Stack Container &amp; Docker Image Registry
+                    </h2>
+                    <p class="section-subtitle">Audited runtime state, image tags, port architectures, database engines &amp; handoffs</p>
                 </div>
             </div>
-        </main>
 
-        <!-- ================================================================= -->
-        <!-- DISPLAY 4: LIVE AUTOHEALER HUD -->
-        <!-- ================================================================= -->
-        <main id="display-autoheal" class="display-view">
-            <div class="glass-panel" style="padding: 24px; border-radius: var(--radius-lg);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <h2><i class="ph ph-heartbeat" style="color: var(--emerald-glow);"></i> Autonomous Self-Healing & Sentinel HUD</h2>
-                    <span class="brand-badge">AutoHeal Loop: 15s</span>
+            <!-- Filter & Search Bar -->
+            <div class="stack-filter-bar">
+                <div class="category-tabs" role="tablist">
+                    <button class="cat-tab active" data-cat="all" onclick="filterCategory('all')">All Services (13)</button>
+                    <button class="cat-tab" data-cat="streaming" onclick="filterCategory('streaming')">Streaming &amp; Discovery</button>
+                    <button class="cat-tab" data-cat="servarr" onclick="filterCategory('servarr')">Servarr Automation</button>
+                    <button class="cat-tab" data-cat="metadata" onclick="filterCategory('metadata')">Metadata Mirrors</button>
+                    <button class="cat-tab" data-cat="replication" onclick="filterCategory('replication')">P2P Replication</button>
+                    <button class="cat-tab" data-cat="livetv" onclick="filterCategory('livetv')">Live TV &amp; Tuners</button>
+                    <button class="cat-tab" data-cat="ingress" onclick="filterCategory('ingress')">Ingress &amp; Proxy</button>
+                    <button class="cat-tab" data-cat="database" onclick="filterCategory('database')">Databases</button>
                 </div>
-                <div class="terminal-log-stream" id="terminal-stream">
-                    <div class="log-line"><span class="log-time">[2026-08-31 15:30:00]</span> <span class="log-info">[SWITCH AUDIT]</span> Ethernet switch latency 1.9ms • 0% packet loss confirmed.</div>
-                    <div class="log-line"><span class="log-time">[2026-08-31 15:30:05]</span> <span class="log-success">[INGRESS]</span> Caddy master reverse proxy running with End-to-End HTTPS (:443).</div>
-                    <div class="log-line"><span class="log-time">[2026-08-31 15:30:10]</span> <span class="log-success">[STREAMING]</span> Jellyfin unbuffered socket :8096 active with HA failover upstream.</div>
-                    <div class="log-line"><span class="log-time">[2026-08-31 15:30:15]</span> <span class="log-info">[PICARD]</span> MusicBrainz local mirror at :5000 / :5001 ready for high-speed tagging.</div>
-                    <div class="log-line"><span class="log-time">[2026-08-31 15:30:20]</span> <span class="log-success">[INTEGRITY]</span> All 7 SQLite cluster databases verified with PRAGMA quick_check OK.</div>
+
+                <div class="search-input-box">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" id="service-search-input" placeholder="Search service, container, image, port..." oninput="handleSearch(this.value)" aria-label="Search Services">
                 </div>
             </div>
-        </main>
+
+            <!-- Services Grid -->
+            <div class="services-grid" id="services-grid-container">
+                <!-- Dynamically populated by app.js -->
+            </div>
+        </section>
+
+        <!-- 4. FOOTER & AI SENTINEL COLLABORATION NEXUS -->
+        <footer style="margin-top: 20px; padding: 24px 0; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; color: var(--text-muted); font-size: 0.84rem;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="pulse-dot"></div>
+                <span>MediaStack Autonomous AI Sentinel &bull; Voltaire Cluster Edition</span>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.78rem;">
+                VoltaireUn (192.168.4.21) &harr; VoltaireDeux (192.168.4.30)
+            </div>
+        </footer>
     </div>
 
-    <!-- Live Client Radar & Probe JavaScript Engine -->
-    <script>
-        let currentMode = 'lan-dns'; // 'lan-dns' | 'lan-ip' | 'ddns'
-        const baseDomain = 'waltdakind.xubi.org';
-        const primaryIp = '192.168.4.21';
+    <!-- MODAL VIEWER (For Suites & Expert Handoffs) -->
+    <div class="modal-overlay" id="info-modal" onclick="if(event.target === this) closeModal()">
+        <div class="modal-content" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Specification Details</h3>
+                <button class="modal-close-btn" onclick="closeModal()" aria-label="Close Modal">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Dynamic Content Loaded Here -->
+            </div>
+        </div>
+    </div>
 
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toTimeString().split(' ')[0];
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+    <!-- TOAST NOTIFICATIONS CONTAINER -->
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
-        function switchDisplay(viewId, btn) {
-            document.querySelectorAll('.display-view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.display-tab').forEach(b => b.classList.remove('active'));
-            const target = document.getElementById(viewId);
-            if (target) target.classList.add('active');
-            if (btn) btn.classList.add('active');
-        }
-
-        function setIngressMode(mode, btn) {
-            currentMode = mode;
-            document.querySelectorAll('.mode-pill').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            updateServiceLinks();
-            probeAllRadarServices();
-        }
-
-        function updateServiceLinks() {
-            document.querySelectorAll('.service-card').forEach(card => {
-                const sub = card.getAttribute('data-subdomain');
-                const port = card.getAttribute('data-port');
-                const actionBtn = card.querySelector('.primary-action');
-                if (!actionBtn) return;
-
-                if (currentMode === 'ddns') {
-                    if (sub === 'jellyfin') actionBtn.href = `https://${baseDomain}`;
-                    else actionBtn.href = `https://${sub}.${baseDomain}`;
-                } else if (currentMode === 'lan-ip') {
-                    if (sub === 'hdhomerun') actionBtn.href = `http://192.168.4.45`;
-                    else actionBtn.href = `http://${primaryIp}:${port}`;
-                } else {
-                    if (sub === 'jellyfin') actionBtn.href = `https://voltaireun.local`;
-                    else actionBtn.href = `https://${sub}.voltaireun.local`;
-                }
-            });
-        }
-
-        function filterServices() {
-            const query = document.getElementById('service-search').value.toLowerCase();
-            document.querySelectorAll('.service-card').forEach(card => {
-                const name = card.getAttribute('data-name').toLowerCase();
-                const text = card.innerText.toLowerCase();
-                if (name.includes(query) || text.includes(query)) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        function filterCategory(cat, btn) {
-            document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll('.service-card').forEach(card => {
-                const cCat = card.getAttribute('data-category');
-                if (cat === 'all' || cCat === cat) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        async function probeRadarPort(port) {
-            const latBox = document.getElementById(`radar-lat-${port}`);
-            const badge = document.getElementById(`radar-badge-${port}`);
-            if (!latBox) return;
-
-            const startTime = performance.now();
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 2000);
-
-                let testUrl = `:${port}/`;
-                if (port === 80) testUrl = '/';
-                if (port === 443) testUrl = '/System/Info/Public';
-
-                await fetch(testUrl, { mode: 'no-cors', signal: controller.signal });
-                clearTimeout(timeoutId);
-                const latency = Math.round(performance.now() - startTime);
-
-                latBox.innerText = `${latency} ms`;
-                latBox.style.color = 'var(--emerald-glow)';
-                if (badge) {
-                    badge.className = 'status-badge online';
-                    badge.innerText = 'OPEN / ACTIVE';
-                }
-            } catch (err) {
-                // If it resolves fast or CORS blocked, it proves the port socket is open
-                latBox.innerText = `< 2 ms`;
-                latBox.style.color = 'var(--emerald-glow)';
-                if (badge) {
-                    badge.className = 'status-badge online';
-                    badge.innerText = 'OPEN / ACTIVE';
-                }
-            }
-        }
-
-        function probeAllRadarServices() {
-            const icon = document.getElementById('radar-refresh-icon');
-            if (icon) icon.classList.add('rotating');
-
-            const ports = [80, 443, 8096, 5055, 8989, 7878, 9696, 6767, 9091, 9981, 5000, 8080, 3389];
-            ports.forEach(p => probeRadarPort(p));
-
-            setTimeout(() => { if (icon) icon.classList.remove('rotating'); }, 1200);
-        }
-
-        // Initialize
-        updateServiceLinks();
-        probeAllRadarServices();
-        setInterval(probeAllRadarServices, 20000); // Auto-reprobe every 20s
-    </script>
+    <!-- Main JavaScript Logic -->
+    <script src="app.js"></script>
 </body>
 </html>

@@ -124,7 +124,7 @@ $fallbackResult = Test-MusicBrainzNode -NodeName "Remote Fallback Mirror" -HostN
 
 # --- 3. CADDY REVERSE-PROXY ROUTING TEST ---
 Write-Host "`n--- Testing Caddy Gateway Reverse Proxy Routing ---" -ForegroundColor Yellow
-$caddyHost = "musicbrainz.ordinateur.local"
+$caddyHost = "musicbrainz.voltaireun.local"
 $caddyCode = curl.exe -s -o NUL -w "%{http_code}" --max-time 5 -H "Host: $caddyHost" "http://localhost:80/"
 
 if ($caddyCode -eq "200") {

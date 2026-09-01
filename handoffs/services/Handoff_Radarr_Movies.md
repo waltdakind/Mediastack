@@ -1,0 +1,60 @@
+﻿# Expert Operational Handoff: Radarr Movies Manager
+
+| Architectural Parameter | Runtime Specification |
+| :--- | :--- |
+| **Service Key** | radarr |
+| **Display Name** | Radarr Movies Manager |
+| **Service Category** | Servarr |
+| **Container Name** | radarr |
+| **Image Tag** | lscr.io/linuxserver/radarr:latest |
+| **Primary Ingress Port** | 7878 |
+| **Associated Storage/DB**| radarr.db |
+| **Container Status** | **RUNNING** |
+| **Restart Count** | 0 |
+| **Container Started** | 2026-08-31T23:38:20.617481202Z |
+| **L7 Response Code** | HTTP 302 |
+| **TTFB Latency** | 4.1 ms |
+| **Vault Secrets Status**| SECURED IN VAULT |
+| **Error Lines Detected**| 0 |
+| **Audit Timestamp** | 2026-08-31 20:00:15 |
+
+---
+
+## 1. Network & Reverse-Proxy Topology
+- **Local Ingress Endpoint:** `http://localhost:7878/`
+- **Caddy Virtual Host Route:** `http://radarr.voltairedeux.local/`
+- **Peer Cluster Gateway:** `http://192.168.4.30:7878/`
+- **Security Policy:** TLS 1.3 / Reverse-Proxy Ingress isolated via Caddy network.
+
+---
+
+## 2. Storage & Database Layout
+- **Host Config Root:** `C:\MediastackConfig\radarr`
+- **Active Database File:** `radarr.db`
+- **Persistent Media Mounts:** `C:\MediastackShares\` (Music, TV, Videos, Radio, Podcasts)
+- **Lock Management:** SQLite WAL with zero-downtime checkpoints.
+
+---
+
+## 3. Inter-Service Handshake Matrix
+- **Upstream Gateway:** Caddy Reverse Proxy (`caddy:80/443`)
+- **Downstream Dependencies:** `mediastack-db`, `redis`, `postgres`
+- **Cluster Peer Target:** VoltaireUn (`192.168.4.21`) via reciprocal SMB & Syncthing mesh.
+
+---
+
+## 4. Diagnostic Log Mining & Health Assessment
+### Log Extraction (Last 40 Lines)
+`	ext
+User UID:    1000 User GID:    1000 ─────────────────────────────────────── Linuxserver.io version: 6.3.0.10514-ls314 Build-date: 2026-08-23T17:07:38+00:00 ───────────────────────────────────────      [custom-init] No custom files found, skipping... [Info] Bootstrap: Starting Radarr - /app/radarr/bin/Radarr - Version 6.3.0.10514  [Info] AppFolderInfo: Data directory is being overridden to [/config]  [Debug] Bootstrap: Console selected  [Info] AppFolderInfo: Data directory is being overridden to [/config]  [Info] AppFolderInfo: Data directory is being overridden to [/config]  [Info] MigrationController: *** Migrating data source=/config/radarr.db;cache size=-20000;datetimekind=Utc;journal mode=Wal;pooling=True;version=3;busytimeout=1000 ***  [Info] FluentMigrator.Runner.MigrationRunner: DatabaseEngineVersionCheck migrating  [Info] FluentMigrator.Runner.MigrationRunner: PerformDBOperation   [Info] NzbDrone.Core.Datastore.Migration.Framework.NzbDroneSQLiteProcessor: Performing DB Operation  [Info] DatabaseEngineVersionCheck: SQLite 3.50.4  [Info] FluentMigrator.Runner.MigrationRunner: => 0.1509797s  [Info] FluentMigrator.Runner.MigrationRunner: DatabaseEngineVersionCheck migrated  [Info] FluentMigrator.Runner.MigrationRunner: => 0.1726979s  [Info] MigrationController: *** Migrating data source=/config/logs.db;cache size=-20000;datetimekind=Utc;journal mode=Wal;pooling=True;version=3;busytimeout=1000 ***  [Info] FluentMigrator.Runner.MigrationRunner: DatabaseEngineVersionCheck migrating  [Info] FluentMigrator.Runner.MigrationRunner: PerformDBOperation   [Info] NzbDrone.Core.Datastore.Migration.Framework.NzbDroneSQLiteProcessor: Performing DB Operation  [Info] DatabaseEngineVersionCheck: SQLite 3.50.4  [Info] FluentMigrator.Runner.MigrationRunner: => 0.2493865s  [Info] FluentMigrator.Runner.MigrationRunner: DatabaseEngineVersionCheck migrated  [Info] FluentMigrator.Runner.MigrationRunner: => 0.2762743s  [Info] Microsoft.Hosting.Lifetime: Now listening on: http://[::]:7878  [Info] CommandExecutor: Starting 2 threads for tasks.  [Info] Microsoft.Hosting.Lifetime: Application started. Press Ctrl+C to shut down.  [Info] Microsoft.Hosting.Lifetime: Hosting environment: Production  [Info] Microsoft.Hosting.Lifetime: Content root path: /app/radarr/bin  [Info] ManagedHttpDispatcher: IPv4 is available: True, IPv6 will be disabled  [ls.io-init] done. [Info] RssSyncService: Starting RSS Sync  [Warn] FetchAndParseRssService: No available indexers. check your configuration.  [Info] DownloadDecisionMaker: No results found  [Info] RssSyncService: RSS Sync Completed. Reports found: 0, Reports grabbed: 0 
+`
+
+---
+
+## 5. Architectural Recommendations & Maintenance Tips
+1. **Auto-Recovery:** If degraded, execute `.\Repair-radarr.ps1` or `.\Repair-MediaStackFleet.ps1 -Service Servarr`.
+2. **Backup Strategy:** Included in atomic hot backup snapshot via `.\Backup-MediaStackFleet.ps1`.
+3. **Replication Strategy:** Synchronized across Voltaire nodes via `.\Replicate-MediaStackCluster.ps1`.
+
+---
+*Generated autonomously by MediaStack Deep Analysis Engine.*

@@ -75,24 +75,25 @@ http://jellyfin.ordinateur.local, http://jellyfin.mediaserver.local {
 }
 
 # 5. MusicBrainz & Picard WebService API (Primary Port 5000 -> Fallback Port 5001)
-http://musicbrainz.ordinateur.local, http://musicbrainz.mediaserver.local {
+http://musicbrainz.voltairedeux.local, http://musicbrainz.voltaireun.local, http://musicbrainz.ordinateur.local, http://musicbrainz.mediaserver.local {
     @options {
         method OPTIONS
     }
     handle @options {
         header Access-Control-Allow-Origin "*"
-        header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
         header Access-Control-Allow-Headers "*"
         respond "" 204
     }
 
-    reverse_proxy host.docker.internal:5000 192.168.4.30:5001 {
+    reverse_proxy host.docker.internal:5000 192.168.4.21:5000 192.168.4.30:5001 host.docker.internal:5001 {
         lb_policy first
         fail_duration 10s
         flush_interval -1
 
         header_up Host {host}
         header_up X-Real-IP {remote_host}
+        header_up Authorization {http.request.header.Authorization}
         header_down Access-Control-Allow-Origin "*"
     }
 }

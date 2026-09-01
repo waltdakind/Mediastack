@@ -1,11 +1,42 @@
-﻿# Secrets — NEVER commit actual runtime secrets
+# =============================================================================
+# MediaStack Secrets & Credentials — NEVER COMMIT TO GIT OR STORE ONLINE
+# =============================================================================
 .env
 .env*
+*.env
+*.env*
+env.*
+env.*
+!*.example
+!*.example.*
+!*.example.env
+!*.example.json
+!*.example.yml
 !.env*.example
 !env.*.example
-!env.*.arm
-!env.*.x64
-!env.raspi
+
+# Specific secret files and directories
+secrets/
+.secrets/
+**/secrets/
+**/local/secrets/
+*metabrainz_access_token*
+*token*
+!*.md
+!*.ps1
+!*.sh
+!*.yml
+!*.yaml
+!*.json.example
+picard_api_keys.json
+secrets.json
+secrets.env
+*.key
+*.pem
+*.pfx
+*.p12
+*.crt
+*.cer
 
 # Backup archives, runtime databases & temporary dumps
 backups/
@@ -18,6 +49,7 @@ db-backup/
 
 # Docker runtime data, large media & binary data
 config/
+!config/secrets/*.example.*
 data/
 downloads/
 media/
@@ -36,3 +68,4 @@ HomepageInstaller/node_modules/
 .DS_Store
 Thumbs.db
 desktop.ini
+

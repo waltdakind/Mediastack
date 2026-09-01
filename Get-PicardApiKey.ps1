@@ -73,6 +73,20 @@ if ($Save) {
     if (-not (Test-Path $parentDir)) { New-Item -ItemType Directory -Force -Path $parentDir | Out-Null }
     $secretObj | ConvertTo-Json -Depth 5 | Set-Content -Path $secretsJsonPath -Encoding UTF8
     Write-Host ("  [OK] Saved to: {0}" -f $secretsJsonPath) -ForegroundColor Green
+
+    # Also update master secrets vault
+    $masterSecrets = "$PSScriptRoot\config\secrets\secrets.json"
+    if (Test-Path $masterSecrets) {
+        try {
+            $vaultObj = Get-Content $masterSecrets -Raw -Encoding UTF8 | ConvertFrom-Json
+            $vaultObj.secrets.musicbrainz.acoustid_apikey = $currentAcoustId
+            $vaultObj.secrets.musicbrainz.picard_oauth_access_token = $currentOAuth
+            $vaultObj.secrets.musicbrainz.picard_username = $currentUser
+            $vaultObj.updated_at = $timestamp
+            $vaultObj | ConvertTo-Json -Depth 10 | Set-Content -Path $masterSecrets -Encoding UTF8
+            Write-Host ("  [OK] Updated central secrets vault: {0}" -f $masterSecrets) -ForegroundColor Green
+        } catch {}
+    }
     
     # Update Picard.ini if exists
     if (Test-Path $picardIniPath) {

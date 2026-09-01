@@ -22,9 +22,9 @@ param(
     [Parameter(Mandatory = $false)][switch]$BenchmarkOnly
 )
 
-$targetScript = Join-Path $PSScriptRoot "Start-VoltaireUnMasterExecution.ps1"
+$targetScript = Join-Path $PSScriptRoot "Start-VoltaireUnMainExecution.ps1"
 if (Test-Path $targetScript) {
     & $targetScript -ExternalDomain $ExternalDomain -PrimaryIP $PrimaryIP -SecondaryIP $SecondaryIP -NonInteractive:$NonInteractive -SkipSentinel:$SkipSentinel -BenchmarkOnly:$BenchmarkOnly
 } else {
-    Write-Error "Start-VoltaireUnMasterExecution.ps1 not found in $PSScriptRoot"
+    Write-Error "Start-VoltaireUnMainExecution.ps1 not found in $PSScriptRoot"
 }
