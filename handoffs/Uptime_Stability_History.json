@@ -38,5 +38,13 @@
         "ActiveContainers":  18,
         "TranscodeReclaimedMB":  0,
         "ZeroDowntimeReload":  true
+    },
+    {
+        "Timestamp":  "2026-08-30 19:09:41",
+        "HostUptimeDays":  1.85,
+        "HostUptimeFormatted":  "1 days, 20 hours, 26 minutes, 42 seconds",
+        "ActiveContainers":  20,
+        "TranscodeReclaimedMB":  0,
+        "ZeroDowntimeReload":  true
     }
 ]

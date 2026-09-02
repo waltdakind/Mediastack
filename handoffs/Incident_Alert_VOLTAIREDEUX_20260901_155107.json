@@ -1,0 +1,24 @@
+﻿{
+    "incident_id":  "INCIDENT_20260901_155107",
+    "timestamp":  "2026-09-01 15:51:07",
+    "source_node":  "VOLTAIREDEUX",
+    "source_ip":  "192.168.4.30",
+    "target_peer":  "VOLTAIREUN",
+    "status":  "REQUIRES_AI_REMEDIATION",
+    "service_anomalies":  [
+
+                          ],
+    "database_anomalies":  [
+
+                           ],
+    "stopped_containers":  [
+                               "api-gateway (Restarting (1) Less than a second ago)"
+                           ],
+    "running_containers":  19,
+    "online_services":  13,
+    "suggested_actions":  [
+                              "Analyze service logs and formulate targeted AutoFix repair package.",
+                              "Inspect container restart loop or database lock status.",
+                              "Publish remediation package to handoffs/cluster_update_manifest.json."
+                          ]
+}

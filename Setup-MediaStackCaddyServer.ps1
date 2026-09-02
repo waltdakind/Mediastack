@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Setup-MediaStackCaddyServer.ps1 - Primary Caddy Reverse Proxy & Dual-Node Ingress Security Engine.
 
@@ -91,16 +91,17 @@ if ($needCerts) {
 
 # Install Root CA into Windows Certificate Store for seamless green padlock
 if ($InstallRootCA -and (Test-Path $caCrt)) {
-    try {
-        $check = certutil.exe -user -verifystore Root "MediaStack Root CA" 2>&1
-        if ($check -match "Certificate is valid" -or $check -match "MediaStack") {
-            Write-Host "  [OK] MediaStack Root CA already trusted in Windows Certificate Store." -ForegroundColor Green
-        } else {
-            certutil.exe -addstore -user -f Root $caCrt 2>&1 | Out-Null
-            Write-Host "  [OK] MediaStack Root CA imported into CurrentUser Trusted Root Store." -ForegroundColor Green
-        }
-    } catch {
-        Write-Host "  [INFO] Note: Root CA store import completed." -ForegroundColor DarkGray
+    $trustScript = Join-Path $BaseDir "Install-MediaStackRootCA.ps1"
+    if (Test-Path $trustScript) {
+        & $trustScript -CertPath $caCrt -NonInteractive
+    } else {
+        try {
+            if (Get-Command Import-Certificate -ErrorAction SilentlyContinue) {
+                Import-Certificate -FilePath $caCrt -CertStoreLocation "Cert:\LocalMachine\Root" -ErrorAction SilentlyContinue | Out-Null
+                Import-Certificate -FilePath $caCrt -CertStoreLocation "Cert:\CurrentUser\Root" -ErrorAction SilentlyContinue | Out-Null
+            }
+            & certutil.exe -addstore -f "Root" $caCrt 2>&1 | Out-Null
+        } catch { }
     }
 }
 

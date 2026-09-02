@@ -7,6 +7,8 @@ services:
       - "3000:3000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./api-gateway/index.js:/app/index.js:ro
+      - ./certs:/certs:ro
     restart: unless-stopped
     labels:
       - "autoheal=true"
@@ -16,7 +18,17 @@ services:
     container_name: caddy
     ports:
       - "80:80"
+      - "81:81"
       - "443:443"
+      - "444:444"
+      - "8097:8097"
+      - "8990:8990"
+      - "7879:7879"
+      - "9697:9697"
+      - "6768:6768"
+      - "5056:5056"
+      - "9092:9092"
+      - "8081:8081"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./certs:/etc/caddy/certs:ro
@@ -47,9 +59,11 @@ services:
       - JELLYFIN_WEB_DIR=/usr/share/jellyfin/web
     volumes:
       - ./config/jellyfin:/config
+      - ./certs:/certs:ro
       - ${MEDIA_DIR}:/data
     ports:
       - "8096:8096"
+      - "8920:8920"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
@@ -160,8 +174,8 @@ services:
       - ${MEDIA_DIR}:/data
     ports:
       - "9091:9091"
-      - "${TRANSMISSION_PEER_PORT:-51500}:51413"
-      - "${TRANSMISSION_PEER_PORT:-51500}:51413/udp"
+      - "51413:51413"
+      - "51413:51413/udp"
     restart: unless-stopped
     labels:
       - "autoheal=true"
@@ -233,13 +247,20 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped
 
-  # -----------------------------------------------------------------------------
-  # MusicBrainz Server & Metadata Mirror Stack
-  # Ports: 5000 (Default Standard Web & REST API), 5001 (Secondary / Mirror Port)
-  # -----------------------------------------------------------------------------
+  # =============================================================================
+  # MUSICBRAINZ LOCAL DB, SEARCH & MIRROR API STACK (MERGED SERVICES)
+  # =============================================================================
+
   musicbrainz:
-    image: musicbrainz-docker-musicbrainz
+    build:
+      context: ./musicbrainz-docker/build/musicbrainz-prebuilt
+    image: musicbrainz-docker_musicbrainz:latest
     container_name: musicbrainz-docker-musicbrainz-1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "50"
     ports:
       - "5000:5000"
       - "5001:5000"
@@ -255,15 +276,22 @@ services:
       - MUSICBRAINZ_SERVER_PROCESSES=${MUSICBRAINZ_SERVER_PROCESSES:-10}
       - MUSICBRAINZ_USE_PROXY=1
       - MUSICBRAINZ_WEB_SERVER_HOST=${MUSICBRAINZ_WEB_SERVER_HOST:-localhost}
-      - MUSICBRAINZ_WEB_SERVER_PORT=5000
+      - MUSICBRAINZ_WEB_SERVER_PORT=${MUSICBRAINZ_WEB_SERVER_PORT:-5000}
     depends_on:
       - musicbrainz-db
       - musicbrainz-search
       - musicbrainz-valkey
 
   musicbrainz-db:
-    image: musicbrainz-docker_db:18
+    build:
+      context: ./musicbrainz-docker/build/postgres-prebuilt
+    image: musicbrainz-docker_db:${POSTGRES_VERSION:-18}
     container_name: musicbrainz-docker-db-1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
     restart: unless-stopped
     command: postgres -c "shared_buffers=2048MB"
     env_file:
@@ -271,29 +299,23 @@ services:
     shm_size: "2GB"
     volumes:
       - musicbrainz_pgdata:/var/lib/postgresql
+    ports:
+      - "5432:5432"
     expose:
       - "5432"
 
-  musicbrainz-search:
-    image: musicbrainz-docker_search:4.1.0
-    container_name: musicbrainz-docker-search-1
-    restart: unless-stopped
-    environment:
-      - SOLR_HEAP=2g
-      - LOG4J_FORMAT_MSG_NO_LOOKUPS=true
-    mem_swappiness: 1
-    expose:
-      - "8983"
-    volumes:
-      - musicbrainz_dbdump:/media/dbdump:ro
-      - musicbrainz_solrdata:/var/solr
-      - musicbrainz_solrdump:/var/cache/musicbrainz/solr-backups
-
   musicbrainz-indexer:
-    image: musicbrainz-docker-indexer
+    build:
+      context: ./musicbrainz-docker/build/sir
+    image: musicbrainz-docker_indexer:latest
     container_name: musicbrainz-docker-indexer-1
     env_file:
       - ./musicbrainz-docker/default/postgres.env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
     volumes:
       - ./musicbrainz-docker/default/indexer.ini:/code/config.ini
     restart: unless-stopped
@@ -301,10 +323,43 @@ services:
       - musicbrainz-db
       - musicbrainz-search
 
+  musicbrainz-search:
+    build:
+      context: ./musicbrainz-docker/build/solr
+      args:
+        - MB_SOLR_VERSION=${MB_SOLR_VERSION:-4.1.0}
+    image: musicbrainz-docker_search:${MB_SOLR_VERSION:-4.1.0}
+    container_name: musicbrainz-docker-search-1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+    restart: unless-stopped
+    environment:
+      - SOLR_HEAP=2g
+      - LOG4J_FORMAT_MSG_NO_LOOKUPS=true
+    mem_swappiness: 1
+    ports:
+      - "8983:8983"
+    expose:
+      - "8983"
+    volumes:
+      - musicbrainz_dbdump:/media/dbdump:ro
+      - musicbrainz_solrdata:/var/solr
+      - musicbrainz_solrdump:/var/cache/musicbrainz/solr-backups
+
   musicbrainz-valkey:
     image: valkey/valkey:9-alpine
-    container_name: musicbrainz-docker-valkey-1
+    container_name: musicbrainz-docker-valkey-2
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
     restart: unless-stopped
+    ports:
+      - "6379:6379"
     expose:
       - "6379"
 
@@ -321,4 +376,3 @@ volumes:
   musicbrainz_solrdump:
     name: musicbrainz-docker_solrdump
     external: true
-

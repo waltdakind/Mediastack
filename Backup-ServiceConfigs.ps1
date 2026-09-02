@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Backup-ServiceConfigs.ps1 - Atomic Hot Backup Engine for Individual MediaStack Services.
 
@@ -105,15 +105,35 @@ if ($servicesToBackup -contains "Jellyfin") {
     Write-Host "  [OK] Staged Jellyfin Server configuration & database state." -ForegroundColor Green
 }
 
-# 5. MusicBrainz Metadata Backup
+# 5. MusicBrainz Database & Metadata Fleet Backup
 if ($servicesToBackup -contains "MusicBrainz") {
     $mbDst = Join-Path $StagingDir "musicbrainz"
     New-Item -ItemType Directory -Force -Path $mbDst | Out-Null
+    
+    # 1. Picard Client Settings
     $picardIni = "$env:APPDATA\MusicBrainz\Picard.ini"
     if (Test-Path $picardIni) { Copy-Item -Path $picardIni -Destination $mbDst -Force }
+    
+    # 2. MetaBrainz Access Token & Secrets
     $token = Join-Path $BaseDir "musicbrainz-docker\local\secrets\metabrainz_access_token"
     if (Test-Path $token) { Copy-Item -Path $token -Destination $mbDst -Force }
-    Write-Host "  [OK] Staged MusicBrainz token, mirror settings & Picard configuration." -ForegroundColor Green
+    
+    # 3. Environment & Indexer Configs
+    $pgEnv = Join-Path $BaseDir "musicbrainz-docker\default\postgres.env"
+    if (Test-Path $pgEnv) { Copy-Item -Path $pgEnv -Destination $mbDst -Force }
+    $idxIni = Join-Path $BaseDir "musicbrainz-docker\default\indexer.ini"
+    if (Test-Path $idxIni) { Copy-Item -Path $idxIni -Destination $mbDst -Force }
+    
+    # 4. Invoke Automated Metadata & Schema Backup Script
+    $mbBackupScript = Join-Path $BaseDir "Backup-MusicBrainzMetadata.ps1"
+    if (Test-Path $mbBackupScript) {
+        & $mbBackupScript 2>&1 | Out-Null
+        $mbDbBackup = Join-Path $ConfigDir "db-backup"
+        if (Test-Path $mbDbBackup) {
+            Copy-Item -Path $mbDbBackup -Destination (Join-Path $mbDst "db-backup") -Recurse -Force -ErrorAction SilentlyContinue
+        }
+    }
+    Write-Host "  [OK] Staged MusicBrainz PostgreSQL metadata, replication token, Picard & indexer configs." -ForegroundColor Green
 }
 
 # 6. Syncthing Cluster Backup

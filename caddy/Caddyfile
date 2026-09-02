@@ -2,7 +2,7 @@
     default_sni 192.168.4.30
 }
 
-mediaserverlaptop.local, localhost, 192.168.4.30 {
+waltdakind.xubi.org, jellyfin.waltdakind.xubi.org, voltairedeux.local, voltaireun.local, localhost, 192.168.4.30 {
     tls /certs/cert.pem /certs/key.pem
 
     reverse_proxy jellyfin:8096 {
@@ -11,3 +11,4 @@ mediaserverlaptop.local, localhost, 192.168.4.30 {
         health_interval 10s
     }
 }
+

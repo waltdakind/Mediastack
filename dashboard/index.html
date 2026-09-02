@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -50,6 +50,11 @@
                         <span id="global-status-text">Fleet Health: OPTIMAL (100%)</span>
                     </div>
 
+                    <div class="status-summary-pill" id="ssl-status-pill" onclick="probeHttpsTls()" style="cursor: pointer; border-color: rgba(16, 185, 129, 0.35);" title="Click to test live HTTPS handshake">
+                        <div class="pulse-dot" id="ssl-pulse" style="background: var(--emerald-glow); box-shadow: 0 0 10px var(--emerald-glow);"></div>
+                        <span id="ssl-status-text" style="color: var(--emerald-glow); font-weight: 600;">HTTPS 443: VIABLE</span>
+                    </div>
+
                     <button onclick="copyCliCommand('.\\s.ps1 -bk')" class="btn" id="backup-btn" title="Run Primary Fleet Backup">
                         <i class="ph-bold ph-archive"></i>
                         <span>Hot Backup</span>
@@ -70,7 +75,7 @@
                     <h2 class="section-title" id="topology-heading">
                         <i class="ph-bold ph-hard-drives"></i> Multi-Node Cluster Topology &amp; Interconnect
                     </h2>
-                    <p class="section-subtitle">Real-time synchronized mesh between primary 24/7 host and AI push node</p>
+                    <p class="section-subtitle">Real-time synchronized mesh between primary 24/7 host (VoltaireUn) and AI push node (VoltaireDeux)</p>
                 </div>
                 <button class="btn btn-sm btn-accent" onclick="copyCliCommand('.\\s.ps1 -l')" title="Optimize TCP & Edge Caches">
                     <i class="ph-bold ph-lightning"></i> Optimize Dual LCP
@@ -167,7 +172,34 @@
             </div>
         </section>
 
-        <!-- 2. ENTERPRISE 8-PILLAR OPERATIONAL SUITE HUB -->
+        <!-- 2. SSL / TLS PATHWAYS & HTTPS VIABILITY RADAR -->
+        <section aria-labelledby="ssl-heading" id="ssl-section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title" id="ssl-heading">
+                        <i class="ph-bold ph-shield-check"></i> SSL / TLS Pathways, SAN Mappings &amp; HTTPS Viability Engine
+                    </h2>
+                    <p class="section-subtitle">Real-time wildcard certificate verification, physical-to-container pathway mappings, WAN/LAN security &amp; 1-click self-repair</p>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-sm" onclick="showSslCodeModal()" title="Inspect Caddyfile TLS, Docker volume mounts & OpenSSL config code">
+                        <i class="ph-bold ph-code"></i> Inspect SSL Code
+                    </button>
+                    <button class="btn btn-sm btn-accent" onclick="probeHttpsTls()" id="ssl-probe-btn" title="Run live TLS handshake on port 443">
+                        <i class="ph-bold ph-arrows-clockwise"></i> Probe HTTPS :443
+                    </button>
+                    <button class="btn btn-sm btn-primary repair-btn-glow" onclick="triggerSslRepair()" id="ssl-repair-btn" title="Regenerate certs, install trust, and reload Caddy">
+                        <i class="ph-bold ph-wrench"></i> Auto-Repair SSL
+                    </button>
+                </div>
+            </div>
+
+            <div class="ssl-deck" id="ssl-deck-container">
+                <!-- Dynamically populated by app.js -->
+            </div>
+        </section>
+
+        <!-- 3. ENTERPRISE 8-PILLAR OPERATIONAL SUITE HUB -->
         <section aria-labelledby="suite-heading">
             <div class="section-header">
                 <div>
@@ -200,7 +232,7 @@
             <!-- Filter & Search Bar -->
             <div class="stack-filter-bar">
                 <div class="category-tabs" role="tablist">
-                    <button class="cat-tab active" data-cat="all" onclick="filterCategory('all')">All Services (13)</button>
+                    <button class="cat-tab active" data-cat="all" onclick="filterCategory('all')">All Services (12)</button>
                     <button class="cat-tab" data-cat="streaming" onclick="filterCategory('streaming')">Streaming &amp; Discovery</button>
                     <button class="cat-tab" data-cat="servarr" onclick="filterCategory('servarr')">Servarr Automation</button>
                     <button class="cat-tab" data-cat="metadata" onclick="filterCategory('metadata')">Metadata Mirrors</button>

@@ -13,10 +13,10 @@
 | **Restart Count** | 0 |
 | **Container Started** | N/A |
 | **L7 Response Code** | HTTP 307 |
-| **TTFB Latency** | 13.9 ms |
+| **TTFB Latency** | 414.4 ms |
 | **Vault Secrets Status**| SECURED IN VAULT |
 | **Error Lines Detected**| 0 |
-| **Audit Timestamp** | 2026-08-31 20:00:15 |
+| **Audit Timestamp** | 2026-09-01 17:53:17 |
 
 ---
 

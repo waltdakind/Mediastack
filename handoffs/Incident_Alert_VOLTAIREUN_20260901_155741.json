@@ -1,0 +1,30 @@
+﻿{
+    "incident_id":  "INCIDENT_20260901_155741",
+    "timestamp":  "2026-09-01 15:57:41",
+    "source_node":  "VOLTAIREUN",
+    "source_ip":  "192.168.4.21",
+    "target_peer":  "VOLTAIREDEUX",
+    "status":  "REQUIRES_AI_REMEDIATION",
+    "service_anomalies":  [
+                              {
+                                  "Service":  "Transmission Web UI",
+                                  "Port":  9091,
+                                  "Container":  "transmission",
+                                  "Reason":  "Port 9091 Unreachable / Closed",
+                                  "Severity":  "CRITICAL"
+                              }
+                          ],
+    "database_anomalies":  [
+
+                           ],
+    "stopped_containers":  [
+
+                           ],
+    "running_containers":  19,
+    "online_services":  12,
+    "suggested_actions":  [
+                              "Analyze service logs and formulate targeted AutoFix repair package.",
+                              "Inspect container restart loop or database lock status.",
+                              "Publish remediation package to handoffs/cluster_update_manifest.json."
+                          ]
+}

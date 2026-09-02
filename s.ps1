@@ -17,6 +17,9 @@ param(
     [Alias("v", "verifyfleet")][switch]$VerifyFleet,
     [Alias("da", "deepanalysis", "handoffs")][switch]$DeepAnalysis,
     [Alias("i", "install", "newnode")][switch]$InstallNode,
+    [Alias("t", "ssl", "cert", "tls")][switch]$Ssl,
+    [Alias("rpssl", "repairssl")][switch]$RepairSsl,
+    [Alias("o", "orchestrate", "master")][switch]$Orchestrator,
     [Parameter(Mandatory = $false)][switch]$NonInteractive
 )
 
@@ -33,6 +36,10 @@ $ErrorActionPreference = "Continue"
 [System.Console]::InputEncoding  = [System.Text.Encoding]::UTF8
 
 # Direct flag dispatch
+if ($Orchestrator) {
+    & "$PSScriptRoot\Start-MediaStackOrchestrator.ps1" -NonInteractive:$NonInteractive
+    return
+}
 if ($VoltaireUn) {
     & "$PSScriptRoot\Start-VoltaireUn.ps1" -NonInteractive:$NonInteractive
     return
@@ -101,6 +108,14 @@ if ($InstallNode) {
     & "$PSScriptRoot\Install-VoltaireNode.ps1"
     return
 }
+if ($Ssl) {
+    & "$PSScriptRoot\Test-MediaStackSslViability.ps1"
+    return
+}
+if ($RepairSsl) {
+    & "$PSScriptRoot\Test-MediaStackSslViability.ps1" -AutoRepair
+    return
+}
 
 # Interactive Single-Key HUD Menu
 Clear-Host
@@ -139,10 +154,16 @@ Write-Host "Network Users and Reciprocal Read-Write SMB Shares Setup -> .\s.ps1 
 Write-Host "  [0] " -NoNewline -ForegroundColor Yellow
 Write-Host "Install / Replicate MediaStack Update Package (Unzip and Bootstrap) -> .\s.ps1 -Update" -ForegroundColor Green
 
+Write-Host "  [O] " -NoNewline -ForegroundColor Yellow
+Write-Host "Master Orchestrator: Housekeeping, Backup, Startup, Autohealer & AI Hub -> .\s.ps1 -o" -ForegroundColor Green
+
 Write-Host "  [F] " -NoNewline -ForegroundColor Yellow
 Write-Host "Full Suite: Diagnose, Backup, Shutdown, Repull, Restart & AI Sentinel -> .\s.ps1 -f" -ForegroundColor Magenta
 
-Write-Host "`n--- 4-PILLAR ENTERPRISE OPERATIONAL HUBS ---" -ForegroundColor Cyan
+Write-Host "`n--- ENTERPRISE OPERATIONAL HUBS & SECURITY ---" -ForegroundColor Cyan
+
+Write-Host "  [T] " -NoNewline -ForegroundColor Yellow
+Write-Host "SSL/TLS Pathways & HTTPS Viability Engine (4096-bit Multi-Domain SANs) -> .\s.ps1 -ssl" -ForegroundColor Green
 
 Write-Host "  [R] " -NoNewline -ForegroundColor Yellow
 Write-Host "Primary Fleet Repair (Auto-Heal All 12 Services) -> Shortcut: .\s.ps1 -rp" -ForegroundColor Cyan
@@ -168,7 +189,7 @@ Write-Host "Install / Replicate New Node on Voltaire Network -> Shortcut: .\s.ps
 Write-Host "  [Q] " -NoNewline -ForegroundColor DarkGray
 Write-Host "Quit" -ForegroundColor DarkGray
 
-Write-Host "`nSelect an option [0-9, F, R, B, C, S, V, D, I, Q]: " -NoNewline -ForegroundColor Yellow
+Write-Host "`nSelect an option [0-9, O, F, T, R, B, C, S, V, D, I, Q]: " -NoNewline -ForegroundColor Yellow
 
 if ($NonInteractive) {
     Write-Host "3 (Default NonInteractive: Dual-Node LCP)" -ForegroundColor Cyan
@@ -180,6 +201,7 @@ $key = [Console]::ReadKey($true).KeyChar
 Write-Host "$key`n"
 
 switch ($key.ToString().ToUpper()) {
+    "O" { & "$PSScriptRoot\Start-MediaStackOrchestrator.ps1" }
     "1" { & "$PSScriptRoot\Start-VoltaireUn.ps1" }
     "U" { & "$PSScriptRoot\Start-VoltaireUn.ps1" }
     "2" { & "$PSScriptRoot\Start-VoltaireDeux.ps1" }
@@ -187,7 +209,6 @@ switch ($key.ToString().ToUpper()) {
     "3" { & "$PSScriptRoot\Optimize-DualNodeLcp.ps1" }
     "L" { & "$PSScriptRoot\Optimize-DualNodeLcp.ps1" }
     "4" { & "$PSScriptRoot\Test-LocalNetworkSwitch.ps1" }
-    "R" { & "$PSScriptRoot\Repair-MediaStackFleet.ps1" -All -AutoFix }
     "5" { & "$PSScriptRoot\Repair-JellyfinServer.ps1" -AutoFix }
     "J" { & "$PSScriptRoot\Repair-JellyfinServer.ps1" -AutoFix }
     "6" { & "$PSScriptRoot\Merge-OneDriveMediaStack.ps1" }
@@ -200,6 +221,8 @@ switch ($key.ToString().ToUpper()) {
     "N" { & "$PSScriptRoot\Set-MediaStackNetworkUsers.ps1" }
     "0" { & "$PSScriptRoot\Install-MediaStackUpdate.ps1" }
     "F" { & "$PSScriptRoot\Invoke-MediaStackFullRebootSuite.ps1" }
+    "T" { & "$PSScriptRoot\Test-MediaStackSslViability.ps1" }
+    "R" { & "$PSScriptRoot\Repair-MediaStackFleet.ps1" -All -AutoFix }
     "B" { & "$PSScriptRoot\Backup-MediaStackFleet.ps1" -All }
     "C" { & "$PSScriptRoot\Test-MediaStackFleetConnectivity.ps1" -All -DeepAuth }
     "S" { & "$PSScriptRoot\Replicate-MediaStackCluster.ps1" -All -RunOnce }

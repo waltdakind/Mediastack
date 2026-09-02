@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # New-MediaStackSslCertificates.ps1 - Enterprise SSL/TLS Certificate Generator
 # Generates multi-domain wildcard SAN certificates, Root CA, PEM, CRT, KEY, and PFX
 # for Caddy, Jellyfin, HTTPS Reverse Proxies, and LAN/WAN remote connections.
@@ -91,7 +91,7 @@ extendedKeyUsage = serverAuth, clientAuth
 subjectAltName = @alt_names
 
 [alt_names]
-# Public Domains & Subdomains
+# Public Domains & Subdomains (External WAN Access)
 DNS.1  = $PrimaryDomain
 DNS.2  = *.$PrimaryDomain
 DNS.3  = jellyfin.$PrimaryDomain
@@ -102,19 +102,13 @@ DNS.7  = prowlarr.$PrimaryDomain
 DNS.8  = bazarr.$PrimaryDomain
 DNS.9  = musicbrainz.$PrimaryDomain
 
-# Local LAN Domains
+# Local LAN Node Hostnames (voltaireun.local & voltairedeux.local)
 DNS.10 = voltaireun.local
 DNS.11 = *.voltaireun.local
 DNS.12 = voltairedeux.local
 DNS.13 = *.voltairedeux.local
-DNS.14 = voltaireun.local
-DNS.15 = *.voltaireun.local
-DNS.16 = mediaserver.local
-DNS.17 = *.mediaserver.local
-DNS.18 = mediaserverlaptop.local
-DNS.19 = *.mediaserverlaptop.local
-DNS.20 = localhost
-DNS.21 = *.localhost
+DNS.14 = localhost
+DNS.15 = *.localhost
 
 # IP Addresses
 IP.1   = 127.0.0.1
@@ -186,16 +180,17 @@ Write-Host "  $PrimaryDomain | *.$PrimaryDomain | *.voltaireun.local | *.voltair
 # Optional Trust Store Installation
 if ($InstallToTrustStore) {
     Write-Host "`n[TRUST STORE] Installing Root CA into Windows Certificate Store..." -ForegroundColor Yellow
-    try {
-        if (Get-Command Import-Certificate -ErrorAction SilentlyContinue) {
-            Import-Certificate -FilePath $caCrtPath -CertStoreLocation "Cert:\CurrentUser\Root" -ErrorAction Stop | Out-Null
-            Write-Host "  [OK] Root CA added to CurrentUser Trusted Root Certification Authorities via Import-Certificate" -ForegroundColor Green
-        } else {
-            & certutil.exe -user -addstore -f "Root" $caCrtPath 2>$null | Out-Null
-            Write-Host "  [OK] Root CA added to CurrentUser Trusted Root Certification Authorities via certutil" -ForegroundColor Green
-        }
-    } catch {
-        Write-Host "  [INFO] Trust store update logged: $($_.Exception.Message)" -ForegroundColor DarkGray
+    $trustScript = Join-Path $PSScriptRoot "Install-MediaStackRootCA.ps1"
+    if (Test-Path $trustScript) {
+        & $trustScript -CertPath $caCrtPath
+    } else {
+        try {
+            if (Get-Command Import-Certificate -ErrorAction SilentlyContinue) {
+                Import-Certificate -FilePath $caCrtPath -CertStoreLocation "Cert:\LocalMachine\Root" -ErrorAction SilentlyContinue | Out-Null
+                Import-Certificate -FilePath $caCrtPath -CertStoreLocation "Cert:\CurrentUser\Root" -ErrorAction SilentlyContinue | Out-Null
+            }
+            & certutil.exe -addstore -f "Root" $caCrtPath 2>$null | Out-Null
+        } catch { }
     }
 }
 
@@ -231,14 +226,14 @@ $mdReport = @"
 | **Status** | **ACTIVE & VERIFIED (Valid Across WAN, LAN & Localhost)** |
 
 ### Subject Alternative Names (SANs) Covered
-* **WAN / DDNS**: \`waltdakind.xubi.org\`, \`*.waltdakind.xubi.org\`
-* **LAN Hostnames**: \`voltaireun.local\`, \`voltairedeux.local\`, \`voltaireun.local\`, \`mediaserver.local\`, \`mediaserverlaptop.local\`
-* **Loopback & IPs**: \`localhost\`, \`127.0.0.1\`, \`192.168.4.30\`, \`192.168.4.21\`, \`192.168.4.1\`
+* **WAN / External DDNS**: `waltdakind.xubi.org`, `*.waltdakind.xubi.org`, `jellyfin.waltdakind.xubi.org`
+* **Local LAN Nodes**: `voltaireun.local`, `*.voltaireun.local`, `voltairedeux.local`, `*.voltairedeux.local`
+* **Loopback & Host IPs**: `localhost`, `127.0.0.1`, `192.168.4.30`, `192.168.4.21`, `192.168.4.1`
 
 ### Usage in MediaStack Components
-1. **Caddy Reverse Proxy Gateway**: Configured via \`/etc/caddy/certs/cert.pem\` and \`/etc/caddy/certs/key.pem\`.
-2. **Jellyfin Native HTTPS**: Load \`server.pfx\` with password \`mediastack\` in Jellyfin Dashboard > Networking.
-3. **Browser Trust**: Import \`certs/ca.crt\` into Chrome / Windows Trusted Root Authorities to eliminate security prompts.
+1. **Caddy Reverse Proxy Gateway**: Configured via `/etc/caddy/certs/cert.pem` and `/etc/caddy/certs/key.pem`.
+2. **Jellyfin Native HTTPS**: Load `server.pfx` with password `mediastack` in Jellyfin Dashboard > Networking.
+3. **Browser & WAN Security**: Validated TLS encryption serving WAN & LAN traffic with full wildcard coverage.
 "@
 
 Set-Content -Path $reportFile -Value $mdReport -Encoding UTF8

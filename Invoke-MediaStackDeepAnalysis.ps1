@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Invoke-MediaStackDeepAnalysis.ps1 - Primary Deep Analysis Engine with Expert-Level Service Handoffs.
 
@@ -113,7 +113,6 @@ $serviceDefs = @(
     @{ Name="syncthing";     DisplayName="Syncthing P2P Mesh";         Port=8384; Category="Replication";  Db="index.db" },
     @{ Name="transmission";  DisplayName="Transmission BitTorrent";    Port=9091; Category="Downloader";   Db="settings.json" },
     @{ Name="tvheadend";     DisplayName="TVHeadend Live TV Gateway";  Port=9981; Category="LiveTV";       Db="tvh.db" },
-    @{ Name="nextpvr";       DisplayName="NextPVR Streaming Backend";  Port=8866; Category="LiveTV";       Db="npvr.db3" },
     @{ Name="mediastack-db"; DisplayName="MediaStack SQLite Web DB";   Port=8080; Category="Database";     Db="mediastack_backup.db" }
 )
 
@@ -209,7 +208,7 @@ if ($GenerateHandoffs) {
         "bazarr"        = "Handoff_Bazarr_Subtitles.md"
         "jellyseerr"    = "Handoff_Jellyseerr_Requests.md"
         "transmission"  = "Handoff_Transmission_Daemon.md"
-        "nextpvr"       = "Handoff_NextPVR_LiveTV.md"
+        "tvheadend"     = "Handoff_TVHeadend_LiveTV.md"
         "caddy"         = "Handoff_Caddy_IngressGateway.md"
         "syncthing"     = "Handoff_Syncthing_Mesh.md"
         "mediastack-db" = "Handoff_Databases_Storage.md"

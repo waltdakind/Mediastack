@@ -56,26 +56,23 @@ if ($pingTuner) {
     Write-Host "  [WARN] HDHomeRun Hardware Tuner ($TunerIp) is unreachable via ICMP." -ForegroundColor Yellow
 }
 
-# 2. NextPVR / TVHeadend Container Inspection
-Write-Host "`n[2/4] Checking Live TV Streaming Containers..." -ForegroundColor Yellow
-$tunerContainers = @("nextpvr", "tvheadend")
-foreach ($tc in $tunerContainers) {
-    $inspect = docker inspect $tc 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue
-    $isUp = ($inspect -and $inspect[0].State.Status -eq "running")
-    Write-Host ("  * Container {0,-15} : {1}" -f $tc, $(if ($isUp) { "RUNNING" } else { "STOPPED/STANDBY" })) -ForegroundColor $(if ($isUp) { "Green" } else { "DarkGray" })
+# 2. TVHeadend Container Inspection
+Write-Host "`n[2/4] Checking TVHeadend Live TV Streaming Container..." -ForegroundColor Yellow
+$inspect = docker inspect tvheadend 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue
+$isUp = ($inspect -and $inspect[0].State.Status -eq "running")
+Write-Host ("  * Container {0,-15} : {1}" -f "tvheadend", $(if ($isUp) { "RUNNING" } else { "STOPPED/STANDBY" })) -ForegroundColor $(if ($isUp) { "Green" } else { "DarkGray" })
 
-    if (-not $isUp -and ($AutoFix -or -not $DiagOnly)) {
-        Write-Host "    [REPAIR] Starting $tc container..." -ForegroundColor Cyan
-        docker start $tc 2>$null | Out-Null
-        Start-Sleep -Seconds 2
-        $remediations += "Started container $tc."
-    }
+if (-not $isUp -and ($AutoFix -or -not $DiagOnly)) {
+    Write-Host "    [REPAIR] Starting tvheadend container..." -ForegroundColor Cyan
+    docker start tvheadend 2>$null | Out-Null
+    Start-Sleep -Seconds 2
+    $remediations += "Started container tvheadend."
 }
 
-# 3. NextPVR Web Endpoint & Tuner Route Probe
-Write-Host "`n[3/4] Probing NextPVR Web & Stream Endpoints..." -ForegroundColor Yellow
-$npCode = curl.exe -s -o NUL -w "%{http_code}" --max-time 4 "http://localhost:${NextPvrPort}/" 2>$null
-Write-Host ("  * NextPVR Web UI (localhost:{0}) -> HTTP {1}" -f $NextPvrPort, $npCode) -ForegroundColor $(if ($npCode -ge 200 -and $npCode -lt 400) { "Green" } else { "Yellow" })
+# 3. TVHeadend Web Endpoint & Tuner Route Probe
+Write-Host "`n[3/4] Probing TVHeadend Web & Stream Endpoints (Port 9981)..." -ForegroundColor Yellow
+$tvCode = curl.exe -s -o NUL -w "%{http_code}" --max-time 4 "http://localhost:9981/" 2>$null
+Write-Host ("  * TVHeadend Web UI (localhost:9981) -> HTTP {0}" -f $tvCode) -ForegroundColor $(if ($tvCode -ge 200 -and $tvCode -lt 400) { "Green" } else { "Yellow" })
 
 # 4. Proxy Route Validation
 Write-Host "`n[4/4] Validating Caddy HDHomeRun Emulation Gateway..." -ForegroundColor Yellow

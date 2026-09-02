@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # Start-MediaStackAutohealer.ps1 - Primary Multi-Node Continuous Autohealing Sentinel
 # Nodes: VOLTAIREDEUX (192.168.4.30) <---> VOLTAIREUN (192.168.4.21)
 # ==============================================================================
@@ -280,7 +280,11 @@ while ($running) {
     $sweep = Invoke-AutohealSweep
     $curTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
-    if (-not $Daemon) {
+    if ($Daemon) {
+        $healthyCount = ($sweep.Services | Where-Object { $_.Status -eq "HEALTHY" }).Count
+        $pStat = if ($sweep.PrimaryLan) { "ONLINE" } else { "STANDBY" }
+        Write-Host ("[{0}] [AUTOHEALER DAEMON] Heartbeat: {1}/{2} Services Healthy | Primary Peer (192.168.4.21): {3}" -f $curTime, $healthyCount, $sweep.Services.Count, $pStat)
+    } else {
         Clear-Host
         Write-Host "================================================================================" -ForegroundColor DarkCyan
         Write-Host "       M E D I A S T A C K   M A S T E R   A U T O H E A L E R   H U D" -ForegroundColor Cyan

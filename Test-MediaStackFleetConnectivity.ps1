@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Test-MediaStackFleetConnectivity.ps1 - Primary Multi-Service Connectivity & Authenticated Handshake Probe.
 
@@ -72,7 +72,7 @@ $fleetEndpoints = @(
     @{ Name="MusicBrainz Local";   Group="MusicBrainz";  Port=5001; Path="";                   Expected=500; HostHeader="musicbrainz.voltairedeux.local" },
     @{ Name="Syncthing P2P Mesh";  Group="Syncthing";    Port=8384; Path="";                   Expected=200; HostHeader="syncthing.voltairedeux.local" },
     @{ Name="Transmission Web";    Group="Transmission"; Port=9091; Path="/transmission/web/"; Expected=200; HostHeader="transmission.voltairedeux.local" },
-    @{ Name="NextPVR Live TV";     Group="LiveTV";       Port=8866; Path="";                   Expected=302; HostHeader="nextpvr.voltairedeux.local" },
+    @{ Name="TVHeadend Live TV";    Group="LiveTV";       Port=9981; Path="";                   Expected=302; HostHeader="tvheadend.voltairedeux.local" },
     @{ Name="HDHomeRun Gateway";   Group="LiveTV";       Port=80;   Path="/discover.json";     Expected=200; HostHeader="hdhomerun.voltairedeux.local" }
 )
 
@@ -119,17 +119,52 @@ foreach ($ep in $activeProbes) {
         $latencyMs = [math]::Round(([double]$matches[2] * 1000), 1)
     }
 
+    # Port + 1 Failover on VoltaireDeux Probe (if primary port fails)
+    $activePort = $port
+    $isFailover = $false
+    if (-not $tcpOk -or ($httpCode -eq "000" -or $httpCode -ge 500)) {
+        $failoverPort = $port + 1
+        try {
+            $foTcp = [System.Net.Sockets.TcpClient]::new()
+            $foIar = $foTcp.BeginConnect("127.0.0.1", $failoverPort, $null, $null)
+            if ($foIar.AsyncWaitHandle.WaitOne(800, $false) -and $foTcp.Connected) {
+                $foTcp.EndConnect($foIar)
+                $foCurl = curl.exe -s -o NUL -w "%{http_code}|%{time_total}" --max-time 3 "http://localhost:${failoverPort}${path}" 2>$null
+                if ($foCurl -and $foCurl -match "^(\d+)\|(.*)$") {
+                    $tcpOk = $true
+                    $httpCode = $matches[1]
+                    $latencyMs = [math]::Round(([double]$matches[2] * 1000), 1)
+                    $activePort = $failoverPort
+                    $isFailover = $true
+                }
+            }
+            $foTcp.Close()
+        } catch { }
+    }
+
     # Caddy Virtual Host Route Check
     $caddyCode = curl.exe -s -o NUL -w "%{http_code}" --max-time 3 -H "Host: $hostHdr" "http://localhost:80${path}" 2>$null
 
-    $status = if ($tcpOk -and ($httpCode -ge 200 -and $httpCode -lt 500)) { "HEALTHY" } elseif ($tcpOk) { "STANDBY" } else { "OFFLINE" }
-    $color = if ($status -eq "HEALTHY") { "Green" } elseif ($status -eq "STANDBY") { "Yellow" } else { "Red" }
+    $status = if ($isFailover) {
+        "FAILOVER"
+    } elseif ($tcpOk -and ($httpCode -ge 200 -and $httpCode -lt 500)) {
+        "HEALTHY"
+    } elseif ($tcpOk) {
+        "STANDBY"
+    } else {
+        "OFFLINE"
+    }
 
-    Write-Host ("  [{0,-7}] {1,-22} -> TCP :{2,-5} | HTTP {3,-3} ({4,6}ms) | Proxy {5}" -f $status, $name, $port, $httpCode, $latencyMs, $caddyCode) -ForegroundColor $color
+    $color = if ($status -eq "HEALTHY" -or $status -eq "FAILOVER") { "Green" } elseif ($status -eq "STANDBY") { "Yellow" } else { "Red" }
+    $portDisplay = if ($isFailover) { ":$port -> :$activePort [FO]" } else { ":$port" }
+
+    Write-Host ("  [{0,-8}] {1,-20} -> TCP {2,-16} | HTTP {3,-3} ({4,6}ms) | Proxy {5}" -f $status, $name, $portDisplay, $httpCode, $latencyMs, $caddyCode) -ForegroundColor $color
 
     $probeResults += [PSCustomObject]@{
         Service     = $name
-        Port        = $port
+        Port        = $activePort
+        PrimaryPort = $port
+        IsFailover  = $isFailover
         TcpSocket   = $tcpOk
         HTTPCode    = $httpCode
         LatencyMs   = $latencyMs

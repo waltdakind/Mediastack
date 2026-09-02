@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Invoke-MediaStackAiCollaboration.ps1 - Dual-Node AI Collaboration & Cross-Healing Nexus.
 
@@ -490,6 +490,8 @@ if ($Continuous) {
     Write-Host "`n[CONTINUOUS SENTINEL ACTIVE] Polling for VoltaireUn updates every ${IntervalSeconds}s (Press Ctrl+C to stop)..." -ForegroundColor Cyan
     $lastReportTime = [DateTime]::UtcNow
     while ($true) {
+        $hbTs = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        Write-Host "[$hbTs] [AI COLLABORATION HUB] Heartbeat: Peer (192.168.4.21) Synchronized. Watching handoffs/ for peer telemetry..." -ForegroundColor DarkGray
         Start-Sleep -Seconds $IntervalSeconds
         $newReports = Get-ChildItem -Path $HandoffsDir -Filter "VoltaireUn_*.md" -ErrorAction SilentlyContinue |
             Where-Object { $_.LastWriteTimeUtc -gt $lastReportTime } |

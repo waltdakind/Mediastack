@@ -1,79 +1,10 @@
 ﻿{
     "author_node":  "VOLTAIREDEUX",
-    "timestamp":  "2026-08-31 19:38:15",
+    "timestamp":  "2026-09-01 16:53:33",
     "overall_status":  "DEGRADED",
     "requires_remediation":  true,
-    "active_incident":  "INCIDENT_20260831_193815",
+    "active_incident":  "INCIDENT_20260901_165333",
     "service_anomalies":  [
-                              {
-                                  "Service":  "Caddy Gateway (HTTP)",
-                                  "Port":  80,
-                                  "Container":  "caddy",
-                                  "Reason":  "Port 80 Unreachable / Closed",
-                                  "Severity":  "CRITICAL"
-                              },
-                              {
-                                  "Service":  "Caddy Gateway (HTTPS)",
-                                  "Port":  443,
-                                  "Container":  "caddy",
-                                  "Reason":  "Port 443 Unreachable / Closed",
-                                  "Severity":  "CRITICAL"
-                              },
-                              {
-                                  "Service":  "Jellyfin Media Server",
-                                  "Port":  8096,
-                                  "Container":  "jellyfin",
-                                  "Reason":  "Port 8096 Unreachable / Closed",
-                                  "Severity":  "CRITICAL"
-                              },
-                              {
-                                  "Service":  "Sonarr TV Automation",
-                                  "Port":  8989,
-                                  "Container":  "sonarr",
-                                  "Reason":  "Port 8989 Unreachable / Closed",
-                                  "Severity":  "CRITICAL"
-                              },
-                              {
-                                  "Service":  "Radarr Movie Manager",
-                                  "Port":  7878,
-                                  "Container":  "radarr",
-                                  "Reason":  "Port 7878 Unreachable / Closed",
-                                  "Severity":  "CRITICAL"
-                              },
-                              {
-                                  "Service":  "Prowlarr Indexer",
-                                  "Port":  9696,
-                                  "Container":  "prowlarr",
-                                  "Reason":  "Port 9696 Unreachable / Closed",
-                                  "Severity":  "CRITICAL"
-                              },
-                              {
-                                  "Service":  "Bazarr Subtitles",
-                                  "Port":  6767,
-                                  "Container":  "bazarr",
-                                  "Reason":  "Port 6767 Unreachable / Closed",
-                                  "Severity":  "CRITICAL"
-                              },
-                              {
-                                  "Service":  "Jellyseerr Requests",
-                                  "Port":  5055,
-                                  "Container":  "jellyseerr",
-                                  "Reason":  "Port 5055 Unreachable / Closed",
-                                  "Severity":  "CRITICAL"
-                              },
-                              {
-                                  "Service":  "Transmission Web UI",
-                                  "Port":  9091,
-                                  "Container":  "transmission",
-                                  "Reason":  "Port 9091 Unreachable / Closed",
-                                  "Severity":  "CRITICAL"
-                              },
-                              {
-                                  "Service":  "TVHeadend Web UI",
-                                  "Port":  9981,
-                                  "Container":  "tvheadend",
-                                  "Reason":  "Port 9981 Unreachable / Closed",
-                                  "Severity":  "CRITICAL"
-                              }
+
                           ]
 }

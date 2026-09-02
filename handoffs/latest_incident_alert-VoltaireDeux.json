@@ -1,0 +1,24 @@
+﻿{
+    "incident_id":  "INCIDENT_20260901_165333",
+    "timestamp":  "2026-09-01 16:53:33",
+    "source_node":  "VOLTAIREDEUX",
+    "source_ip":  "192.168.4.30",
+    "target_peer":  "VOLTAIREUN",
+    "status":  "REQUIRES_AI_REMEDIATION",
+    "service_anomalies":  [
+
+                          ],
+    "database_anomalies":  [
+
+                           ],
+    "stopped_containers":  [
+                               "musicbrainz-docker-musicbrainz-1 (Restarting (1) 1 second ago)"
+                           ],
+    "running_containers":  18,
+    "online_services":  13,
+    "suggested_actions":  [
+                              "Analyze service logs and formulate targeted AutoFix repair package.",
+                              "Inspect container restart loop or database lock status.",
+                              "Publish remediation package to handoffs/cluster_update_manifest.json."
+                          ]
+}

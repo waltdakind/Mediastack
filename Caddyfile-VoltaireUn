@@ -1,0 +1,286 @@
+# =============================================================================
+# Caddyfile - MediaStack Master Reverse Proxy
+# Supports Multi-Server Load Balancing, Failover, LAN (*.ordinateur.local) & DDNS (waltdakind.xubi.org)
+# =============================================================================
+
+# --- Common Snippets ---
+(security_headers) {
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options SAMEORIGIN
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}
+
+(custom_tls) {
+	tls /etc/caddy/certs/cert.pem /etc/caddy/certs/key.pem
+}
+
+# --- Multi-Server Jellyfin Cluster with Auto-Failover & Read-Only Listener Autologin ---
+(jellyfin_cluster) {
+	import security_headers
+	encode gzip zstd
+
+	# Read-Only Guest Autologin Routes
+	handle /autologin* {
+		rewrite * /autologin.html
+		root * /var/www/dashboard
+		file_server
+	}
+
+	handle /guest* {
+		rewrite * /autologin.html
+		root * /var/www/dashboard
+		file_server
+	}
+
+	handle /listen* {
+		rewrite * /autologin.html
+		root * /var/www/dashboard
+		file_server
+	}
+
+	# Mission Control Dashboard Route
+	handle /dashboard* {
+		root * /var/www/dashboard
+		file_server
+	}
+
+	# API Gateway Reverse Proxy
+	handle /api/* {
+		reverse_proxy api-gateway:3000
+	}
+
+	# Upstream Media Server Reverse Proxy
+	handle {
+		reverse_proxy jellyfin:8096 192.168.4.30:8096 {
+			# Priority: Primary container first, fails over to VoltaireDeux
+			lb_policy first
+			lb_retries 2
+			lb_try_duration 4s
+
+			# Passive health checking (quarantines failed backend for 15s)
+			fail_duration 15s
+			max_fails 2
+
+			# WebSocket support
+			header_up Connection {>Connection}
+			header_up Upgrade {>Upgrade}
+		}
+	}
+
+	# Error handling: If all Jellyfin servers are down, serve modern status page
+	handle_errors {
+		@down `{err.status_code} in [502, 503, 504]`
+		respond @down `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaStack - All Jellyfin Servers Offline</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background: #0b0e14; color: #e2e8f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+        .card { background: rgba(22, 27, 34, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 40px; max-width: 580px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .icon { font-size: 54px; margin-bottom: 20px; display: inline-block; }
+        h1 { font-size: 26px; font-weight: 700; margin-bottom: 12px; color: #f8fafc; }
+        p { color: #94a3b8; font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
+        .server-status { background: #131922; border-radius: 10px; padding: 16px; margin-bottom: 24px; text-align: left; font-size: 13px; font-family: monospace; border: 1px solid #1e293b; }
+        .server-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .server-item:last-child { margin-bottom: 0; }
+        .badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+        .badge-fail { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .btn { display: inline-block; background: #0284c7; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; transition: 0.2s; cursor: pointer; border: none; }
+        .btn:hover { background: #0369a1; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">📡</div>
+        <h1>Media Servers Offline</h1>
+        <p>No active Jellyfin server could be reached on the network. Caddy attempted routing to both the primary and fallback servers, but all upstreams are currently offline or initializing.</p>
+        <div class="server-status">
+            <div class="server-item">
+                <span>Primary (OrdinateurdeVol - 192.168.4.21:8096):</span>
+                <span class="badge badge-fail">Unreachable</span>
+            </div>
+            <div class="server-item">
+                <span>Fallback (VoltaireDeux - 192.168.4.30:8096):</span>
+                <span class="badge badge-fail">Unreachable</span>
+            </div>
+        </div>
+        <button class="btn" onclick="window.location.reload()">Retry Connection</button>
+    </div>
+</body>
+</html>` 503
+	}
+}
+
+# --- Direct Port Listeners ---
+:8096 {
+	import jellyfin_cluster
+}
+
+# --- External DDNS Domain (waltdakind.xubi.org) ---
+http://waltdakind.xubi.org, http://jellyfin.waltdakind.xubi.org {
+	import security_headers
+	encode gzip zstd
+	redir https://{host}{uri} permanent
+}
+
+https://waltdakind.xubi.org, https://jellyfin.waltdakind.xubi.org {
+	import custom_tls
+	import jellyfin_cluster
+}
+
+http://jellyseerr.waltdakind.xubi.org, https://jellyseerr.waltdakind.xubi.org {
+	import security_headers
+	encode gzip zstd
+	reverse_proxy jellyseerr:5055
+}
+
+http://sonarr.waltdakind.xubi.org, https://sonarr.waltdakind.xubi.org {
+	import security_headers
+	reverse_proxy sonarr:8989
+}
+
+http://radarr.waltdakind.xubi.org, https://radarr.waltdakind.xubi.org {
+	import security_headers
+	reverse_proxy radarr:7878
+}
+
+http://musicbrainz.waltdakind.xubi.org, https://musicbrainz.waltdakind.xubi.org {
+	import security_headers
+	encode gzip zstd
+	reverse_proxy 192.168.4.21:5000
+}
+
+# --- Local LAN Control Dashboard & NOC Access (HTTP & HTTPS) ---
+http://ordinateur.local, http://voltaireun.local, http://voltairedeux.local, http://mediaserver.local, http://192.168.4.30, http://192.168.4.21, http://localhost {
+	import security_headers
+	encode gzip zstd
+
+	handle /api/* {
+		reverse_proxy api-gateway:3000
+	}
+
+	handle /autologin* {
+		rewrite * /autologin.html
+		root * /var/www/dashboard
+		file_server
+	}
+
+	handle /guest* {
+		rewrite * /autologin.html
+		root * /var/www/dashboard
+		file_server
+	}
+
+	handle /listen* {
+		rewrite * /autologin.html
+		root * /var/www/dashboard
+		file_server
+	}
+
+	handle {
+		root * /var/www/dashboard
+		file_server
+	}
+}
+
+https://ordinateur.local, https://voltaireun.local, https://voltairedeux.local, https://mediaserver.local, https://192.168.4.30, https://192.168.4.21, https://localhost {
+	import security_headers
+	import custom_tls
+	encode gzip zstd
+
+	handle /api/* {
+		reverse_proxy api-gateway:3000
+	}
+
+	handle /autologin* {
+		rewrite * /autologin.html
+		root * /var/www/dashboard
+		file_server
+	}
+
+	handle /guest* {
+		rewrite * /autologin.html
+		root * /var/www/dashboard
+		file_server
+	}
+
+	handle /listen* {
+		rewrite * /autologin.html
+		root * /var/www/dashboard
+		file_server
+	}
+
+	handle {
+		root * /var/www/dashboard
+		file_server
+	}
+}
+
+http://jellyfin.ordinateur.local, http://jellyfin.voltaireun.local, http://jellyfin.voltairedeux.local, http://jellyfin.mediaserver.local {
+	import jellyfin_cluster
+}
+
+https://jellyfin.ordinateur.local, https://jellyfin.voltaireun.local, https://jellyfin.voltairedeux.local, https://jellyfin.mediaserver.local {
+	import custom_tls
+	import jellyfin_cluster
+}
+
+http://radarr.ordinateur.local, http://radarr.voltaireun.local, http://radarr.voltairedeux.local {
+	import security_headers
+	reverse_proxy radarr:7878
+}
+
+http://sonarr.ordinateur.local, http://sonarr.voltaireun.local, http://sonarr.voltairedeux.local {
+	import security_headers
+	reverse_proxy sonarr:8989
+}
+
+http://jellyseerr.ordinateur.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltairedeux.local {
+	import security_headers
+	encode gzip zstd
+	reverse_proxy jellyseerr:5055
+}
+
+http://prowlarr.ordinateur.local, http://prowlarr.voltaireun.local, http://prowlarr.voltairedeux.local {
+	import security_headers
+	reverse_proxy prowlarr:9696
+}
+
+http://bazarr.ordinateur.local, http://bazarr.voltaireun.local, http://bazarr.voltairedeux.local {
+	import security_headers
+	reverse_proxy bazarr:6767
+}
+
+http://transmission.ordinateur.local, http://transmission.voltaireun.local, http://transmission.voltairedeux.local {
+	import security_headers
+	reverse_proxy transmission:9091 {
+		header_up X-Transmission-Session-Id {http.request.header.X-Transmission-Session-Id}
+	}
+}
+
+http://tvheadend.ordinateur.local, http://tvheadend.voltaireun.local, http://tvheadend.voltairedeux.local {
+	import security_headers
+	reverse_proxy tvheadend:9981
+}
+
+http://hdhomerun.ordinateur.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltairedeux.local {
+	import security_headers
+	reverse_proxy 192.168.4.45:80
+}
+
+http://musicbrainz.ordinateur.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltairedeux.local {
+	import security_headers
+	encode gzip zstd
+	reverse_proxy 192.168.4.21:5000
+}
+
+http://db.ordinateur.local, http://db.voltaireun.local, http://db.voltairedeux.local {
+	import security_headers
+	reverse_proxy mediastack-db:8080
+}

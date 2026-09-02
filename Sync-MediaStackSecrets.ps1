@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Sync-MediaStackSecrets.ps1 - Primary Secrets Manager and Cross-Node Credential Synchronizer.
 
@@ -38,6 +38,7 @@ param(
     [switch]$SyncLocal,
     [string]$MetaBrainzToken,
     [string]$AcoustIdKey,
+    [string]$JellyWatchCode,
     [string]$GenerateEnvNode,
     [string]$RemoteNodeIP,
     [switch]$SkipReport
@@ -55,6 +56,8 @@ $SecretsJson = Join-Path $SecretsDir 'secrets.json'
 $SecretsEnv = Join-Path $SecretsDir 'secrets.env'
 $MbTokenFile = Join-Path $PSScriptRoot 'musicbrainz-docker\local\secrets\metabrainz_access_token'
 $HandoffsDir = Join-Path $PSScriptRoot 'handoffs'
+$CredentialsRegistry = Join-Path $PSScriptRoot 'config\api_credentials_registry.json'
+$JellyWatchPluginXml = Join-Path $PSScriptRoot 'config\jellyfin\data\plugins\configurations\Jellyfin.Plugin.JellyWatch.xml'
 
 if (-not (Test-Path $SecretsDir)) { New-Item -ItemType Directory -Force -Path $SecretsDir | Out-Null }
 $mbSecretDir = Split-Path $MbTokenFile -Parent
@@ -83,8 +86,8 @@ if (-not $vault) {
         'version'       = '1.0.0'
         'updated_at'    = $timestamp
         'cluster_nodes' = [ordered]@{
-            'voltaireun'   = @{ 'ip' = '192.168.4.21'; 'role' = 'primary'; 'musicbrainz_port' = 5000 }
-            'voltairedeux' = @{ 'ip' = '192.168.4.30'; 'role' = 'secondary_ai_workstation'; 'musicbrainz_port' = 5001 }
+            'voltaireun'   = @{ 'ip' = '192.168.4.21'; 'role' = 'primary'; 'musicbrainz_port' = 5000; 'server_id' = 'd9fa4abb39204b6e9d680e4b8a0e7df9' }
+            'voltairedeux' = @{ 'ip' = '192.168.4.30'; 'role' = 'secondary_ai_workstation'; 'musicbrainz_port' = 5001; 'server_id' = 'd9fa4abb39204b6e9d680e4b8a0e7df9' }
         }
         'secrets'       = [ordered]@{
             'musicbrainz'  = [ordered]@{
@@ -103,7 +106,18 @@ if (-not $vault) {
             'prowlarr'     = [ordered]@{ 'api_key' = 'f07e5d11f5cd4444bef72da2e4532596'; 'port' = 9696 }
             'bazarr'       = [ordered]@{ 'api_key' = '5f1ec7cd0e18b997288b532c1afe1cfd'; 'port' = 6767 }
             'jellyseerr'   = [ordered]@{ 'api_key' = 'MTc4NzM2Mjg1OTA4NmE5NWEwYzE1LWM3MDEtNDIwZi05ODhmLTkyNTg5MTNlYjgyNA=='; 'port' = 5055 }
-            'jellyfin'     = [ordered]@{ 'api_key' = 'aa8e1b0671064da9bb41b3791c13a219'; 'port' = 8096 }
+            'jellyfin'     = [ordered]@{ 
+                'api_key'              = 'aa8e1b0671064da9bb41b3791c13a219'
+                'port'                 = 8096
+                'voltaireun_server_id'   = 'd9fa4abb39204b6e9d680e4b8a0e7df9'
+                'voltairedeux_server_id' = 'd9fa4abb39204b6e9d680e4b8a0e7df9'
+            }
+            'jellywatch'   = [ordered]@{
+                'api_code'             = '4f3eeea865c64d649330bdae9dde2ca1'
+                'license_type'         = 'Premium Activation'
+                'status'               = 'ACTIVE'
+                'activated_at'         = '2026-08-30T19:08:00Z'
+            }
             'syncthing'    = [ordered]@{ 'api_key' = 'o3ZLA65vDJGXNJRV2NJoZwRvCRUSGujw'; 'port' = 8384 }
             'postgres'     = [ordered]@{ 'user' = 'musicbrainz'; 'password' = 'musicbrainz'; 'database' = 'musicbrainz'; 'port' = 5432 }
             'transmission' = [ordered]@{ 'username' = 'admin'; 'password' = 'changeme_strong_password'; 'port' = 9091 }
@@ -125,6 +139,16 @@ if ($AcoustIdKey) {
     $changed = $true
     Write-Host '  [+] Updated AcoustID API Key in Vault.' -ForegroundColor Green
 }
+if ($JellyWatchCode) {
+    if (-not $vault.secrets.jellywatch) {
+        $vault.secrets | Add-Member -MemberType NoteProperty -Name "jellywatch" -Value ([ordered]@{})
+    }
+    $vault.secrets.jellywatch.api_code = $JellyWatchCode.Trim()
+    $vault.secrets.jellywatch.status = 'ACTIVE'
+    $vault.secrets.jellywatch.activated_at = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
+    $changed = $true
+    Write-Host '  [+] Updated JellyWatch Premium Activation Code in Vault.' -ForegroundColor Green
+}
 
 if ($changed) {
     $vault.updated_at = (Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
@@ -144,6 +168,7 @@ if ($SyncLocal -or $changed -or (-not (Test-Path $MbTokenFile))) {
     }
 
     # B. Generate config/secrets/secrets.env
+    $jwCode = if ($vault.secrets.jellywatch -and $vault.secrets.jellywatch.api_code) { $vault.secrets.jellywatch.api_code } else { '4f3eeea865c64d649330bdae9dde2ca1' }
     $envLines = @(
         '# =============================================================================',
         '# MediaStack Environment Secrets - NEVER COMMIT TO GIT OR STORE ONLINE',
@@ -157,6 +182,9 @@ if ($SyncLocal -or $changed -or (-not (Test-Path $MbTokenFile))) {
         "BAZARR_API_KEY=$($vault.secrets.bazarr.api_key)",
         "JELLYSEERR_API_KEY=$($vault.secrets.jellyseerr.api_key)",
         "JELLYFIN_API_KEY=$($vault.secrets.jellyfin.api_key)",
+        "JELLYFIN_VOLTAIREUN_SERVER_ID=$($vault.secrets.jellyfin.voltaireun_server_id)",
+        "JELLYFIN_VOLTAIREDEUX_SERVER_ID=$($vault.secrets.jellyfin.voltairedeux_server_id)",
+        "JELLYWATCH_API_CODE=$jwCode",
         "SYNCTHING_API_KEY=$($vault.secrets.syncthing.api_key)",
         "POSTGRES_USER=$($vault.secrets.postgres.user)",
         "POSTGRES_PASSWORD=$($vault.secrets.postgres.password)",
@@ -194,24 +222,61 @@ if ($SyncLocal -or $changed -or (-not (Test-Path $MbTokenFile))) {
         $outLines | Set-Content -Path $picardIni -Encoding UTF8
         Write-Host "  [OK] Synchronized AcoustID and MusicBrainz credentials in: $picardIni" -ForegroundColor Green
     }
+
+    # D. Synchronize JellyWatch Credentials Registry and XML Plugin Config
+    if ($jwCode) {
+        if (Test-Path $CredentialsRegistry) {
+            try {
+                $reg = Get-Content $CredentialsRegistry -Raw -Encoding UTF8 | ConvertFrom-Json
+                if ($reg.services.jellywatch) {
+                    $reg.services.jellywatch.api_code = $jwCode
+                    $reg.services.jellywatch.status = "ACTIVE"
+                    $reg.last_updated = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
+                    $reg | ConvertTo-Json -Depth 6 | Set-Content -Path $CredentialsRegistry -Encoding UTF8
+                    Write-Host "  [OK] Synchronized JellyWatch code in: $CredentialsRegistry" -ForegroundColor Green
+                }
+            } catch { }
+        }
+
+        if (Test-Path (Split-Path $JellyWatchPluginXml -Parent)) {
+            $jwXmlContent = @"
+<?xml version="1.0" encoding="utf-8"?>
+<PluginConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ApiKey>$jwCode</ApiKey>
+  <ActivationKey>$jwCode</ActivationKey>
+  <LicenseMode>Premium</LicenseMode>
+  <IsPremiumActive>true</IsPremiumActive>
+  <SyncPlaybackStatus>true</SyncPlaybackStatus>
+  <EnhancedNotifications>true</EnhancedNotifications>
+  <ScrobbleEnabled>true</ScrobbleEnabled>
+  <LastActivated>$(Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")</LastActivated>
+</PluginConfiguration>
+"@
+            [System.IO.File]::WriteAllText($JellyWatchPluginXml, $jwXmlContent, [System.Text.Encoding]::UTF8)
+            Write-Host "  [OK] Synchronized JellyWatch plugin configuration in: $JellyWatchPluginXml" -ForegroundColor Green
+        }
+    }
 }
 
 # --- 4. Audit & Masked Display ---
 Write-Host "`n[STAGE] Auditing Cluster Service Secrets and Tokens:" -ForegroundColor Yellow
 
 $auditItems = @(
-    @{ Service = "MusicBrainz / MetaBrainz"; Type = "Replication Token"; Key = $vault.secrets.musicbrainz.metabrainz_access_token; Port = 5000 },
-    @{ Service = "Picard / AcoustID";      Type = "Fingerprint Key";   Key = $vault.secrets.musicbrainz.acoustid_apikey;        Port = 5001 },
-    @{ Service = "Sonarr";                 Type = "API Key";           Key = $vault.secrets.sonarr.api_key;                    Port = 8989 },
-    @{ Service = "Radarr";                 Type = "API Key";           Key = $vault.secrets.radarr.api_key;                    Port = 7878 },
-    @{ Service = "Prowlarr";               Type = "API Key";           Key = $vault.secrets.prowlarr.api_key;                  Port = 9696 },
-    @{ Service = "Bazarr";                 Type = "API Key";           Key = $vault.secrets.bazarr.api_key;                    Port = 6767 },
-    @{ Service = "Jellyseerr";             Type = "API Key";           Key = $vault.secrets.jellyseerr.api_key;                Port = 5055 },
-    @{ Service = "Jellyfin";               Type = "API Key";           Key = $vault.secrets.jellyfin.api_key;                  Port = 8096 },
-    @{ Service = "Syncthing";              Type = "API Key";           Key = $vault.secrets.syncthing.api_key;                 Port = 8384 },
-    @{ Service = "PostgreSQL DB";          Type = "Credentials";       Key = "$($vault.secrets.postgres.user):$($vault.secrets.postgres.password)"; Port = 5432 },
-    @{ Service = "Transmission";           Type = "Web Credentials";   Key = "$($vault.secrets.transmission.username):$($vault.secrets.transmission.password)"; Port = 9091 },
-    @{ Service = "Network Sync Users";     Type = "SMB Credentials";   Key = "$($vault.secrets.network_accounts.cluster_user):$($vault.secrets.network_accounts.cluster_password)"; Port = 445 }
+    @{ Service = "MusicBrainz / MetaBrainz";         Type = "Replication Token"; Key = $vault.secrets.musicbrainz.metabrainz_access_token; Port = 5000 },
+    @{ Service = "Picard / AcoustID";              Type = "Fingerprint Key";   Key = $vault.secrets.musicbrainz.acoustid_apikey;        Port = 5001 },
+    @{ Service = "Sonarr";                         Type = "API Key";           Key = $vault.secrets.sonarr.api_key;                    Port = 8989 },
+    @{ Service = "Radarr";                         Type = "API Key";           Key = $vault.secrets.radarr.api_key;                    Port = 7878 },
+    @{ Service = "Prowlarr";                       Type = "API Key";           Key = $vault.secrets.prowlarr.api_key;                  Port = 9696 },
+    @{ Service = "Bazarr";                         Type = "API Key";           Key = $vault.secrets.bazarr.api_key;                    Port = 6767 },
+    @{ Service = "Jellyseerr";                     Type = "API Key";           Key = $vault.secrets.jellyseerr.api_key;                Port = 5055 },
+    @{ Service = "Jellyfin";                       Type = "API Key";           Key = $vault.secrets.jellyfin.api_key;                  Port = 8096 },
+    @{ Service = "Jellyfin (VoltaireUn Server ID)";   Type = "Server ID";         Key = $vault.secrets.jellyfin.voltaireun_server_id;     Port = 8096 },
+    @{ Service = "Jellyfin (VoltaireDeux Server ID)"; Type = "Server ID";         Key = $vault.secrets.jellyfin.voltairedeux_server_id;   Port = 8096 },
+    @{ Service = "JellyWatch (Companion / App)";   Type = "Premium Code";      Key = $(if ($vault.secrets.jellywatch) { $vault.secrets.jellywatch.api_code } else { '4f3eeea865c64d649330bdae9dde2ca1' }); Port = 8096 },
+    @{ Service = "Syncthing";                      Type = "API Key";           Key = $vault.secrets.syncthing.api_key;                 Port = 8384 },
+    @{ Service = "PostgreSQL DB";                  Type = "Credentials";       Key = "$($vault.secrets.postgres.user):$($vault.secrets.postgres.password)"; Port = 5432 },
+    @{ Service = "Transmission";                   Type = "Web Credentials";   Key = "$($vault.secrets.transmission.username):$($vault.secrets.transmission.password)"; Port = 9091 },
+    @{ Service = "Network Sync Users";             Type = "SMB Credentials";   Key = "$($vault.secrets.network_accounts.cluster_user):$($vault.secrets.network_accounts.cluster_password)"; Port = 445 }
 )
 
 function Get-MaskedSecret([string]$val) {

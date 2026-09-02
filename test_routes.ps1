@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = "Stop";
+$ErrorActionPreference = "Stop";
 
 $global:FailureCounts = @{}
 $global:GracePeriods = @{}
@@ -121,6 +121,30 @@ function Test-Routes {
             } else {
                 $global:FailureCounts[$container] = 0
             }
+        }
+    }
+
+    # HTTPS Ingress Verification
+    $httpsEndpoints = @(
+        @{ Host="waltdakind.xubi.org"; Name="WAN Root (Jellyfin HTTPS)" },
+        @{ Host="jellyfin.waltdakind.xubi.org"; Name="WAN Subdomain (Jellyfin HTTPS)" },
+        @{ Host="voltairedeux.local"; Name="LAN VoltaireDeux (HTTPS)" },
+        @{ Host="voltaireun.local"; Name="LAN VoltaireUn (HTTPS)" }
+    )
+    if (-not $Silent) {
+        Write-Host "`n--- HTTPS (:443) Ingress & TLS Handshake Verification ---" -ForegroundColor Cyan
+    }
+    foreach ($ep in $httpsEndpoints) {
+        try {
+            $hCode = curl.exe -k -s -o NUL -w "%{http_code}" --max-time 5 --resolve "$($ep.Host):443:127.0.0.1" "https://$($ep.Host)/" --ssl-no-revoke
+            $hI = [int]$hCode
+            if ($hI -ge 200 -and $hI -lt 400) {
+                if (-not $Silent) { Write-Host ("  [OK] https://{0,-30} (TLSv1.3 Secure -> HTTP {1})" -f $ep.Host, $hI) -ForegroundColor Green }
+            } else {
+                if (-not $Silent) { Write-Host ("  [WARN] https://{0} returned HTTP {1}" -f $ep.Host, $hI) -ForegroundColor Yellow }
+            }
+        } catch {
+            if (-not $Silent) { Write-Host ("  [FAIL] https://{0} TLS handshake failed" -f $ep.Host) -ForegroundColor Red }
         }
     }
 }

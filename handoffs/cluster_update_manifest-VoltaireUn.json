@@ -1,0 +1,17 @@
+﻿{
+    "update_id":  "VOLTAIREDEUX_OPT_20260831_162139",
+    "staged_at":  "2026-08-31 16:21:39",
+    "staged_by_node":  "ORDINATEURDEVOL",
+    "target_node":  "VOLTAIREDEUX",
+    "status":  "READY_FOR_VOLTAIREUN_PULL",
+    "commit_message":  "AI Stack Optimization, Persistent Data Protection \u0026 24/7 Sentinel Suite",
+    "advice_document":  "AI_Expert_Advice_FOR_VOLTAIREUN_20260831_162139.md",
+    "action_items":  [
+                         "Purge snapshot archives older than 7 days in db-backup/snapshots/",
+                         "Apply PRAGMA wal_autocheckpoint=1000 and PRAGMA busy_timeout=5000 across core DBs",
+                         "Synchronize master Caddyfile with dynamic host routing and HA failover",
+                         "Route AI model offloading and Picard batch jobs to VoltaireDeux (192.168.4.30)",
+                         "Enforce atomic pre-sync database snapshotting before every code or config merge"
+                     ],
+    "mandatory_pre_sync_backup":  true
+}

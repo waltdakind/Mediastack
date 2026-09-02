@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # Invoke-StackAutoRepair.ps1 - Primary Autonomous Self-Healing, Code-Writing & Troubleshooting Engine
 # Automatically detects issues, autowrites custom PowerShell remediation scripts,
 # generates AI Markdown RCA diagnostic handoffs, and executes targeted fixes.
@@ -203,13 +203,8 @@ if ($diagnosedIncidents.Count -eq 0) {
                 [void]$fixCodeLines.Add("docker exec caddy caddy reload --config /etc/caddy/Caddyfile")
             }
             "ALIGN_PICARD_PRIMARY" {
-                [void]$fixCodeLines.Add("Write-Host '  -> Re-aligning Picard client target to Primary Node (192.168.4.21:5000)...' -ForegroundColor Yellow")
-                [void]$fixCodeLines.Add("if (Test-Path '$picardIni') {")
-                [void]$fixCodeLines.Add("    `$content = Get-Content '$picardIni'")
-                [void]$fixCodeLines.Add("    `$content = `$content -replace '^server_host\s*=.*', 'server_host = 192.168.4.21'")
-                [void]$fixCodeLines.Add("    `$content = `$content -replace '^server_port\s*=.*', 'server_port = 5000'")
-                [void]$fixCodeLines.Add("    Set-Content -Path '$picardIni' -Value `$content")
-                [void]$fixCodeLines.Add("}")
+                [void]$fixCodeLines.Add("Write-Host '  -> Re-aligning Picard client target with Repair-PicardConfiguration.ps1...' -ForegroundColor Yellow")
+                [void]$fixCodeLines.Add("& `"$PSScriptRoot\Repair-PicardConfiguration.ps1`"")
             }
             "RESTORE_MUSICBRAINZ_PERSISTENCE" {
                 [void]$fixCodeLines.Add("Write-Host '  -> Auto-recovering MusicBrainz database persistence from snapshot...' -ForegroundColor Yellow")
@@ -218,6 +213,15 @@ if ($diagnosedIncidents.Count -eq 0) {
         }
     }
 }
+
+[void]$rcaLines.Add("## Quick Access & Navigation Links")
+[void]$rcaLines.Add("")
+[void]$rcaLines.Add("- **Mission Control Dashboard:** [https://192.168.4.30/dashboard/](https://192.168.4.30/dashboard/)")
+[void]$rcaLines.Add("- **Fallback HTTPS Ingress (:444):** [https://192.168.4.30:444/dashboard/](https://192.168.4.30:444/dashboard/)")
+[void]$rcaLines.Add("- **Generated Remediation Code:** [$fixScriptFile](file:///$($fixScriptFile.Replace('\', '/')))")
+[void]$rcaLines.Add("- **Cluster Update Manifest:** [cluster_update_manifest.json](file:///$($HandoffsDir.Replace('\', '/'))/cluster_update_manifest.json)")
+[void]$rcaLines.Add("- **AI Collaboration Nexus:** [ai_collaboration_nexus.json](file:///$($HandoffsDir.Replace('\', '/'))/ai_collaboration_nexus.json)")
+[void]$rcaLines.Add("")
 
 [void]$fixCodeLines.Add("Write-Host '  [OK] Remediation actions completed.' -ForegroundColor Green")
 

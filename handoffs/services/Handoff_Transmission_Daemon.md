@@ -11,12 +11,12 @@
 | **Associated Storage/DB**| settings.json |
 | **Container Status** | **RUNNING** |
 | **Restart Count** | 0 |
-| **Container Started** | 2026-08-31T23:38:23.999346493Z |
+| **Container Started** | 2026-09-01T20:20:39.757337751Z |
 | **L7 Response Code** | HTTP 301 |
-| **TTFB Latency** | 2.5 ms |
+| **TTFB Latency** | 37.3 ms |
 | **Vault Secrets Status**| SECURED IN VAULT |
-| **Error Lines Detected**| 5 |
-| **Audit Timestamp** | 2026-08-31 20:00:15 |
+| **Error Lines Detected**| 0 |
+| **Audit Timestamp** | 2026-09-01 17:53:17 |
 
 ---
 
@@ -46,7 +46,7 @@
 ## 4. Diagnostic Log Mining & Health Assessment
 ### Log Extraction (Last 40 Lines)
 `	ext
-[ls.io-init] done. 127.0.0.1:9091/transmission/rpc/ acknowledged notification Closing transmission session... done. [migrations] started [migrations] no migrations found usermod: no changes ───────────────────────────────────────        ██╗     ███████╗██╗ ██████╗       ██║     ██╔════╝██║██╔═══██╗       ██║     ███████╗██║██║   ██║       ██║     ╚════██║██║██║   ██║       ███████╗███████║██║╚██████╔╝       ╚══════╝╚══════╝╚═╝ ╚═════╝     Brought to you by linuxserver.io ───────────────────────────────────────  To support LSIO projects visit: https://www.linuxserver.io/donate/  ─────────────────────────────────────── GID/UID ───────────────────────────────────────  User UID:    1000 User GID:    1000 ─────────────────────────────────────── Linuxserver.io version: 4.1.3-r0-ls357 Build-date: 2026-08-04T12:22:56+00:00 ───────────────────────────────────────      ln: failed to create symbolic link '/transmissionic/index.html': File exists ln: failed to create symbolic link '/combustion-release/index.html': File exists ln: failed to create symbolic link '/flood-for-transmission/index.html': File exists ln: failed to create symbolic link '/kettu/index.html': File exists ln: failed to create symbolic link '/transmission-web-control/index.html': File exists [custom-init] No custom files found, skipping... Connection to localhost (::1) 9091 port [tcp/*] succeeded! [ls.io-init] done.
+[migrations] started [migrations] no migrations found ───────────────────────────────────────        ██╗     ███████╗██╗ ██████╗       ██║     ██╔════╝██║██╔═══██╗       ██║     ███████╗██║██║   ██║       ██║     ╚════██║██║██║   ██║       ███████╗███████║██║╚██████╔╝       ╚══════╝╚══════╝╚═╝ ╚═════╝     Brought to you by linuxserver.io ───────────────────────────────────────  To support LSIO projects visit: https://www.linuxserver.io/donate/  ─────────────────────────────────────── GID/UID ───────────────────────────────────────  User UID:    1000 User GID:    1000 ─────────────────────────────────────── Linuxserver.io version: 4.1.3-r0-ls357 Build-date: 2026-08-04T12:22:56+00:00 ───────────────────────────────────────      [custom-init] No custom files found, skipping... Connection to localhost (::1) 9091 port [tcp/*] succeeded! [ls.io-init] done.
 `
 
 ---

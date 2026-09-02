@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     MediaStackOps - Primary Enterprise Operations, Node Discovery & Database Lifecycle Module.
 
@@ -183,13 +183,34 @@ function Test-MediaStackPort {
     $sw.Stop()
     $latency = $sw.ElapsedMilliseconds
 
+    # Automated Port + 1 Failover on VoltaireDeux (if primary port is closed)
+    $activePort = $Port
+    $isFailover = $false
+    if (-not $isOpen) {
+        $failoverPort = $Port + 1
+        try {
+            $foClient = New-Object System.Net.Sockets.TcpClient
+            $foAsync = $foClient.BeginConnect("127.0.0.1", $failoverPort, $null, $null)
+            if ($foAsync.AsyncWaitHandle.WaitOne($TimeoutMs, $false) -and $foClient.Connected) {
+                $foClient.EndConnect($foAsync)
+                $isOpen = $true
+                $isFailover = $true
+                $activePort = $failoverPort
+                $errDetail = "Active via VoltaireDeux Failover Port :${failoverPort}"
+            }
+            $foClient.Close()
+        } catch { }
+    }
+
     return [PSCustomObject]@{
-        Hostname  = $Hostname
-        Port      = $Port
-        IsOpen    = $isOpen
-        LatencyMs = $latency
-        Status    = if ($isOpen) { "ONLINE" } else { "CLOSED" }
-        Error     = $errDetail
+        Hostname    = $Hostname
+        Port        = $activePort
+        PrimaryPort = $Port
+        IsFailover  = $isFailover
+        IsOpen      = $isOpen
+        LatencyMs   = $latency
+        Status      = if ($isFailover) { "FAILOVER" } elseif ($isOpen) { "ONLINE" } else { "CLOSED" }
+        Error       = $errDetail
     }
 }
 
@@ -975,6 +996,95 @@ CREATE TABLE IF NOT EXISTS crud_sentinel_lifecycle (
     }
 }
 
+# ==============================================================================
+# 10. JELLYWATCH RESILIENT CONNECTION & EXPERT GUIDANCE HANDLER
+# ==============================================================================
+
+function Test-MediaStackJellyWatchConnectivity {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$false)][string]$PrimaryIP = "192.168.4.21",
+        [Parameter(Mandatory=$false)][string]$SecondaryIP = "192.168.4.30",
+        [Parameter(Mandatory=$false)][string]$ExternalDomain = "waltdakind.xubi.org"
+    )
+
+    $routes = @(
+        @{ Tier = 1; Name = "VoltaireUn Direct Socket"; Url = "http://${PrimaryIP}:8096/System/Info/Public"; Protocol = "HTTP/REST" },
+        @{ Tier = 2; Name = "VoltaireUn Caddy Proxy";    Url = "https://voltaireun.local/System/Info/Public"; Protocol = "HTTPS/HTTP2" },
+        @{ Tier = 3; Name = "VoltaireDeux AI Node";      Url = "http://${SecondaryIP}:8096/System/Info/Public"; Protocol = "HTTP/REST" },
+        @{ Tier = 4; Name = "Remote WAN Gateway";        Url = "https://${ExternalDomain}/System/Info/Public"; Protocol = "HTTPS/WAN" },
+        @{ Tier = 5; Name = "Localhost Loopback";        Url = "http://127.0.0.1:8096/health"; Protocol = "HTTP/Loopback" }
+    )
+
+    $results = @()
+    foreach ($r in $routes) {
+        $sw = [System.Diagnostics.Stopwatch]::StartNew()
+        $status = "OFFLINE"
+        $httpCode = 0
+        try {
+            $req = [System.Net.HttpWebRequest]::Create($r.Url)
+            $req.Timeout = 1500
+            $req.ServerCertificateValidationCallback = { $true }
+            $res = $req.GetResponse()
+            $httpCode = [int]$res.StatusCode
+            $sw.Stop()
+            if ($httpCode -ge 200 -and $httpCode -lt 400) { $status = "ONLINE" }
+            $res.Close()
+        } catch [System.Net.WebException] {
+            $sw.Stop()
+            if ($_.Exception.Response) {
+                $httpCode = [int]$_.Exception.Response.StatusCode
+                $status = if ($httpCode -ge 200 -and $httpCode -lt 500) { "REACHABLE" } else { "HTTP_ERROR" }
+            } else { $status = "UNREACHABLE" }
+        } catch {
+            $sw.Stop()
+            $status = "ERROR"
+        }
+
+        $results += [PSCustomObject]@{
+            Tier      = $r.Tier
+            Name      = $r.Name
+            Url       = $r.Url
+            Protocol  = $r.Protocol
+            Status    = $status
+            HttpCode  = $httpCode
+            LatencyMs = [int]$sw.ElapsedMilliseconds
+        }
+    }
+
+    $online = $results | Where-Object { $_.Status -eq "ONLINE" } | Sort-Object Tier, LatencyMs
+    $primary = if ($online) { $online[0] } else { $results[0] }
+
+    return [PSCustomObject]@{
+        PrimaryRoute = $primary
+        Routes       = $results
+        AllPassed    = ($online.Count -gt 0)
+        Summary      = if ($online) { "JellyWatch connected via Tier $($primary.Tier) ($($primary.Name)) - $($primary.LatencyMs)ms" } else { "All JellyWatch routes offline" }
+    }
+}
+
+function Invoke-MediaStackJellyWatchHandler {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$false)][switch]$TestConnectivity,
+        [Parameter(Mandatory=$false)][switch]$AutoRepair,
+        [Parameter(Mandatory=$false)][switch]$GenerateMagicLink,
+        [Parameter(Mandatory=$false)][string]$SimulateError = ""
+    )
+
+    $handlerScript = Join-Path $PSScriptRoot "Invoke-JellyWatchHandler.ps1"
+    if (Test-Path $handlerScript) {
+        $params = @{}
+        if ($TestConnectivity) { $params["TestConnectivity"] = $true }
+        if ($AutoRepair) { $params["AutoRepair"] = $true }
+        if ($GenerateMagicLink) { $params["GenerateMagicLink"] = $true }
+        if ($SimulateError) { $params["SimulateError"] = $SimulateError }
+        & $handlerScript @params
+    } else {
+        Test-MediaStackJellyWatchConnectivity
+    }
+}
+
 try {
     if (Get-Command Export-ModuleMember -ErrorAction SilentlyContinue) {
         Export-ModuleMember -Function `
@@ -989,6 +1099,8 @@ try {
             Repair-MediaStackPortConflict, `
             New-MediaStackClusterHandoff, `
             Invoke-MediaStackClusterUpdateCheck, `
-            Test-MediaStackCrudLifecycle -ErrorAction SilentlyContinue
+            Test-MediaStackCrudLifecycle, `
+            Test-MediaStackJellyWatchConnectivity, `
+            Invoke-MediaStackJellyWatchHandler -ErrorAction SilentlyContinue
     }
 } catch { }

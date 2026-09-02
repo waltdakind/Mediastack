@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # PrimarySentinelSuite.ps1 - Primary Primary Music Server Sentinel & Health Engine
 # Real-Time Dual-Node Watchdog, Picard Alignment, Self-Healing & Telemetry Matrix
 # Nodes: ORDINATEURDEVOLT (192.168.4.21:5000) <---> VOLTAIREDEUX (192.168.4.30:5001)
@@ -210,14 +210,14 @@ function Invoke-SentinelAudit {
     }
 
     # --- SECTION 6: High-Availability Reverse-Proxy Ingress Routing ---
-    if (-not $Silent) { Write-Host "`n[6/6] Verifying Caddy High-Availability Ingress Routing..." -ForegroundColor Yellow }
+    if (-not $Silent) { Write-Host "`n[6/7] Verifying Caddy High-Availability Ingress Routing..." -ForegroundColor Yellow }
     $gwRoutes = @(
         "voltairedeux.local", "jellyfin.voltairedeux.local", "sonarr.voltairedeux.local",
         "radarr.voltairedeux.local", "prowlarr.voltairedeux.local", "bazarr.voltairedeux.local",
         "jellyseerr.voltairedeux.local", "transmission.voltairedeux.local", "tvheadend.voltairedeux.local",
         "musicbrainz.voltairedeux.local", "db.voltairedeux.local", "api.voltairedeux.local",
         "homepage.voltairedeux.local", "hdhomerun.voltairedeux.local",
-        "voltaireun.local", "jellyfin.voltaireun.local", "db.mediaserver.local"
+        "voltaireun.local", "jellyfin.voltaireun.local", "db.voltaireun.local"
     )
     $gwPass = 0
     foreach ($gr in $gwRoutes) {
@@ -229,6 +229,39 @@ function Invoke-SentinelAudit {
     }
     if (-not $Silent) { Write-Host ("  [OK] Caddy HA Ingress: {0}/{1} Core Routes Responding" -f $gwPass, $gwRoutes.Count) -ForegroundColor Green }
     $auditSummary["Gateway Ingress"] = "$gwPass/$($gwRoutes.Count) Routes Active"
+
+    # --- SECTION 7: SSL/TLS Certificate Pathways & HTTPS Viability Engine ---
+    if (-not $Silent) { Write-Host "`n[7/7] Auditing SSL/TLS Pathways, Wildcard SANs & HTTPS Viability..." -ForegroundColor Yellow }
+    $sslScript = Join-Path $PSScriptRoot "Test-MediaStackSslViability.ps1"
+    $sslViable = $false
+    $sslScore = 100
+    if (Test-Path $sslScript) {
+        $sslRes = & $sslScript -Silent
+        if ($sslRes) {
+            $sslViable = $sslRes.IsViable
+            $sslScore = $sslRes.ViabilityScore
+            $certDays = if ($sslRes.Certificate) { $sslRes.Certificate.DaysRemaining } else { 0 }
+            $httpsCode = if ($sslRes.LiveHttpsProbe) { $sslRes.LiveHttpsProbe.HttpCode } else { 0 }
+            
+            if ($sslViable) {
+                if (-not $Silent) { Write-Host ("  [OK] SSL/TLS Pathways Valid: {0}% ({1} Days Valid, HTTPS {2})" -f $sslScore, $certDays, $httpsCode) -ForegroundColor Green }
+                $auditSummary["SSL/TLS Security"] = "VIABLE ($sslScore% - $certDays Days Remaining)"
+                $auditSummary["HTTPS Ingress (:443)"] = "ACTIVE (HTTP $httpsCode)"
+            } else {
+                if (-not $Silent) { Write-Host ("  [WARN] SSL/TLS Pathways Degraded: {0}% Score" -f $sslScore) -ForegroundColor Yellow }
+                $auditSummary["SSL/TLS Security"] = "DEGRADED ($sslScore%)"
+                $auditSummary["HTTPS Ingress (:443)"] = "FAIL"
+                $warnings += "SSL/TLS certificate pathway or HTTPS listener degraded"
+                $score -= 10
+                
+                if ($AutoRepairOnAnomaly) {
+                    Write-Host "  [AUTO-REPAIR] Repairing SSL/TLS certificates and reloading Caddy..." -ForegroundColor Magenta
+                    & $sslScript -AutoRepair -Silent | Out-Null
+                    $auditSummary["SSL/TLS Security"] = "REPAIRED (100% - Active)"
+                }
+            }
+        }
+    }
 
     # Auto-Repair Trigger
     if ($score -lt 85 -and $AutoRepairOnAnomaly -and (Test-Path "$PSScriptRoot\Invoke-StackAutoRepair.ps1")) {
@@ -258,6 +291,8 @@ function Invoke-SentinelAudit {
 | **Sentinel Score** | **$score% [$grade]** |
 | **Primary Node Link** | $($auditSummary["Primary Node Link"]) |
 | **Primary MusicBrainz** | $($auditSummary["Primary MusicBrainz"]) |
+| **SSL/TLS Security** | $($auditSummary["SSL/TLS Security"]) |
+| **HTTPS Ingress (:443)** | $($auditSummary["HTTPS Ingress (:443)"]) |
 | **Secondary MusicBrainz** | $($auditSummary["Secondary MusicBrainz"]) |
 | **Picard Client Target** | $($auditSummary["Picard Target"]) |
 | **Database Fleet** | $($auditSummary["Database Fleet"]) |

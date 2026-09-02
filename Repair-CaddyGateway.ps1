@@ -87,12 +87,28 @@ if ($AutoFix -and -not $DiagOnly) {
     }
 }
 
-# 4. Probe Ingress Endpoints
-Write-Host "`n[4/4] Probing Ingress Reverse Proxy Routes..." -ForegroundColor Yellow
-$routes = @("localhost", "voltairedeux.local", "jellyfin.voltairedeux.local", "radarr.voltairedeux.local", "sonarr.voltairedeux.local", "musicbrainz.voltairedeux.local")
+# 4. Probe Ingress Endpoints & SSL Viability
+Write-Host "`n[4/5] Auditing SSL/TLS Certificate Pathways & HTTPS Ingress..." -ForegroundColor Yellow
+$sslScript = Join-Path $BaseDir "Test-MediaStackSslViability.ps1"
+if (Test-Path $sslScript) {
+    $sslAudit = & $sslScript -Silent
+    if ($sslAudit -and $sslAudit.IsViable) {
+        Write-Host "  [OK] SSL/TLS Pathways & HTTPS Viability Verified ($($sslAudit.ViabilityScore)%)." -ForegroundColor Green
+    } else {
+        Write-Host "  [WARN] SSL/TLS Certificate degraded. Generating repair..." -ForegroundColor Yellow
+        if ($AutoFix -and -not $DiagOnly) {
+            & $sslScript -AutoRepair -Silent | Out-Null
+            $remediations += "Repaired and regenerated multi-domain SSL/TLS certificates."
+            Write-Host "  [REPAIR] Certificates repaired successfully." -ForegroundColor Cyan
+        }
+    }
+}
+
+Write-Host "`n[5/5] Probing Ingress Reverse Proxy & HTTPS Routes..." -ForegroundColor Yellow
+$routes = @("localhost", "voltairedeux.local", "jellyfin.voltairedeux.local", "voltaireun.local", "jellyfin.voltaireun.local", "waltdakind.xubi.org", "jellyfin.waltdakind.xubi.org")
 foreach ($r in $routes) {
-    $code = curl.exe -s -o NUL -w "%{http_code}" --max-time 3 -H "Host: $r" "http://localhost:80/" 2>$null
-    Write-Host ("  * Route {0,-35} -> HTTP {1}" -f $r, $code) -ForegroundColor $(if ($code -ge 200 -and $code -lt 500) { "Green" } else { "Yellow" })
+    $code = curl.exe -k -s -o NUL -w "%{http_code}" --max-time 3 --resolve "$($r):443:127.0.0.1" "https://$r/" --ssl-no-revoke 2>$null
+    Write-Host ("  * HTTPS Route {0,-35} -> HTTP {1}" -f $r, $code) -ForegroundColor $(if ($code -ge 200 -and $code -lt 500) { "Green" } else { "Yellow" })
 }
 
 # Report
@@ -110,3 +126,4 @@ $(if ($remediations.Count -gt 0) { $remediations | ForEach-Object { "- $_" } | O
 "@
 Set-Content -Path $reportFile -Value $rep -Encoding UTF8
 Write-Host "`n[COMPLETE] Caddy gateway repair finished. Report: $reportFile`n" -ForegroundColor Green
+

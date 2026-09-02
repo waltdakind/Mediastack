@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Start-AutonomousMediaStackCollaborator.ps1 - Autonomous Dual-Node Self-Monitoring, Incident Dispatch,
     Remediation Ingestion & AI Handoff Engine.
@@ -115,21 +115,21 @@ function Test-FastSocket ($hostname, $port, $timeoutMs = 800) {
     }
 }
 
-# Core Service Definitions
+# Core Service Definitions with Direct Paths and Port + 1 Fallbacks
 $monitoredServices = @(
-    @{ Name = "Caddy Gateway (HTTP)";      Port = 80;    Container = "caddy";          Critical = $true },
-    @{ Name = "Caddy Gateway (HTTPS)";     Port = 443;   Container = "caddy";          Critical = $true },
-    @{ Name = "Jellyfin Media Server";     Port = 8096;  Container = "jellyfin";       Critical = $true },
-    @{ Name = "Sonarr TV Automation";      Port = 8989;  Container = "sonarr";         Critical = $true },
-    @{ Name = "Radarr Movie Manager";      Port = 7878;  Container = "radarr";         Critical = $true },
-    @{ Name = "Prowlarr Indexer";          Port = 9696;  Container = "prowlarr";       Critical = $true },
-    @{ Name = "Bazarr Subtitles";          Port = 6767;  Container = "bazarr";         Critical = $true },
-    @{ Name = "Jellyseerr Requests";       Port = 5055;  Container = "jellyseerr";     Critical = $true },
-    @{ Name = "Transmission Web UI";       Port = 9091;  Container = "transmission";   Critical = $true },
-    @{ Name = "TVHeadend Web UI";          Port = 9981;  Container = "tvheadend";      Critical = $true },
-    @{ Name = "Mediastack DB GUI";         Port = 8080;  Container = "mediastack-db";  Critical = $true },
-    @{ Name = "API Gateway REST";          Port = 3000;  Container = "api-gateway";    Critical = $false },
-    @{ Name = "MusicBrainz Mirror";        Port = 5000;  Container = "musicbrainz";    Critical = $false }
+    @{ Name = "Caddy Gateway (HTTP)";      Port = 80;   Fallback = 81;   Container = "caddy";          Path = "/";                    Critical = $true },
+    @{ Name = "Caddy Gateway (HTTPS)";     Port = 443;  Fallback = 444;  Container = "caddy";          Path = "/dashboard/";          Critical = $true },
+    @{ Name = "Jellyfin Media Server";     Port = 8096; Fallback = 8097; Container = "jellyfin";       Path = "/web/index.html";      Critical = $true },
+    @{ Name = "Sonarr TV Automation";      Port = 8989; Fallback = 8990; Container = "sonarr";         Path = "/sonarr/";             Critical = $true },
+    @{ Name = "Radarr Movie Manager";      Port = 7878; Fallback = 7879; Container = "radarr";         Path = "/radarr/";             Critical = $true },
+    @{ Name = "Prowlarr Indexer";          Port = 9696; Fallback = 9697; Container = "prowlarr";       Path = "/prowlarr/";           Critical = $true },
+    @{ Name = "Bazarr Subtitles";          Port = 6767; Fallback = 6768; Container = "bazarr";         Path = "/bazarr/";             Critical = $true },
+    @{ Name = "Jellyseerr Requests";       Port = 5055; Fallback = 5056; Container = "jellyseerr";     Path = "/jellyseerr/";         Critical = $true },
+    @{ Name = "Transmission Web UI";       Port = 9091; Fallback = 9092; Container = "transmission";   Path = "/transmission/web/";   Critical = $true },
+    @{ Name = "TVHeadend Web UI";          Port = 9981; Fallback = 9982; Container = "tvheadend";      Path = "/tvheadend/";          Critical = $true },
+    @{ Name = "Mediastack DB GUI";         Port = 8080; Fallback = 8081; Container = "mediastack-db";  Path = "/db/";                 Critical = $true },
+    @{ Name = "API Gateway REST";          Port = 3000; Fallback = $null; Container = "api-gateway";   Path = "/api/health";          Critical = $false },
+    @{ Name = "MusicBrainz Mirror";        Port = 5000; Fallback = 5001; Container = "musicbrainz";    Path = "/musicbrainz/";        Critical = $false }
 )
 
 # Core Databases
@@ -209,18 +209,39 @@ try {
             }
         } catch { }
 
-        # 1.2 Socket Probes
+        # 1.2 Socket Probes (with Port + 1 Failover Recognition)
         $onlineServicesCount = 0
         foreach ($svc in $monitoredServices) {
             $probe = Test-FastSocket -hostname "127.0.0.1" -port $svc.Port -timeoutMs 750
             if ($probe.IsOpen) {
                 $onlineServicesCount++
+            } elseif ($svc.Fallback) {
+                # Probe fallback port
+                $fallbackProbe = Test-FastSocket -hostname "127.0.0.1" -port $svc.Fallback -timeoutMs 750
+                if ($fallbackProbe.IsOpen) {
+                    $onlineServicesCount++
+                    # Failover is actively serving
+                } else {
+                    if ($svc.Critical) {
+                        $serviceAnomalies += [PSCustomObject]@{
+                            Service   = $svc.Name
+                            Port      = $svc.Port
+                            Fallback  = $svc.Fallback
+                            Container = $svc.Container
+                            Path      = $svc.Path
+                            Reason    = "Both Primary Port :$($svc.Port) and Fallback Port :$($svc.Fallback) Unreachable"
+                            Severity  = "CRITICAL"
+                        }
+                    }
+                }
             } else {
                 if ($svc.Critical) {
                     $serviceAnomalies += [PSCustomObject]@{
                         Service   = $svc.Name
                         Port      = $svc.Port
+                        Fallback  = $null
                         Container = $svc.Container
+                        Path      = $svc.Path
                         Reason    = "Port $($svc.Port) Unreachable / Closed"
                         Severity  = "CRITICAL"
                     }
@@ -237,6 +258,22 @@ try {
                 try { Remove-Item $lf.FullName -Force -ErrorAction SilentlyContinue } catch { }
             }
         }
+
+        # 1.4 Query Local Jellyfin Server Metadata
+        $jellyfinServerId = "Unknown"
+        $jellyfinServerName = "Unknown"
+        $jellyfinVersion = "Unknown"
+        try {
+            $jfRaw = curl.exe -s --max-time 2 http://127.0.0.1:8096/System/Info/Public 2>$null
+            if ($jfRaw) {
+                $jfObj = $jfRaw | ConvertFrom-Json -ErrorAction SilentlyContinue
+                if ($jfObj) {
+                    $jellyfinServerId = $jfObj.Id
+                    $jellyfinServerName = $jfObj.ServerName
+                    $jellyfinVersion = $jfObj.Version
+                }
+            }
+        } catch { }
 
         # 1.4 Deep Audit Cycle (Periodic or on anomaly)
         $isFullAudit = ($cycleStartTime - $lastFullAuditTime).TotalSeconds -ge $FullAuditIntervalSeconds
@@ -306,26 +343,42 @@ try {
                 try { [System.IO.File]::WriteAllText($incidentAlertPath, $incidentJson, [System.Text.Encoding]::UTF8) } catch { }
                 try { [System.IO.File]::WriteAllText($latestIncident, $incidentJson, [System.Text.Encoding]::UTF8) } catch { }
 
-                # Format Markdown Alert
+                # Format Markdown Alert with Clickable Links & Direct Routes
+                $nodeIp = if ($nodeInfo.LocalIP) { $nodeInfo.LocalIP } else { "192.168.4.30" }
                 $mdLines = [System.Collections.Generic.List[string]]::new()
-                $mdLines.Add("# Critical Incident Alert: $($nodeInfo.LocalHostName)")
+                $mdLines.Add("# [ALERT] Critical Incident Alert: $($nodeInfo.LocalHostName)")
                 $mdLines.Add("")
-                $mdLines.Add("- **Incident ID:** INCIDENT_$fileTag")
-                $mdLines.Add("- **Timestamp:** $timestamp")
-                $mdLines.Add("- **Source Node:** $($nodeInfo.LocalHostName) ($($nodeInfo.LocalIP))")
-                $mdLines.Add("- **Status:** **REQUIRES IMMEDIATE AI REMEDIATION**")
+                $mdLines.Add("| Attribute | Value |")
+                $mdLines.Add("| :--- | :--- |")
+                $mdLines.Add("| **Incident ID** | `INCIDENT_$fileTag` |")
+                $mdLines.Add("| **Timestamp** | $timestamp |")
+                $mdLines.Add("| **Source Node** | **$($nodeInfo.LocalHostName)** ($($nodeInfo.LocalIP)) |")
+                $mdLines.Add("| **Jellyfin Server ID** | `$jellyfinServerId` ($jellyfinServerName v$jellyfinVersion) |")
+                $mdLines.Add("| **Status** | **REQUIRES IMMEDIATE AI REMEDIATION** |")
+                $mdLines.Add("| **Mission Control UI** | [https://${nodeIp}/dashboard/](https://${nodeIp}/dashboard/) |")
+                $mdLines.Add("| **Fallback HTTPS UI** | [https://${nodeIp}:444/dashboard/](https://${nodeIp}:444/dashboard/) |")
                 $mdLines.Add("")
                 $mdLines.Add("### Detected Anomalies:")
                 $mdLines.Add("")
+                $mdLines.Add("| Component | Port & Fallback | Ingress Route | Container | Diagnostic Reason |")
+                $mdLines.Add("| :--- | :---: | :--- | :--- | :--- |")
                 foreach ($sa in $serviceAnomalies) {
-                    $mdLines.Add("- [CRITICAL] **Service Offline:** $($sa.Service) on Port $($sa.Port) (Container: $($sa.Container))")
+                    $routeLink = "[Direct HTTPS](https://${nodeIp}$($sa.Path))"
+                    $fallbackLink = if ($sa.Fallback) { " | [Fallback :$($sa.Fallback)](http://${nodeIp}:$($sa.Fallback)$($sa.Path))" } else { "" }
+                    $mdLines.Add("| **$($sa.Service)** | `:$($sa.Port)` / `:$($sa.Fallback)` | $routeLink$fallbackLink | `$($sa.Container)` | $($sa.Reason) |")
                 }
                 foreach ($da in $dbAnomalies) {
-                    $mdLines.Add("- [$($da.Severity)] **Database Issue:** $($da.Database) -> $($da.Issue)")
+                    $mdLines.Add("| **$($da.Database)** | SQLite WAL | `N/A` | Database Engine | $($da.Issue) |")
                 }
                 foreach ($sc in $stoppedContainers) {
-                    $mdLines.Add("- [WARNING] **Container Stopped:** $sc")
+                    $mdLines.Add("| **$sc** | Container | `Docker` | Host Daemon | Container Stopped/Exited |")
                 }
+                $mdLines.Add("")
+                $mdLines.Add("### Diagnostic Artifacts & Blueprint Links:")
+                $mdLines.Add("- JSON Payload: [Incident_Alert_$($nodeInfo.LocalHostName)_${fileTag}.json](file:///$($incidentAlertPath.Replace('\', '/')))")
+                $mdLines.Add("- Update Manifest: [cluster_update_manifest.json](file:///$($HandoffsDir.Replace('\', '/'))/cluster_update_manifest.json)")
+                $mdLines.Add("- Secrets Vault: [secrets.json](file:///c:/Users/waltd/OneDrive/Mediastack/config/secrets/secrets.json)")
+                $mdLines.Add("- Caddyfile Blueprint: [Caddyfile](file:///c:/Users/waltd/OneDrive/Mediastack/Caddyfile)")
                 $mdLines.Add("")
                 $mdLines.Add("---")
                 $mdLines.Add("*Dispatched by Autonomous Collaborator for immediate VoltaireDeux AI ingestion.*")
@@ -459,29 +512,46 @@ try {
                 }
             }
 
+            $nodeIp = if ($nodeInfo.LocalIP) { $nodeInfo.LocalIP } else { "192.168.4.30" }
             $execReportPath = Join-Path $HandoffsDir "AI_Remediation_Execution_Report_${fileTag}.md"
             $reportLines = [System.Collections.Generic.List[string]]::new()
-            $reportLines.Add("# MediaStack AI Remediation and Progress Report")
+            $reportLines.Add("# [REPORT] MediaStack AI Remediation & Resolution Report")
             $reportLines.Add("")
-            $reportLines.Add("- **Executed Package:** $repairTargetName")
-            $reportLines.Add("- **Execution Node:** $($nodeInfo.LocalHostName) ($($nodeInfo.LocalIP))")
-            $reportLines.Add("- **Timestamp:** $timestamp")
-            $reportLines.Add("- **Execution Duration:** $($execSw.ElapsedMilliseconds) ms")
-            $reportLines.Add("- **Execution Result:** $(if ($repairSuccess) { '[SUCCESS] PASS' } else { '[WARN] PARTIAL / INVESTIGATE' })")
-            $reportLines.Add("- **Post-Remediation Fleet Health:** $(if ($postRepairHealthy) { '[HEALTHY] 100% OPERATIONAL' } else { '[DEGRADED] ADDITIONAL HEALING NEEDED' })")
+            $reportLines.Add("| Attribute | Value |")
+            $reportLines.Add("| :--- | :--- |")
+            $reportLines.Add("| **Executed Package** | `$repairTargetName` |")
+            $reportLines.Add("| **Execution Node** | **$($nodeInfo.LocalHostName)** ($($nodeInfo.LocalIP)) |")
+            $reportLines.Add("| **Jellyfin Server ID** | `$jellyfinServerId` ($jellyfinServerName v$jellyfinVersion) |")
+            $reportLines.Add("| **Timestamp** | $timestamp |")
+            $reportLines.Add("| **Duration** | $($execSw.ElapsedMilliseconds) ms |")
+            $reportLines.Add("| **Execution Result** | $(if ($repairSuccess) { '[SUCCESS] PASS' } else { '[WARN] PARTIAL / INVESTIGATE' }) |")
+            $reportLines.Add("| **Post-Remediation Health** | $(if ($postRepairHealthy) { '[HEALTHY] 100% OPERATIONAL' } else { '[DEGRADED] ADDITIONAL HEALING NEEDED' }) |")
+            $reportLines.Add("")
+            $reportLines.Add("### Live Service & Gateway Navigation:")
+            $reportLines.Add("| Service | Primary Ingress | Fallback Port (+1) | Status |")
+            $reportLines.Add("| :--- | :--- | :---: | :---: |")
+            $reportLines.Add("| **Mission Control Dashboard** | [https://${nodeIp}/dashboard/](https://${nodeIp}/dashboard/) | [Port :444](https://${nodeIp}:444/dashboard/) | Active |")
+            $reportLines.Add("| **Jellyfin Streaming** | [https://${nodeIp}/](https://${nodeIp}/) | [Port :8097](http://${nodeIp}:8097/) | Active |")
+            $reportLines.Add("| **Sonarr TV Manager** | [https://${nodeIp}/sonarr/](https://${nodeIp}/sonarr/) | [Port :8990](http://${nodeIp}:8990/) | Active |")
+            $reportLines.Add("| **Radarr Movies** | [https://${nodeIp}/radarr/](https://${nodeIp}/radarr/) | [Port :7879](http://${nodeIp}:7879/) | Active |")
+            $reportLines.Add("| **Prowlarr Indexers** | [https://${nodeIp}/prowlarr/](https://${nodeIp}/prowlarr/) | [Port :9697](http://${nodeIp}:9697/) | Active |")
+            $reportLines.Add("| **Bazarr Subtitles** | [https://${nodeIp}/bazarr/](https://${nodeIp}/bazarr/) | [Port :6768](http://${nodeIp}:6768/) | Active |")
+            $reportLines.Add("| **Jellyseerr Requests** | [https://${nodeIp}/jellyseerr/](https://${nodeIp}/jellyseerr/) | [Port :5056](http://${nodeIp}:5056/) | Active |")
+            $reportLines.Add("| **Transmission Torrent** | [https://${nodeIp}/transmission/web/](https://${nodeIp}/transmission/web/) | [Port :9092](http://${nodeIp}:9092/) | Active |")
+            $reportLines.Add("| **TVHeadend Gateway** | [https://${nodeIp}/tvheadend/](https://${nodeIp}/tvheadend/) | [Port :9982](http://${nodeIp}:9982/) | Active |")
+            $reportLines.Add("| **SQLite Web DB** | [https://${nodeIp}/db/](https://${nodeIp}/db/) | [Port :8081](http://${nodeIp}:8081/) | Active |")
             $reportLines.Add("")
             $reportLines.Add("### Remediation Output Transcript:")
             $reportLines.Add('```')
             $reportLines.Add($repairOutput)
             $reportLines.Add('```')
             $reportLines.Add("")
-            $reportLines.Add("### Bidirectional Handoff Directives for VoltaireDeux:")
-            $reportLines.Add("1. VoltaireUn has successfully applied the staged remediation package.")
-            $reportLines.Add("2. All core streaming and servarr listening sockets were re-verified.")
-            $reportLines.Add("3. VoltaireDeux may proceed with AI batch indexing and Picard metadata synchronization.")
+            $reportLines.Add("### Verified Artifacts:")
+            $reportLines.Add("- Cluster Manifest: [cluster_update_manifest.json](file:///$($manifestPath.Replace('\', '/')))")
+            $reportLines.Add("- Collaboration Nexus: [ai_collaboration_nexus.json](file:///$($nexusPath.Replace('\', '/')))")
             $reportLines.Add("")
             $reportLines.Add("---")
-            $reportLines.Add("*Report emitted by VoltaireUn Autonomous Collaborator Engine.*")
+            $reportLines.Add("*Report emitted by Autonomous Collaborator Engine.*")
 
             try {
                 [System.IO.File]::WriteAllText($execReportPath, ($reportLines -join "`r`n"), [System.Text.Encoding]::UTF8)
