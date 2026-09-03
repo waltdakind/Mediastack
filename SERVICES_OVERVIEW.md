@@ -1,4 +1,4 @@
-﻿# MediaStack Complete Services Overview & Default Port Specifications
+# MediaStack Complete Services Overview & Default Port Specifications
 
 This guide provides explicit directions for the default network ports, internal container ports, host port bindings, and Docker DNS communication across the entire MediaStack fleet.
 
@@ -21,6 +21,8 @@ All services in the MediaStack ecosystem are pre-configured to use their officia
 | **TVHeadend** | Live TV Streamer & DVR Backend | `9981` (Web), `9982` (HTSP) | `9981:9981`, `9982:9982` | TCP | `http://<HOST_IP>:9981` | `http://tvheadend.voltairedeux.local` |
 | **Syncthing** | Continuous Theme & Config Sync | `8384` (GUI), `22000` (Sync) | `8384:8384`, `22000:22000` | TCP / UDP | `http://<HOST_IP>:8384` | `http://syncthing.voltairedeux.local` |
 | **API Gateway** | Fleet Management REST API | `3000` | `3000:3000` | TCP | `http://<HOST_IP>:3000` | `http://api.voltairedeux.local` |
+| **JellyWatch Requests** | Media Discovery & Requests Server | `3000` / `80` | `3000:3000`, `80/443` | TCP | `http://<HOST_IP>:80/requests` | `https://requests.voltaireun.local` |
+| **JellyWatch Issues** | Playback & Defect Triage Server | `3000` / `80` | `3000:3000`, `80/443` | TCP | `http://<HOST_IP>:80/issues` | `https://issues.voltaireun.local` |
 | **Homepage** | Unified Media Dashboard | `3000` (Internal) | `3000` or Caddy Proxy | TCP | `http://<HOST_IP>:80` | `http://homepage.voltairedeux.local` |
 | **Mediastack-DB** | SQLite Web Database Explorer | `8080` | `8080:8080` | TCP | `http://<HOST_IP>:8080` | `http://db.voltairedeux.local` |
 | **MusicBrainz** | Local Music Metadata Mirror API | `5000` (Primary), `5001` (Sec) | `5001:5000` / `5000:5000` | TCP | `http://<HOST_IP>:5001` | `http://musicbrainz.voltairedeux.local` |

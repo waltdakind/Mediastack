@@ -28,6 +28,8 @@ $hostsEntries = @"
 192.168.4.30    prowlarr.voltairedeux.local
 192.168.4.30    bazarr.voltairedeux.local
 192.168.4.30    jellyseerr.voltairedeux.local
+192.168.4.30    requests.voltairedeux.local
+192.168.4.30    issues.voltairedeux.local
 192.168.4.30    transmission.voltairedeux.local
 192.168.4.30    tvheadend.voltairedeux.local
 192.168.4.30    hdhomerun.voltairedeux.local
@@ -45,6 +47,8 @@ $hostsEntries = @"
 192.168.4.21    prowlarr.voltaireun.local
 192.168.4.21    bazarr.voltaireun.local
 192.168.4.21    jellyseerr.voltaireun.local
+192.168.4.21    requests.voltaireun.local
+192.168.4.21    issues.voltaireun.local
 192.168.4.21    transmission.voltaireun.local
 192.168.4.21    tvheadend.voltaireun.local
 192.168.4.21    hdhomerun.voltaireun.local

@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # Add-HostsEntries.ps1 - Intelligent Windows Hosts File Provisioner & Domain Resolver
 # Adds voltairedeux.local, voltaireun.local, voltaireun.local & mediaserver.local domain mappings
 # ==============================================================================
@@ -49,6 +49,8 @@ $domainsToAdd = @(
     @{ IP="127.0.0.1"; Domain="prowlarr.voltaireun.local" },
     @{ IP="127.0.0.1"; Domain="bazarr.voltaireun.local" },
     @{ IP="127.0.0.1"; Domain="jellyseerr.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="requests.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="issues.voltaireun.local" },
     @{ IP="127.0.0.1"; Domain="transmission.voltaireun.local" },
     @{ IP="127.0.0.1"; Domain="tvheadend.voltaireun.local" },
     @{ IP="127.0.0.1"; Domain="musicbrainz.voltaireun.local" },
@@ -65,6 +67,8 @@ $domainsToAdd = @(
     @{ IP="127.0.0.1"; Domain="prowlarr.voltairedeux.local" },
     @{ IP="127.0.0.1"; Domain="bazarr.voltairedeux.local" },
     @{ IP="127.0.0.1"; Domain="jellyseerr.voltairedeux.local" },
+    @{ IP="127.0.0.1"; Domain="requests.voltairedeux.local" },
+    @{ IP="127.0.0.1"; Domain="issues.voltairedeux.local" },
     @{ IP="127.0.0.1"; Domain="transmission.voltairedeux.local" },
     @{ IP="127.0.0.1"; Domain="tvheadend.voltairedeux.local" },
     @{ IP="127.0.0.1"; Domain="musicbrainz.voltairedeux.local" },

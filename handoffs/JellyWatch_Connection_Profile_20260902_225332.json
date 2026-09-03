@@ -1,0 +1,87 @@
+﻿{
+    "app_name":  "JellyWatch",
+    "version":  "2.0.0",
+    "created_at":  "2026-09-02 22:53:32",
+    "server_id":  "d9fa4abb39204b6e9d680e4b8a0e7df9",
+    "license_code":  "4f3eeea865c64d649330bdae9dde2ca1",
+    "active_tier":  1,
+    "primary_endpoint":  "https://waltdakind.xubi.org",
+    "fallback_chain":  [
+                           {
+                               "tier":  1,
+                               "name":  "Remote WAN Gateway (Public DDNS - Main Login)",
+                               "url":  "https://waltdakind.xubi.org",
+                               "protocol":  "HTTPS/WAN",
+                               "status":  "ONLINE",
+                               "latency_ms":  144
+                           },
+                           {
+                               "tier":  2,
+                               "name":  "VoltaireUn Direct Socket (Local Network Fallback)",
+                               "url":  "http://192.168.4.21:8096",
+                               "protocol":  "HTTP/REST",
+                               "status":  "ONLINE",
+                               "latency_ms":  26
+                           },
+                           {
+                               "tier":  3,
+                               "name":  "VoltaireUn Ingress Gateway (Caddy HTTPS)",
+                               "url":  "https://voltaireun.local",
+                               "protocol":  "HTTPS/HTTP2",
+                               "status":  "ONLINE",
+                               "latency_ms":  467
+                           },
+                           {
+                               "tier":  4,
+                               "name":  "VoltaireDeux AI Node (Failover LAN)",
+                               "url":  "http://192.168.4.30:8096",
+                               "protocol":  "HTTP/REST",
+                               "status":  "ONLINE",
+                               "latency_ms":  3
+                           },
+                           {
+                               "tier":  5,
+                               "name":  "Localhost Loopback Socket",
+                               "url":  "http://127.0.0.1:8096",
+                               "protocol":  "HTTP/Loopback",
+                               "status":  "ONLINE",
+                               "latency_ms":  8
+                           }
+                       ],
+    "services":  {
+                     "requests_server":  {
+                                             "api_endpoint":  "http://192.168.4.21:3000/api/jellywatch/requests",
+                                             "ingress_domain":  "https://requests.voltaireun.local",
+                                             "wan_domain":  "https://requests.waltdakind.xubi.org",
+                                             "web_portal":  "http://192.168.4.21:80/requests",
+                                             "stats":  null
+                                         },
+                     "issues_server":  {
+                                           "api_endpoint":  "http://192.168.4.21:3000/api/jellywatch/issues",
+                                           "ingress_domain":  "https://issues.voltaireun.local",
+                                           "wan_domain":  "https://issues.waltdakind.xubi.org",
+                                           "web_portal":  "http://192.168.4.21:80/issues",
+                                           "stats":  null
+                                       }
+                 },
+    "magic_pairing":  {
+                          "pin":  "903255",
+                          "user_id":  "walter",
+                          "username":  "walter",
+                          "local_url":  "http://192.168.4.21:8096/watch/?pin=903255\u0026userId=walter\u0026username=walter",
+                          "wan_url":  "https://waltdakind.xubi.org/watch/?pin=903255\u0026userId=walter\u0026username=walter"
+                      },
+    "diagnostic_guidance":  {
+                                "Code":  "ERR_GENERAL_DISCONNECT",
+                                "Remediation":  [
+                                                    "Tier 1 (LAN): http://192.168.4.21:8096",
+                                                    "Tier 2 (Proxy): https://voltaireun.local",
+                                                    "Tier 3 (Failover): http://192.168.4.30:8096",
+                                                    "Tier 4 (WAN): https://waltdakind.xubi.org"
+                                                ],
+                                "ImmediateAction":  "Use Tier 1 Direct LAN Socket (http://192.168.4.21:8096).",
+                                "Severity":  "INFO",
+                                "Title":  "JellyWatch Multi-Tier Connection Cascade",
+                                "RootCause":  "Standard resilient connection profile."
+                            }
+}

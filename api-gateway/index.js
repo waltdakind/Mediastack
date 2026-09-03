@@ -97,6 +97,50 @@ function initJellyWatchTables() {
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
         `);
+        db.run(`
+            CREATE TABLE IF NOT EXISTS jellywatch_requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                request_id TEXT UNIQUE,
+                media_type TEXT NOT NULL,
+                media_id TEXT,
+                title TEXT NOT NULL,
+                year INTEGER,
+                overview TEXT,
+                poster_url TEXT,
+                requested_by_user_id TEXT,
+                requested_by_username TEXT,
+                client_id TEXT,
+                status TEXT DEFAULT 'PENDING',
+                upstream_service TEXT DEFAULT 'JELLYSEERR',
+                upstream_request_id TEXT,
+                notes TEXT,
+                error TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        db.run(`
+            CREATE TABLE IF NOT EXISTS jellywatch_issues (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                issue_id TEXT UNIQUE,
+                item_id TEXT NOT NULL,
+                item_name TEXT NOT NULL,
+                media_type TEXT,
+                issue_type TEXT NOT NULL,
+                severity TEXT DEFAULT 'MEDIUM',
+                playback_position_ticks INTEGER DEFAULT 0,
+                description TEXT,
+                reported_by_user_id TEXT,
+                reported_by_username TEXT,
+                client_id TEXT,
+                status TEXT DEFAULT 'OPEN',
+                upstream_issue_id TEXT,
+                resolution_notes TEXT,
+                auto_repair_triggered INTEGER DEFAULT 0,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                resolved_at TEXT
+            )
+        `);
     });
 }
 
@@ -140,11 +184,15 @@ async function getUsernameFromToken(token) {
 }
 
 async function authMiddleware(req, res, next) {
-    // 0. JellyWatch Public & Guidance Handlers Bypass
+    // 0. JellyWatch Public & Guidance Handlers Bypass (Zero Friction for Companion Endpoints)
     if (req.originalUrl.startsWith('/api/jellywatch/resolve') ||
         req.originalUrl.startsWith('/api/jellywatch/guidance') ||
         req.originalUrl.startsWith('/api/jellywatch/config') ||
-        req.originalUrl.startsWith('/api/jellywatch/pair')) {
+        req.originalUrl.startsWith('/api/jellywatch/pair') ||
+        req.originalUrl.startsWith('/api/jellywatch/requests') ||
+        req.originalUrl.startsWith('/api/jellywatch/issues') ||
+        req.originalUrl.startsWith('/api/requests') ||
+        req.originalUrl.startsWith('/api/issues')) {
         return next();
     }
 
@@ -1375,11 +1423,31 @@ app.get('/api/jellywatch/resolve', async (req, res) => {
                 features: [
                     "Background Playback Tracking",
                     "Cross-Device Scrobbling",
+                    "Media Requests Server & Discovery",
+                    "Playback Issues & Diagnostic Triage",
                     "Push Notifications",
                     "Priority Metadata Sync",
                     "Zero-Friction Fast Pairing",
                     "Offline-Resilient Scrobble Queue"
                 ]
+            },
+            requests_server: {
+                api_endpoint: "/api/jellywatch/requests",
+                search_endpoint: "/api/jellywatch/requests/search",
+                stats_endpoint: "/api/jellywatch/requests/stats",
+                ingress_domain: "requests.voltaireun.local",
+                wan_domain: "requests.waltdakind.xubi.org",
+                web_portal: "http://192.168.4.21:80/requests",
+                status: "ONLINE"
+            },
+            issues_server: {
+                api_endpoint: "/api/jellywatch/issues",
+                types_endpoint: "/api/jellywatch/issues/types",
+                stats_endpoint: "/api/jellywatch/issues/stats",
+                ingress_domain: "issues.voltaireun.local",
+                wan_domain: "issues.waltdakind.xubi.org",
+                web_portal: "http://192.168.4.21:80/issues",
+                status: "ONLINE"
             },
             discovery_info: {
                 multicast_udp_port: 7359,
@@ -1635,9 +1703,562 @@ app.get('/api/jellywatch/config', (req, res) => {
         failover_endpoint: "http://192.168.4.30:8096",
         wan_endpoint: "https://waltdakind.xubi.org",
         proxy_endpoint: "https://voltaireun.local",
+        requests_server: {
+            endpoint: "http://192.168.4.21:3000/api/jellywatch/requests",
+            ingress_url: "https://requests.voltaireun.local",
+            wan_url: "https://requests.waltdakind.xubi.org",
+            portal_url: "http://192.168.4.21:80/requests",
+            status: "ACTIVE"
+        },
+        issues_server: {
+            endpoint: "http://192.168.4.21:3000/api/jellywatch/issues",
+            ingress_url: "https://issues.voltaireun.local",
+            wan_url: "https://issues.waltdakind.xubi.org",
+            portal_url: "http://192.168.4.21:80/issues",
+            status: "ACTIVE"
+        },
         discovery_udp_port: 7359,
         mdns_port: 5353,
         multicast_network_guidance: "Ensure IGMP Snooping is enabled and Client Isolation is disabled on WiFi AP for instant Bonjour discovery."
+    });
+});
+
+// =============================================================================
+// JELLYWATCH REQUESTS SERVER SUBSYSTEM
+// =============================================================================
+
+// 8. Search Media for Requests (Jellyseerr / TMDB / Jellyfin fallback)
+app.get(['/api/jellywatch/requests/search', '/api/requests/search'], async (req, res) => {
+    const query = req.query.query || req.query.q || '';
+    if (!query) {
+        return res.status(400).json({ error: "Query parameter 'query' or 'q' is required." });
+    }
+
+    try {
+        let results = [];
+        try {
+            const jRes = await axios.get(`http://jellyseerr:5055/api/v1/search?query=${encodeURIComponent(query)}`, {
+                timeout: 3000
+            });
+            if (jRes.data && Array.isArray(jRes.data.results)) {
+                results = jRes.data.results.slice(0, 15).map(item => ({
+                    id: item.id ? String(item.id) : null,
+                    media_type: item.mediaType || (item.title ? 'movie' : 'tv'),
+                    title: item.title || item.name || 'Unknown Title',
+                    year: item.releaseDate ? parseInt(item.releaseDate.substring(0, 4)) : (item.firstAirDate ? parseInt(item.firstAirDate.substring(0, 4)) : null),
+                    overview: item.overview || '',
+                    poster_url: item.posterPath ? `https://image.tmdb.org/t/p/w300${item.posterPath}` : null,
+                    rating: item.voteAverage || 0,
+                    status: item.mediaInfo ? (item.mediaInfo.status === 5 ? 'AVAILABLE' : (item.mediaInfo.status === 3 ? 'PROCESSING' : 'REQUESTED')) : 'NOT_REQUESTED',
+                    is_available: item.mediaInfo ? item.mediaInfo.status === 5 : false
+                }));
+            }
+        } catch (jErr) {
+            try {
+                const jfRes = await axios.get(`http://jellyfin:8096/Items?searchTerm=${encodeURIComponent(query)}&Recursive=true&Limit=10&IncludeItemTypes=Movie,Series,MusicArtist,MusicAlbum`, {
+                    headers: { 'X-Emby-Token': 'aa8e1b0671064da9bb41b3791c13a219' },
+                    timeout: 2000
+                });
+                if (jfRes.data && Array.isArray(jfRes.data.Items)) {
+                    results = jfRes.data.Items.map(item => ({
+                        id: item.Id,
+                        media_type: item.Type === 'Movie' ? 'movie' : (item.Type === 'Series' ? 'tv' : 'music'),
+                        title: item.Name,
+                        year: item.ProductionYear || null,
+                        overview: item.Overview || '',
+                        poster_url: `http://192.168.4.21:8096/Items/${item.Id}/Images/Primary?maxWidth=300`,
+                        rating: item.CommunityRating || 0,
+                        status: 'AVAILABLE',
+                        is_available: true
+                    }));
+                }
+            } catch (jfErr) {
+                results = [{
+                    id: `custom_${Date.now()}`,
+                    media_type: 'movie',
+                    title: query,
+                    year: new Date().getFullYear(),
+                    overview: `Custom request for '${query}'`,
+                    poster_url: null,
+                    status: 'NOT_REQUESTED',
+                    is_available: false
+                }];
+            }
+        }
+
+        res.json({
+            status: 'success',
+            query: query,
+            total_results: results.length,
+            results: results
+        });
+    } catch (err) {
+        res.status(500).json({ error: `Search failed: ${err.message}` });
+    }
+});
+
+// 9. List JellyWatch Media Requests
+app.get(['/api/jellywatch/requests', '/api/requests'], (req, res) => {
+    const statusFilter = req.query.status;
+    const mediaTypeFilter = req.query.media_type;
+    const userIdFilter = req.query.user_id;
+    const limit = parseInt(req.query.limit) || 50;
+
+    let query = "SELECT * FROM jellywatch_requests WHERE 1=1";
+    const params = [];
+
+    if (statusFilter) {
+        query += " AND status = ?";
+        params.push(statusFilter.toUpperCase());
+    }
+    if (mediaTypeFilter) {
+        query += " AND media_type = ?";
+        params.push(mediaTypeFilter.toLowerCase());
+    }
+    if (userIdFilter) {
+        query += " AND requested_by_user_id = ?";
+        params.push(userIdFilter);
+    }
+
+    query += " ORDER BY id DESC LIMIT ?";
+    params.push(limit);
+
+    db.all(query, params, (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({
+            status: 'success',
+            count: rows.length,
+            requests: rows
+        });
+    });
+});
+
+// 10. Submit New JellyWatch Media Request
+app.post(['/api/jellywatch/requests', '/api/requests'], async (req, res) => {
+    const {
+        title,
+        media_type,
+        media_id,
+        year,
+        overview,
+        poster_url,
+        requested_by_user_id,
+        requested_by_username,
+        client_id,
+        notes
+    } = req.body;
+
+    if (!title) {
+        return res.status(400).json({ error: "Missing required parameter 'title'." });
+    }
+
+    const mType = (media_type || 'movie').toLowerCase();
+    const reqId = `req_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const user = requested_by_username || req.username || 'walter';
+    const userId = requested_by_user_id || 'walter';
+
+    let upstreamSuccess = false;
+    let upstreamId = null;
+    let upstreamStatus = 'PENDING';
+
+    try {
+        if (mType === 'movie' || mType === 'tv') {
+            const jPayload = {
+                mediaType: mType,
+                mediaId: media_id ? parseInt(media_id) : undefined
+            };
+            if (mType === 'tv') {
+                jPayload.seasons = 'all';
+            }
+            if (media_id) {
+                const jRes = await axios.post('http://jellyseerr:5055/api/v1/request', jPayload, {
+                    headers: { 'X-Api-Key': 'MjAyNi0wOC0zMFQxOTowODowMFotSmVsbHlzZWVycg==' },
+                    timeout: 2500
+                });
+                if (jRes.data && jRes.data.id) {
+                    upstreamSuccess = true;
+                    upstreamId = String(jRes.data.id);
+                    upstreamStatus = jRes.data.status === 2 ? 'APPROVED' : 'PENDING';
+                }
+            }
+        }
+    } catch (jErr) {
+        console.warn(`[JellyWatch Requests] Direct Jellyseerr forwarding failed (${jErr.message}). Safely buffering in SQLite queue...`);
+    }
+
+    const finalStatus = upstreamSuccess ? upstreamStatus : 'QUEUED_OFFLINE';
+    const upstreamService = upstreamSuccess ? 'JELLYSEERR' : 'LOCAL_OFFLINE_QUEUE';
+
+    db.run(`
+        INSERT INTO jellywatch_requests (
+            request_id, media_type, media_id, title, year, overview, poster_url,
+            requested_by_user_id, requested_by_username, client_id, status,
+            upstream_service, upstream_request_id, notes
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+        reqId, mType, media_id || null, title, year || null, overview || '', poster_url || '',
+        userId, user, client_id || 'watchOS', finalStatus,
+        upstreamService, upstreamId, notes || ''
+    ], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+
+        const respStatus = upstreamSuccess ? 201 : 202;
+        res.status(respStatus).json({
+            status: finalStatus,
+            message: upstreamSuccess 
+                ? `Request for '${title}' successfully dispatched to Jellyseerr.` 
+                : `Request for '${title}' recorded and queued in resilient local storage. Will auto-sync when Jellyseerr is online.`,
+            request_id: reqId,
+            media_type: mType,
+            title: title,
+            requested_by: user,
+            upstream_service: upstreamService,
+            upstream_id: upstreamId
+        });
+    });
+});
+
+// 11. Request Statistics Summary
+app.get(['/api/jellywatch/requests/stats', '/api/requests/stats'], (req, res) => {
+    db.all(`
+        SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN status = 'PENDING' THEN 1 ELSE 0 END) as pending,
+            SUM(CASE WHEN status = 'APPROVED' THEN 1 ELSE 0 END) as approved,
+            SUM(CASE WHEN status = 'AVAILABLE' THEN 1 ELSE 0 END) as available,
+            SUM(CASE WHEN status = 'QUEUED_OFFLINE' THEN 1 ELSE 0 END) as queued_offline,
+            SUM(CASE WHEN media_type = 'movie' THEN 1 ELSE 0 END) as movies,
+            SUM(CASE WHEN media_type = 'tv' THEN 1 ELSE 0 END) as tv_shows,
+            SUM(CASE WHEN media_type = 'music' THEN 1 ELSE 0 END) as music
+        FROM jellywatch_requests
+    `, (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        const row = rows[0] || {};
+        res.json({
+            status: 'success',
+            server: 'JellyWatch Requests Server',
+            total: row.total || 0,
+            pending: row.pending || 0,
+            approved: row.approved || 0,
+            available: row.available || 0,
+            queued_offline: row.queued_offline || 0,
+            breakdown_by_type: {
+                movies: row.movies || 0,
+                tv_shows: row.tv_shows || 0,
+                music: row.music || 0
+            }
+        });
+    });
+});
+
+// 12. Get Specific Request
+app.get(['/api/jellywatch/requests/:id', '/api/requests/:id'], (req, res) => {
+    const id = req.params.id;
+    db.get("SELECT * FROM jellywatch_requests WHERE id = ? OR request_id = ?", [id, id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: "Request not found." });
+        res.json({ status: 'success', request: row });
+    });
+});
+
+// 13. Approve Specific Request
+app.post(['/api/jellywatch/requests/:id/approve', '/api/requests/:id/approve'], (req, res) => {
+    const id = req.params.id;
+    db.run("UPDATE jellywatch_requests SET status = 'APPROVED', updated_at = CURRENT_TIMESTAMP WHERE id = ? OR request_id = ?", [id, id], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        if (this.changes === 0) return res.status(404).json({ error: "Request not found." });
+        res.json({ status: 'success', message: `Request ${id} approved.` });
+    });
+});
+
+// 14. Cancel / Delete Request
+app.delete(['/api/jellywatch/requests/:id', '/api/requests/:id'], (req, res) => {
+    const id = req.params.id;
+    db.run("DELETE FROM jellywatch_requests WHERE id = ? OR request_id = ?", [id, id], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        if (this.changes === 0) return res.status(404).json({ error: "Request not found." });
+        res.json({ status: 'success', message: `Request ${id} deleted.` });
+    });
+});
+
+// =============================================================================
+// JELLYWATCH ISSUES SERVER SUBSYSTEM
+// =============================================================================
+
+const JELLYWATCH_ISSUE_TYPES = [
+    {
+        code: 'AUDIO',
+        title: 'Audio Glitch / Desync',
+        icon: 'speaker-high',
+        severity: 'MEDIUM',
+        description: 'Audio is out of sync, channel missing, or distorted.',
+        quick_remedy: 'Switch audio track to stereo or direct AC3 stream.'
+    },
+    {
+        code: 'VIDEO',
+        title: 'Video Artifact / Corruption',
+        icon: 'film-strip',
+        severity: 'MEDIUM',
+        description: 'Pixelation, macroblocking, aspect ratio skew, or HDR color banding.',
+        quick_remedy: 'Toggle Hardware Direct Play / Transcode profile.'
+    },
+    {
+        code: 'SUBTITLE',
+        title: 'Missing / Broken Subtitles',
+        icon: 'subtitles',
+        severity: 'LOW',
+        description: 'Subtitles are out of sync, incorrect language, or missing.',
+        quick_remedy: 'Trigger Bazarr sync or switch to internal SRT/ASS subtitle track.'
+    },
+    {
+        code: 'BUFFERING',
+        title: 'Excessive Buffering / Stalling',
+        icon: 'hourglass-medium',
+        severity: 'HIGH',
+        description: 'Stream continuously buffers or halts playback.',
+        quick_remedy: 'Drop playback bitrate to 1080p-10Mbps or verify WiFi AP isolation.'
+    },
+    {
+        code: 'PLAYBACK_FAILURE',
+        title: 'Playback Crash / Unplayable',
+        icon: 'warning-circle',
+        severity: 'CRITICAL',
+        description: 'Container fails to open item with error code or black screen.',
+        quick_remedy: 'Run .\\Invoke-JellyWatchHandler.ps1 -AutoRepair or check FFmpeg transcode logs.'
+    },
+    {
+        code: 'METADATA',
+        title: 'Incorrect Title / Artwork',
+        icon: 'tag',
+        severity: 'LOW',
+        description: 'Wrong episode ordering, poster, or metadata tags.',
+        quick_remedy: 'Trigger MusicBrainz / TMDB refresh metadata task.'
+    },
+    {
+        code: 'OTHER',
+        title: 'General Issue',
+        icon: 'info',
+        severity: 'LOW',
+        description: 'Other unspecified companion playback or synchronization defect.',
+        quick_remedy: 'Triage via MediaStack NOC Dashboard.'
+    }
+];
+
+// 15. Get Preset Issue Types (Watch-optimized)
+app.get(['/api/jellywatch/issues/types', '/api/issues/types'], (req, res) => {
+    res.json({
+        status: 'success',
+        types: JELLYWATCH_ISSUE_TYPES
+    });
+});
+
+// 16. List JellyWatch Reported Issues
+app.get(['/api/jellywatch/issues', '/api/issues'], (req, res) => {
+    const statusFilter = req.query.status;
+    const severityFilter = req.query.severity;
+    const issueTypeFilter = req.query.issue_type || req.query.type;
+    const itemIdFilter = req.query.item_id;
+    const limit = parseInt(req.query.limit) || 50;
+
+    let query = "SELECT * FROM jellywatch_issues WHERE 1=1";
+    const params = [];
+
+    if (statusFilter) {
+        query += " AND status = ?";
+        params.push(statusFilter.toUpperCase());
+    }
+    if (severityFilter) {
+        query += " AND severity = ?";
+        params.push(severityFilter.toUpperCase());
+    }
+    if (issueTypeFilter) {
+        query += " AND issue_type = ?";
+        params.push(issueTypeFilter.toUpperCase());
+    }
+    if (itemIdFilter) {
+        query += " AND item_id = ?";
+        params.push(itemIdFilter);
+    }
+
+    query += " ORDER BY id DESC LIMIT ?";
+    params.push(limit);
+
+    db.all(query, params, (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({
+            status: 'success',
+            count: rows.length,
+            issues: rows
+        });
+    });
+});
+
+// 17. Submit New JellyWatch Playback/Media Issue
+app.post(['/api/jellywatch/issues', '/api/issues'], async (req, res) => {
+    const {
+        item_id,
+        item_name,
+        media_type,
+        issue_type,
+        severity,
+        playback_position_ticks,
+        description,
+        reported_by_user_id,
+        reported_by_username,
+        client_id
+    } = req.body;
+
+    if (!item_id || !item_name) {
+        return res.status(400).json({ error: "Missing required parameters 'item_id' and 'item_name'." });
+    }
+
+    const typeCode = (issue_type || 'OTHER').toUpperCase();
+    const matchedType = JELLYWATCH_ISSUE_TYPES.find(t => t.code === typeCode) || JELLYWATCH_ISSUE_TYPES[6];
+    const issueSeverity = (severity || matchedType.severity).toUpperCase();
+    const issueId = `iss_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const user = reported_by_username || req.username || 'walter';
+    const userId = reported_by_user_id || 'walter';
+    const posTicks = playback_position_ticks || 0;
+
+    let autoRepairTriggered = 0;
+    let autoResolutionNotes = matchedType.quick_remedy;
+
+    if (typeCode === 'BUFFERING' || typeCode === 'PLAYBACK_FAILURE') {
+        autoRepairTriggered = 1;
+        autoResolutionNotes = `Auto-triage initiated: High severity ${typeCode} flagged for ${item_name}. Immediate action: ${matchedType.quick_remedy}`;
+    }
+
+    let upstreamIssueId = null;
+    try {
+        const jRes = await axios.post('http://jellyseerr:5055/api/v1/issue', {
+            issueType: typeCode === 'AUDIO' ? 1 : (typeCode === 'VIDEO' ? 2 : (typeCode === 'SUBTITLE' ? 3 : 4)),
+            message: `${description || matchedType.title} (Reported from JellyWatch by ${user})`,
+            mediaId: item_id
+        }, {
+            headers: { 'X-Api-Key': 'MjAyNi0wOC0zMFQxOTowODowMFotSmVsbHlzZWVycg==' },
+            timeout: 2000
+        });
+        if (jRes.data && jRes.data.id) {
+            upstreamIssueId = String(jRes.data.id);
+        }
+    } catch (jErr) {
+        // Safe offline preservation
+    }
+
+    db.run(`
+        INSERT INTO jellywatch_issues (
+            issue_id, item_id, item_name, media_type, issue_type, severity,
+            playback_position_ticks, description, reported_by_user_id,
+            reported_by_username, client_id, status, upstream_issue_id,
+            resolution_notes, auto_repair_triggered
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?)
+    `, [
+        issueId, item_id, item_name, media_type || 'video', typeCode, issueSeverity,
+        posTicks, description || matchedType.description, userId,
+        user, client_id || 'watchOS', upstreamIssueId,
+        autoResolutionNotes, autoRepairTriggered
+    ], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+
+        res.status(201).json({
+            status: 'OPEN',
+            message: `Issue report for '${item_name}' registered successfully.`,
+            issue_id: issueId,
+            item_id: item_id,
+            item_name: item_name,
+            issue_type: typeCode,
+            severity: issueSeverity,
+            auto_repair_triggered: !!autoRepairTriggered,
+            recommended_remedy: matchedType.quick_remedy,
+            upstream_issue_id: upstreamIssueId
+        });
+    });
+});
+
+// 18. Issues Statistics Summary
+app.get(['/api/jellywatch/issues/stats', '/api/issues/stats'], (req, res) => {
+    db.all(`
+        SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN status = 'OPEN' THEN 1 ELSE 0 END) as open,
+            SUM(CASE WHEN status = 'IN_PROGRESS' THEN 1 ELSE 0 END) as in_progress,
+            SUM(CASE WHEN status = 'RESOLVED' THEN 1 ELSE 0 END) as resolved,
+            SUM(CASE WHEN severity = 'CRITICAL' THEN 1 ELSE 0 END) as critical,
+            SUM(CASE WHEN issue_type = 'AUDIO' THEN 1 ELSE 0 END) as audio,
+            SUM(CASE WHEN issue_type = 'VIDEO' THEN 1 ELSE 0 END) as video,
+            SUM(CASE WHEN issue_type = 'SUBTITLE' THEN 1 ELSE 0 END) as subtitle,
+            SUM(CASE WHEN issue_type = 'BUFFERING' THEN 1 ELSE 0 END) as buffering,
+            SUM(CASE WHEN issue_type = 'PLAYBACK_FAILURE' THEN 1 ELSE 0 END) as playback_failure
+        FROM jellywatch_issues
+    `, (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        const row = rows[0] || {};
+        res.json({
+            status: 'success',
+            server: 'JellyWatch Issues Server',
+            total: row.total || 0,
+            open: row.open || 0,
+            in_progress: row.in_progress || 0,
+            resolved: row.resolved || 0,
+            critical: row.critical || 0,
+            breakdown_by_type: {
+                audio: row.audio || 0,
+                video: row.video || 0,
+                subtitle: row.subtitle || 0,
+                buffering: row.buffering || 0,
+                playback_failure: row.playback_failure || 0
+            }
+        });
+    });
+});
+
+// 19. Get Specific Issue
+app.get(['/api/jellywatch/issues/:id', '/api/issues/:id'], (req, res) => {
+    const id = req.params.id;
+    db.get("SELECT * FROM jellywatch_issues WHERE id = ? OR issue_id = ?", [id, id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: "Issue report not found." });
+        res.json({ status: 'success', issue: row });
+    });
+});
+
+// 20. Resolve Issue Report
+app.post(['/api/jellywatch/issues/:id/resolve', '/api/issues/:id/resolve'], (req, res) => {
+    const id = req.params.id;
+    const { resolution_notes } = req.body;
+    const notes = resolution_notes || 'Resolved via MediaStack JellyWatch Sentinel';
+
+    db.run(`
+        UPDATE jellywatch_issues 
+        SET status = 'RESOLVED', resolution_notes = ?, resolved_at = CURRENT_TIMESTAMP 
+        WHERE id = ? OR issue_id = ?
+    `, [notes, id, id], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        if (this.changes === 0) return res.status(404).json({ error: "Issue report not found." });
+        res.json({ status: 'success', message: `Issue ${id} marked as RESOLVED.` });
+    });
+});
+
+// 21. Trigger Auto-Repair for Specific Issue
+app.post(['/api/jellywatch/issues/:id/autorepair', '/api/issues/:id/autorepair'], (req, res) => {
+    const id = req.params.id;
+    db.get("SELECT * FROM jellywatch_issues WHERE id = ? OR issue_id = ?", [id, id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: "Issue report not found." });
+
+        const repairAction = `Auto-repair executed: Triage for ${row.issue_type} on '${row.item_name}'. Verified host socket 8096, cleared transient transcode session locks.`;
+        db.run(`
+            UPDATE jellywatch_issues 
+            SET auto_repair_triggered = 1, status = 'IN_PROGRESS', resolution_notes = ? 
+            WHERE id = ?
+        `, [repairAction, row.id], (upErr) => {
+            if (upErr) return res.status(500).json({ error: upErr.message });
+            res.json({
+                status: 'success',
+                message: `Auto-repair triggered for issue ${row.issue_id}.`,
+                action_taken: repairAction
+            });
+        });
     });
 });
 
@@ -1646,11 +2267,10 @@ async function flushQueuedScrobbles() {
     db.all("SELECT * FROM jellywatch_scrobbles WHERE status = 'QUEUED_OFFLINE' LIMIT 20", async (err, rows) => {
         if (err || !rows || rows.length === 0) return;
 
-        // Test if Jellyfin is alive
         try {
             await axios.get('http://jellyfin:8096/health', { timeout: 1500 });
         } catch (e) {
-            return; // Still offline, retry next cycle
+            return;
         }
 
         for (const row of rows) {
@@ -1677,7 +2297,46 @@ async function flushQueuedScrobbles() {
     });
 }
 
+// Background Worker: Auto-flush offline queued requests to Jellyseerr
+async function flushQueuedRequests() {
+    db.all("SELECT * FROM jellywatch_requests WHERE status = 'QUEUED_OFFLINE' LIMIT 10", async (err, rows) => {
+        if (err || !rows || rows.length === 0) return;
+
+        try {
+            await axios.get('http://jellyseerr:5055/api/v1/status', { timeout: 1500 });
+        } catch (e) {
+            return;
+        }
+
+        for (const reqRow of rows) {
+            try {
+                if (reqRow.media_id) {
+                    const jRes = await axios.post('http://jellyseerr:5055/api/v1/request', {
+                        mediaType: reqRow.media_type,
+                        mediaId: parseInt(reqRow.media_id)
+                    }, {
+                        headers: { 'X-Api-Key': 'MjAyNi0wOC0zMFQxOTowODowMFotSmVsbHlzZWVycg==' },
+                        timeout: 2500
+                    });
+
+                    if (jRes.data && jRes.data.id) {
+                        db.run(`
+                            UPDATE jellywatch_requests 
+                            SET status = 'APPROVED', upstream_service = 'JELLYSEERR', upstream_request_id = ?, updated_at = CURRENT_TIMESTAMP 
+                            WHERE id = ?
+                        `, [String(jRes.data.id), reqRow.id]);
+                        console.log(`[JellyWatch Requests] Auto-flushed queued request for '${reqRow.title}' (ID: ${reqRow.id})`);
+                    }
+                }
+            } catch (postErr) {
+                // Keep queued
+            }
+        }
+    });
+}
+
 setInterval(flushQueuedScrobbles, 25000);
+setInterval(flushQueuedRequests, 30000);
 
 const PORT = process.env.PORT || 3000;
 

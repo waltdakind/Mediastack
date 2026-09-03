@@ -142,7 +142,7 @@
 # =============================================================================
 
 # External DDNS & Jellyfin HTTP Redirection
-http://waltdakind.xubi.org, http://jellyfin.waltdakind.xubi.org, http://jellyseerr.waltdakind.xubi.org, http://sonarr.waltdakind.xubi.org, http://radarr.waltdakind.xubi.org, http://prowlarr.waltdakind.xubi.org, http://bazarr.waltdakind.xubi.org, http://musicbrainz.waltdakind.xubi.org {
+http://waltdakind.xubi.org, http://jellyfin.waltdakind.xubi.org, http://jellyseerr.waltdakind.xubi.org, http://requests.waltdakind.xubi.org, http://issues.waltdakind.xubi.org, http://sonarr.waltdakind.xubi.org, http://radarr.waltdakind.xubi.org, http://prowlarr.waltdakind.xubi.org, http://bazarr.waltdakind.xubi.org, http://musicbrainz.waltdakind.xubi.org {
     import security_headers
     encode gzip zstd
     redir https://{host}{uri} permanent
@@ -156,7 +156,7 @@ http://voltaireun.local, http://voltaireun.local, http://voltairedeux.local, htt
 }
 
 # Internal Subdomains HTTP Redirection
-http://jellyfin.voltaireun.local, http://jellyfin.voltaireun.local, http://jellyfin.voltairedeux.local, http://jellyfin.mediaserver.local, http://dashboard.voltaireun.local, http://dashboard.voltaireun.local, http://dashboard.voltairedeux.local, http://noc.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltairedeux.local, http://sonarr.voltaireun.local, http://sonarr.voltaireun.local, http://sonarr.voltairedeux.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltairedeux.local, http://prowlarr.voltaireun.local, http://prowlarr.voltaireun.local, http://prowlarr.voltairedeux.local, http://bazarr.voltaireun.local, http://bazarr.voltaireun.local, http://bazarr.voltairedeux.local, http://transmission.voltaireun.local, http://transmission.voltaireun.local, http://transmission.voltairedeux.local, http://tvheadend.voltaireun.local, http://tvheadend.voltaireun.local, http://tvheadend.voltairedeux.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltairedeux.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltairedeux.local, http://db.voltaireun.local, http://db.voltaireun.local, http://db.voltairedeux.local {
+http://jellyfin.voltaireun.local, http://jellyfin.voltaireun.local, http://jellyfin.voltairedeux.local, http://jellyfin.mediaserver.local, http://dashboard.voltaireun.local, http://dashboard.voltaireun.local, http://dashboard.voltairedeux.local, http://noc.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltairedeux.local, http://sonarr.voltaireun.local, http://sonarr.voltaireun.local, http://sonarr.voltairedeux.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltairedeux.local, http://requests.voltaireun.local, http://requests.voltairedeux.local, http://issues.voltaireun.local, http://issues.voltairedeux.local, http://prowlarr.voltaireun.local, http://prowlarr.voltaireun.local, http://prowlarr.voltairedeux.local, http://bazarr.voltaireun.local, http://bazarr.voltaireun.local, http://bazarr.voltairedeux.local, http://transmission.voltaireun.local, http://transmission.voltaireun.local, http://transmission.voltairedeux.local, http://tvheadend.voltaireun.local, http://tvheadend.voltaireun.local, http://tvheadend.voltairedeux.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltairedeux.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltairedeux.local, http://db.voltaireun.local, http://db.voltaireun.local, http://db.voltairedeux.local {
     import security_headers
     encode gzip zstd
     redir https://{host}{uri} permanent
@@ -210,6 +210,46 @@ https://jellyseerr.waltdakind.xubi.org, https://jellyseerr.voltaireun.local, htt
     reverse_proxy jellyseerr:5055 192.168.4.21:5055 {
         lb_policy first
         fail_duration 10s
+    }
+}
+
+# --- D2. JellyWatch Dedicated Requests Server Access Point ---
+https://requests.waltdakind.xubi.org, https://requests.voltaireun.local, https://requests.voltairedeux.local {
+    import security_headers
+    import custom_tls
+    encode gzip zstd
+
+    handle /api/* {
+        reverse_proxy api-gateway:3000 192.168.4.21:3000 {
+            lb_policy first
+            fail_duration 5s
+        }
+    }
+
+    handle {
+        root * /var/www/dashboard
+        try_files {path} /requests.html
+        file_server
+    }
+}
+
+# --- D3. JellyWatch Dedicated Issues Server Access Point ---
+https://issues.waltdakind.xubi.org, https://issues.voltaireun.local, https://issues.voltairedeux.local {
+    import security_headers
+    import custom_tls
+    encode gzip zstd
+
+    handle /api/* {
+        reverse_proxy api-gateway:3000 192.168.4.21:3000 {
+            lb_policy first
+            fail_duration 5s
+        }
+    }
+
+    handle {
+        root * /var/www/dashboard
+        try_files {path} /issues.html
+        file_server
     }
 }
 

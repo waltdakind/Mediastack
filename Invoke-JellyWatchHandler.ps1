@@ -47,6 +47,13 @@ param(
     [switch]$GenerateProfile,
     [switch]$GenerateMagicLink,
     [string]$SimulateError = "",
+    [string]$SubmitRequest = "",
+    [string]$MediaType = "movie",
+    [string]$SubmitIssue = "",
+    [string]$IssueType = "BUFFERING",
+    [string]$IssueDescription = "",
+    [switch]$ListRequests,
+    [switch]$ListIssues,
     [string]$UserId = "walter",
     [string]$Username = "walter",
     [switch]$SkipReport
@@ -307,6 +314,38 @@ Write-Host "`n  >>> RECOMMENDED ACTIVE ENDPOINT: $($primaryRoute.Name) -> $($pri
 Write-Host "      Strategy: $($primaryRoute.IdealFor)" -ForegroundColor Green
 
 # ==============================================================================
+# 2B. JELLYWATCH SERVICES AUDIT (REQUESTS SERVER & ISSUES SERVER)
+# ==============================================================================
+Write-Host "`n[STAGE 2B] Probing JellyWatch Requests Server & Issues Server Services..." -ForegroundColor Yellow
+
+$reqStats = $null
+$issStats = $null
+
+try {
+    $reqRes = Invoke-RestMethod -Uri "http://127.0.0.1:3000/api/jellywatch/requests/stats" -TimeoutSec 2 -ErrorAction SilentlyContinue
+    if ($reqRes -and $reqRes.status -eq 'success') {
+        $reqStats = $reqRes
+        Write-Host ("  [OK] Requests Server : ONLINE (Total: {0} | Pending: {1} | Approved: {2} | Offline Queued: {3})" -f $reqRes.total, $reqRes.pending, $reqRes.approved, $reqRes.queued_offline) -ForegroundColor Green
+    } else {
+        Write-Host "  [WARN] Requests Server : HTTP Probe non-200" -ForegroundColor Yellow
+    }
+} catch {
+    Write-Host "  [!] Requests Server : OFFLINE or Unreachable on port 3000" -ForegroundColor DarkGray
+}
+
+try {
+    $issRes = Invoke-RestMethod -Uri "http://127.0.0.1:3000/api/jellywatch/issues/stats" -TimeoutSec 2 -ErrorAction SilentlyContinue
+    if ($issRes -and $issRes.status -eq 'success') {
+        $issStats = $issRes
+        Write-Host ("  [OK] Issues Server   : ONLINE (Total: {0} | Open: {1} | In Triage: {2} | Resolved: {3})" -f $issRes.total, $issRes.open, $issRes.in_progress, $issRes.resolved) -ForegroundColor Green
+    } else {
+        Write-Host "  [WARN] Issues Server   : HTTP Probe non-200" -ForegroundColor Yellow
+    }
+} catch {
+    Write-Host "  [!] Issues Server   : OFFLINE or Unreachable on port 3000" -ForegroundColor DarkGray
+}
+
+# ==============================================================================
 # 3. EXPERT DIAGNOSTIC GUIDANCE ENGINE
 # ==============================================================================
 Write-Host "`n[STAGE 3] JellyWatch Diagnostic Expert Guidance Matrix:" -ForegroundColor Yellow
@@ -399,10 +438,81 @@ foreach ($step in $activeGuidance.Remediation) {
 }
 
 # ==============================================================================
-# 4. MAGIC PAIRING LINK & CONNECTION PROFILE GENERATOR
+# 4. LIVE REQUESTS & ISSUES OPERATIONS
+# ==============================================================================
+if ($SubmitRequest) {
+    Write-Host "`n[STAGE 4A] Submitting Media Request: '$SubmitRequest' ($MediaType)..." -ForegroundColor Yellow
+    try {
+        $body = @{
+            title = $SubmitRequest
+            media_type = $MediaType
+            client_id = "JellyWatchCLI"
+            requested_by_username = $Username
+            requested_by_user_id = $UserId
+        } | ConvertTo-Json
+
+        $reqPost = Invoke-RestMethod -Uri "http://127.0.0.1:3000/api/jellywatch/requests" -Method Post -Body $body -ContentType "application/json"
+        Write-Host "  [OK] Request Created: $($reqPost.request_id) -> Status: $($reqPost.status)" -ForegroundColor Green
+        Write-Host "       $($reqPost.message)" -ForegroundColor DarkCyan
+    } catch {
+        Write-Host "  [!] Request submission failed: $_" -ForegroundColor Red
+    }
+}
+
+if ($SubmitIssue) {
+    Write-Host "`n[STAGE 4B] Submitting Issue Report: '$SubmitIssue' ($IssueType)..." -ForegroundColor Yellow
+    try {
+        $body = @{
+            item_id = "cli_item_$(Get-Date -Format 'yyyyMMddHHmmss')"
+            item_name = $SubmitIssue
+            issue_type = $IssueType
+            description = if ($IssueDescription) { $IssueDescription } else { "Reported via JellyWatch CLI handler" }
+            client_id = "JellyWatchCLI"
+            reported_by_username = $Username
+            reported_by_user_id = $UserId
+        } | ConvertTo-Json
+
+        $issPost = Invoke-RestMethod -Uri "http://127.0.0.1:3000/api/jellywatch/issues" -Method Post -Body $body -ContentType "application/json"
+        Write-Host "  [OK] Issue Ticket Created: $($issPost.issue_id) -> Severity: $($issPost.severity)" -ForegroundColor Green
+        Write-Host "       Remedy Guidance: $($issPost.recommended_remedy)" -ForegroundColor DarkCyan
+    } catch {
+        Write-Host "  [!] Issue submission failed: $_" -ForegroundColor Red
+    }
+}
+
+if ($ListRequests) {
+    Write-Host "`n[STAGE 4C] Active Media Requests Registry:" -ForegroundColor Yellow
+    try {
+        $reqs = Invoke-RestMethod -Uri "http://127.0.0.1:3000/api/jellywatch/requests?limit=10" -ErrorAction Stop
+        if ($reqs.requests -and $reqs.requests.Count -gt 0) {
+            $reqs.requests | Format-Table -Property id, title, media_type, status, requested_by_username, created_at | Out-String | Write-Host -ForegroundColor Cyan
+        } else {
+            Write-Host "  No active requests in queue." -ForegroundColor DarkGray
+        }
+    } catch {
+        Write-Host "  Failed to query requests registry: $_" -ForegroundColor DarkGray
+    }
+}
+
+if ($ListIssues) {
+    Write-Host "`n[STAGE 4D] Active Playback & Defect Triage Registry:" -ForegroundColor Yellow
+    try {
+        $issues = Invoke-RestMethod -Uri "http://127.0.0.1:3000/api/jellywatch/issues?limit=10" -ErrorAction Stop
+        if ($issues.issues -and $issues.issues.Count -gt 0) {
+            $issues.issues | Format-Table -Property id, item_name, issue_type, severity, status, reported_by_username, created_at | Out-String | Write-Host -ForegroundColor Magenta
+        } else {
+            Write-Host "  No open defect issues reported." -ForegroundColor DarkGray
+        }
+    } catch {
+        Write-Host "  Failed to query issues registry: $_" -ForegroundColor DarkGray
+    }
+}
+
+# ==============================================================================
+# 5. MAGIC PAIRING LINK & CONNECTION PROFILE GENERATOR
 # ==============================================================================
 if ($GenerateMagicLink -or $GenerateProfile) {
-    Write-Host "`n[STAGE 4] Generating Magic Pairing Link & Profile..." -ForegroundColor Yellow
+    Write-Host "`n[STAGE 5] Generating Magic Pairing Link & Profile..." -ForegroundColor Yellow
 
     $pairingPin = (Get-Random -Minimum 100000 -Maximum 999999).ToString()
     $localMagic = "http://192.168.4.21:8096/watch/?pin=$pairingPin&userId=$UserId&username=$Username"
@@ -431,6 +541,22 @@ if ($GenerateMagicLink -or $GenerateProfile) {
                 latency_ms = $_.LatencyMs
             }
         }
+        services = [ordered]@{
+            requests_server = [ordered]@{
+                api_endpoint   = "http://192.168.4.21:3000/api/jellywatch/requests"
+                ingress_domain = "https://requests.voltaireun.local"
+                wan_domain     = "https://requests.waltdakind.xubi.org"
+                web_portal     = "http://192.168.4.21:80/requests"
+                stats          = $reqStats
+            }
+            issues_server = [ordered]@{
+                api_endpoint   = "http://192.168.4.21:3000/api/jellywatch/issues"
+                ingress_domain = "https://issues.voltaireun.local"
+                wan_domain     = "https://issues.waltdakind.xubi.org"
+                web_portal     = "http://192.168.4.21:80/issues"
+                stats          = $issStats
+            }
+        }
         magic_pairing = [ordered]@{
             pin = $pairingPin
             user_id = $UserId
@@ -447,7 +573,7 @@ if ($GenerateMagicLink -or $GenerateProfile) {
 }
 
 # ==============================================================================
-# 5. GENERATE DIAGNOSTIC HANDOFF REPORT
+# 6. GENERATE DIAGNOSTIC HANDOFF REPORT
 # ==============================================================================
 if (-not $SkipReport) {
     $reportPath = Join-Path $HandoffsDir "JellyWatch_Connection_Guidance_${fileTimestamp}.md"
@@ -474,17 +600,28 @@ if (-not $SkipReport) {
     }
 
     $mdLines += @(
-        "",
-        "---",
-        "",
-        "## 2. Expert Diagnostic Guidance & Triage",
-        "",
+        '',
+        '---',
+        '',
+        '## 2. JellyWatch Services Access Points',
+        '',
+        '- **Requests Server:** `https://requests.voltaireun.local` | WAN: `https://requests.waltdakind.xubi.org` | Portal: `http://192.168.4.21/requests`',
+        '- **Issues Server:** `https://issues.voltaireun.local` | WAN: `https://issues.waltdakind.xubi.org` | Portal: `http://192.168.4.21/issues`',
+        '- **API Endpoints:** `/api/jellywatch/requests` & `/api/jellywatch/issues`'
+    )
+
+    $mdLines += @(
+        '',
+        '---',
+        '',
+        '## 3. Expert Diagnostic Guidance & Triage',
+        '',
         "### Issue: $($activeGuidance.Title) ($($activeGuidance.Code))",
         "- **Root Cause:** $($activeGuidance.RootCause)",
         "- **Immediate Action:** $($activeGuidance.ImmediateAction)",
-        "",
-        "#### Step-by-Step Remediation:",
-        ""
+        '',
+        '#### Step-by-Step Remediation:',
+        ''
     )
 
     foreach ($s in $activeGuidance.Remediation) {
@@ -492,16 +629,16 @@ if (-not $SkipReport) {
     }
 
     $mdLines += @(
-        "",
-        "---",
-        "",
-        "## 3. Configuration & Auto-Healing Registry",
-        "",
-        "- **Master Registry:** config/api_credentials_registry.json",
-        "- **Jellyfin Plugin XML:** config/jellyfin/data/plugins/configurations/Jellyfin.Plugin.JellyWatch.xml",
-        "- **Multicast Discovery Ports:** UDP 7359 (Jellyfin Bonjour), UDP 5353 (mDNS)",
-        "",
-        "*Generated automatically by MediaStack JellyWatch Resilient Connection Sentinel.*"
+        '',
+        '---',
+        '',
+        '## 4. Configuration & Auto-Healing Registry',
+        '',
+        '- **Master Registry:** config/api_credentials_registry.json',
+        '- **Jellyfin Plugin XML:** config/jellyfin/data/plugins/configurations/Jellyfin.Plugin.JellyWatch.xml',
+        '- **Multicast Discovery Ports:** UDP 7359 (Jellyfin Bonjour), UDP 5353 (mDNS)',
+        '',
+        '*Generated automatically by MediaStack JellyWatch Resilient Connection Sentinel.*'
     )
 
     [System.IO.File]::WriteAllLines($reportPath, $mdLines, [System.Text.Encoding]::UTF8)

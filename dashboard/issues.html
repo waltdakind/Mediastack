@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="JellyWatch Issues & Diagnostic Hub - Report playback, audio, subtitle, and buffering defects with 1-click auto-repair.">
+    <title>JellyWatch Issues — Playback & Defect Triage Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+    <style>
+        :root {
+            --bg-primary: #0a0c16;
+            --bg-card: rgba(18, 22, 39, 0.75);
+            --bg-card-hover: rgba(28, 34, 60, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-cyan: #06b6d4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(244, 63, 94, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 15% 85%, rgba(6, 182, 212, 0.12) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            height: 250px;
+            background: radial-gradient(ellipse, rgba(244, 63, 94, 0.18) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            background: rgba(10, 12, 22, 0.8);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-amber));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.3);
+        }
+
+        .brand-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-badge {
+            font-size: 0.65rem;
+            padding: 2px 7px;
+            border-radius: 9999px;
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--accent-rose);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .header-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--accent-rose);
+            border-color: rgba(244, 63, 94, 0.4);
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px 16px 40px;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        /* Stats Bar */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            backdrop-filter: blur(12px);
+        }
+
+        .stat-num {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* Issue Report Panel */
+        .report-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .section-title i {
+            color: var(--accent-rose);
+        }
+
+        /* 1-Tap Preset Grid */
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .preset-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 10px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .preset-card:hover, .preset-card.selected {
+            background: rgba(244, 63, 94, 0.15);
+            border-color: var(--accent-rose);
+            transform: translateY(-2px);
+        }
+
+        .preset-icon {
+            font-size: 22px;
+            color: var(--accent-rose);
+        }
+
+        .preset-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Form Controls */
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .input-text, .select-box {
+            background: rgba(10, 12, 22, 0.8);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-text:focus, .select-box:focus {
+            border-color: var(--accent-rose);
+        }
+
+        .btn-submit-issue {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-amber));
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(244, 63, 94, 0.3);
+            transition: transform 0.15s, opacity 0.15s;
+            margin-top: 6px;
+        }
+
+        .btn-submit-issue:active {
+            transform: scale(0.98);
+        }
+
+        /* Issues Feed */
+        .feed-container {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px;
+            backdrop-filter: blur(12px);
+        }
+
+        .issue-row {
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: background 0.15s;
+        }
+
+        .issue-row:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .issue-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .issue-item-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .issue-pills {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .issue-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .issue-remedy-box {
+            background: rgba(6, 182, 212, 0.08);
+            border-left: 3px solid var(--accent-cyan);
+            padding: 8px 10px;
+            border-radius: 4px 8px 8px 4px;
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .issue-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 4px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .status-pill {
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-open {
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--accent-rose);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+
+        .status-progress {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-resolved {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-action-sm {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-family: inherit;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s;
+        }
+
+        .btn-action-sm:hover {
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+        }
+
+        .btn-repair-sm {
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--accent-rose);
+            border-color: rgba(244, 63, 94, 0.3);
+        }
+
+        .btn-repair-sm:hover {
+            background: var(--accent-rose);
+            color: #fff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 10px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .empty-state i {
+            font-size: 32px;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(18, 22, 39, 0.95);
+            border: 1px solid var(--accent-rose);
+            color: var(--text-primary);
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .presets-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <header>
+        <a href="/" class="brand" id="brand-link">
+            <div class="brand-icon">
+                <i class="ph-bold ph-warning-octagon"></i>
+            </div>
+            <div>
+                <div class="brand-title">JellyWatch Issues</div>
+            </div>
+            <span class="brand-badge">Diagnostics</span>
+        </a>
+        <div class="header-links">
+            <a href="/requests" class="nav-btn" id="btn-goto-requests" title="Open Requests Portal">
+                <i class="ph-bold ph-paper-plane-tilt"></i> Requests
+            </a>
+            <a href="/watch" class="nav-btn" id="btn-goto-watch" title="Open Watch Companion">
+                <i class="ph-bold ph-watch"></i> Watch
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Stats Summary Bar -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-num" id="stat-total">0</div>
+                <div class="stat-label">Total Issues</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="stat-open" style="color: var(--accent-rose);">0</div>
+                <div class="stat-label">Open / Active</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="stat-progress" style="color: var(--accent-amber);">0</div>
+                <div class="stat-label">In Triage</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="stat-resolved" style="color: var(--accent-emerald);">0</div>
+                <div class="stat-label">Resolved</div>
+            </div>
+        </div>
+
+        <!-- 1-Tap Issue Reporting Hub -->
+        <section class="report-panel" aria-label="Issue Reporting Panel">
+            <div class="section-title">
+                <i class="ph-bold ph-lightning"></i> 1-Tap Defect Preset Selector
+            </div>
+
+            <div class="presets-grid" id="presets-grid">
+                <div class="preset-card selected" data-code="BUFFERING" onclick="selectPreset('BUFFERING', 'Excessive Buffering / Stalling', 'HIGH', this)">
+                    <i class="ph-bold ph-hourglass-medium preset-icon"></i>
+                    <span class="preset-title">Buffering</span>
+                </div>
+                <div class="preset-card" data-code="AUDIO" onclick="selectPreset('AUDIO', 'Audio Glitch or Desync', 'MEDIUM', this)">
+                    <i class="ph-bold ph-speaker-high preset-icon"></i>
+                    <span class="preset-title">Audio Desync</span>
+                </div>
+                <div class="preset-card" data-code="SUBTITLE" onclick="selectPreset('SUBTITLE', 'Missing or Out-of-sync Subtitles', 'LOW', this)">
+                    <i class="ph-bold ph-subtitles preset-icon"></i>
+                    <span class="preset-title">Subtitles</span>
+                </div>
+                <div class="preset-card" data-code="VIDEO" onclick="selectPreset('VIDEO', 'Video Artifact or Pixelation', 'MEDIUM', this)">
+                    <i class="ph-bold ph-film-strip preset-icon"></i>
+                    <span class="preset-title">Video Glitch</span>
+                </div>
+                <div class="preset-card" data-code="PLAYBACK_FAILURE" onclick="selectPreset('PLAYBACK_FAILURE', 'Playback Crash or Black Screen', 'CRITICAL', this)">
+                    <i class="ph-bold ph-warning-circle preset-icon"></i>
+                    <span class="preset-title">Crash / Error</span>
+                </div>
+                <div class="preset-card" data-code="METADATA" onclick="selectPreset('METADATA', 'Incorrect Title or Artwork', 'LOW', this)">
+                    <i class="ph-bold ph-tag preset-icon"></i>
+                    <span class="preset-title">Metadata</span>
+                </div>
+            </div>
+
+            <form id="issue-form" onsubmit="event.preventDefault(); submitIssue();">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="item-name-input">Media Item Name / Title</label>
+                        <input type="text" id="item-name-input" class="input-text" placeholder="e.g. Midnight Synchronicity (or currently playing)" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="severity-select">Severity Tier</label>
+                        <select id="severity-select" class="select-box">
+                            <option value="LOW">Low (Minor Glitch)</option>
+                            <option value="MEDIUM" selected>Medium (Playback Degraded)</option>
+                            <option value="HIGH">High (Buffering / Stalling)</option>
+                            <option value="CRITICAL">Critical (Unplayable)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label" for="desc-input">Description / Diagnostic Details</label>
+                    <input type="text" id="desc-input" class="input-text" placeholder="Detailed symptoms (e.g. buffers every 10s at 1080p, audio 500ms delayed)">
+                </div>
+
+                <button type="submit" id="btn-submit-issue" class="btn-submit-issue">
+                    <i class="ph-bold ph-shield-warning"></i> Report Issue to Sentinel Hub
+                </button>
+            </form>
+        </section>
+
+        <!-- Active Issues Tracker Feed -->
+        <section class="feed-container" aria-label="Issues Activity Feed">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <div class="section-title" style="margin-bottom: 0;">
+                    <i class="ph-bold ph-list-dashes"></i> Active Playback & Defect Triage Log
+                </div>
+                <button type="button" id="btn-refresh-issues" class="nav-btn" onclick="loadIssuesFeed()">
+                    <i class="ph-bold ph-arrows-clockwise"></i> Refresh
+                </button>
+            </div>
+            <div id="issues-list">
+                <div class="empty-state">
+                    <i class="ph-duotone ph-check-circle" style="color: var(--accent-emerald);"></i>
+                    <p>Loading issue tracking registry...</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="toast"><i class="ph-fill ph-check-circle" style="color: var(--accent-emerald);"></i> <span id="toast-msg">Issue Reported</span></div>
+
+    <script>
+        let selectedIssueCode = 'BUFFERING';
+
+        function selectPreset(code, defaultDesc, severity, card) {
+            selectedIssueCode = code;
+            document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('selected'));
+            if (card) card.classList.add('selected');
+            document.getElementById('severity-select').value = severity;
+            if (!document.getElementById('desc-input').value) {
+                document.getElementById('desc-input').value = defaultDesc;
+            }
+        }
+
+        async function fetchStats() {
+            try {
+                const res = await fetch('/api/jellywatch/issues/stats');
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('stat-total').innerText = data.total || 0;
+                    document.getElementById('stat-open').innerText = data.open || 0;
+                    document.getElementById('stat-progress').innerText = data.in_progress || 0;
+                    document.getElementById('stat-resolved').innerText = data.resolved || 0;
+                }
+            } catch (e) {}
+        }
+
+        async function submitIssue() {
+            const itemName = document.getElementById('item-name-input').value.trim();
+            const severity = document.getElementById('severity-select').value;
+            const desc = document.getElementById('desc-input').value.trim();
+
+            if (!itemName) return;
+
+            const btn = document.getElementById('btn-submit-issue');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Submitting...';
+
+            try {
+                const res = await fetch('/api/jellywatch/issues', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        item_id: `item_${Date.now()}`,
+                        item_name: itemName,
+                        issue_type: selectedIssueCode,
+                        severity: severity,
+                        description: desc,
+                        client_id: 'JellyWatchIssuesPortal'
+                    })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    showToast(data.message || `Issue reported for '${itemName}'`);
+                    document.getElementById('item-name-input').value = '';
+                    document.getElementById('desc-input').value = '';
+                    fetchStats();
+                    loadIssuesFeed();
+                } else {
+                    showToast(data.error || 'Failed to submit issue');
+                }
+            } catch (e) {
+                showToast(`Error: ${e.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ph-bold ph-shield-warning"></i> Report Issue to Sentinel Hub';
+            }
+        }
+
+        async function triggerAutoRepair(issueId, btn) {
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Repairing...';
+            }
+
+            try {
+                const res = await fetch(`/api/jellywatch/issues/${issueId}/autorepair`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast('Auto-repair routine executed!');
+                    fetchStats();
+                    loadIssuesFeed();
+                }
+            } catch (e) {
+                showToast(`Auto-repair error: ${e.message}`);
+            }
+        }
+
+        async function resolveIssue(issueId) {
+            try {
+                const res = await fetch(`/api/jellywatch/issues/${issueId}/resolve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resolution_notes: 'Resolved via Web Triage Portal' })
+                });
+                if (res.ok) {
+                    showToast('Issue marked as RESOLVED');
+                    fetchStats();
+                    loadIssuesFeed();
+                }
+            } catch (e) {
+                showToast(`Error: ${e.message}`);
+            }
+        }
+
+        async function loadIssuesFeed() {
+            const list = document.getElementById('issues-list');
+            try {
+                const res = await fetch('/api/jellywatch/issues?limit=20');
+                if (res.ok) {
+                    const data = await res.json();
+                    const items = data.issues || [];
+                    if (items.length === 0) {
+                        list.innerHTML = `
+                            <div class="empty-state">
+                                <i class="ph-duotone ph-check-circle" style="color: var(--accent-emerald);"></i>
+                                <p>All clear! No active media or playback defects recorded.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    list.innerHTML = items.map(iss => {
+                        let statusClass = 'status-open';
+                        if (iss.status === 'IN_PROGRESS') statusClass = 'status-progress';
+                        if (iss.status === 'RESOLVED') statusClass = 'status-resolved';
+
+                        const isResolved = iss.status === 'RESOLVED';
+
+                        return `
+                            <div class="issue-row">
+                                <div class="issue-header">
+                                    <div class="issue-item-name">${escapeHtml(iss.item_name)}</div>
+                                    <div class="issue-pills">
+                                        <span class="status-pill ${statusClass}">${iss.status}</span>
+                                        <span class="status-pill status-open" style="font-size: 0.6rem;">${iss.severity}</span>
+                                    </div>
+                                </div>
+                                <div class="issue-desc">${escapeHtml(iss.description || 'No description provided.')}</div>
+                                ${iss.resolution_notes ? `
+                                    <div class="issue-remedy-box">
+                                        <span><i class="ph-bold ph-wrench"></i> ${escapeHtml(iss.resolution_notes)}</span>
+                                    </div>
+                                ` : ''}
+                                <div class="issue-footer">
+                                    <div>
+                                        <span>Type: <strong>${iss.issue_type}</strong></span>
+                                        <span> • Reported: ${new Date(iss.created_at).toLocaleDateString()}</span>
+                                    </div>
+                                    <div style="display: flex; gap: 6px;">
+                                        ${!isResolved ? `
+                                            <button class="btn-action-sm btn-repair-sm" onclick="triggerAutoRepair('${iss.id}', this)">
+                                                <i class="ph-bold ph-magic-wand"></i> Auto-Repair
+                                            </button>
+                                            <button class="btn-action-sm" onclick="resolveIssue('${iss.id}')">
+                                                <i class="ph-bold ph-check"></i> Resolve
+                                            </button>
+                                        ` : `
+                                            <span style="color: var(--accent-emerald); font-weight: 600;"><i class="ph-bold ph-check-circle"></i> Resolved</span>
+                                        `}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (e) {
+                list.innerHTML = `<div class="empty-state" style="color: var(--accent-rose);">Failed to load issues registry.</div>`;
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // Init
+        fetchStats();
+        loadIssuesFeed();
+    </script>
+</body>
+</html>

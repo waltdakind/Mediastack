@@ -1,4 +1,4 @@
-﻿# Test-MediaStackApis.ps1 - Comprehensive API Verification, Health & Key Discovery Engine
+# Test-MediaStackApis.ps1 - Comprehensive API Verification, Health & Key Discovery Engine
 param(
     [string]$ConfigDir = "$env:SystemDrive\MediastackConfig",
     [switch]$AutoUpdateEnv,
@@ -164,7 +164,7 @@ function Test-Endpoint {
         $req.Method = $Method
         $req.Timeout = $TimeoutMs
         $req.UserAgent = "MediaStack-ApiTester/1.0"
-        $req.AllowAutoRedirect = $true
+        $req.AllowAutoRedirect = $false
 
         foreach ($k in $Headers.Keys) {
             if ($k -eq "Host") {
@@ -302,6 +302,20 @@ $testResults += Test-Endpoint -ServiceName "SQLite DB Web" -Url "http://localhos
 # 11. HDHomeRun Tuner Gateway
 $hdhomerunHeaders = @{ "Host" = "hdhomerun.voltairedeux.local" }
 $testResults += Test-Endpoint -ServiceName "HDHomeRun Tuner" -Url "http://localhost:80/discover.json" -Headers $hdhomerunHeaders -TimeoutMs 4000
+
+# 12. JellyWatch Requests Server
+$jwReqHeaders = @{ "Host" = "requests.voltaireun.local" }
+$testResults += Test-Endpoint -ServiceName "JellyWatch Requests API" -Url "http://localhost:3000/api/jellywatch/requests/stats" -Headers $jwReqHeaders -ExpectedContentField "server"
+
+# 13. JellyWatch Issues Server
+$jwIssHeaders = @{ "Host" = "issues.voltaireun.local" }
+$testResults += Test-Endpoint -ServiceName "JellyWatch Issues API" -Url "http://localhost:3000/api/jellywatch/issues/stats" -Headers $jwIssHeaders -ExpectedContentField "server"
+
+# 14. JellyWatch Requests Web Portal
+$testResults += Test-Endpoint -ServiceName "Requests Web Portal" -Url "http://localhost:80/requests" -Headers $jwReqHeaders -TimeoutMs 3000
+
+# 15. JellyWatch Issues Web Portal
+$testResults += Test-Endpoint -ServiceName "Issues Web Portal" -Url "http://localhost:80/issues" -Headers $jwIssHeaders -TimeoutMs 3000
 
 # --- 3. EXPORT AUDIT REPORT & SQLITE LOGGING ---
 Write-Host "`n[3/3] Exporting API Audit Trail..." -ForegroundColor Yellow

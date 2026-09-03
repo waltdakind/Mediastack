@@ -1069,7 +1069,13 @@ function Invoke-MediaStackJellyWatchHandler {
         [Parameter(Mandatory=$false)][switch]$TestConnectivity,
         [Parameter(Mandatory=$false)][switch]$AutoRepair,
         [Parameter(Mandatory=$false)][switch]$GenerateMagicLink,
-        [Parameter(Mandatory=$false)][string]$SimulateError = ""
+        [Parameter(Mandatory=$false)][string]$SimulateError = "",
+        [Parameter(Mandatory=$false)][string]$SubmitRequest = "",
+        [Parameter(Mandatory=$false)][string]$MediaType = "movie",
+        [Parameter(Mandatory=$false)][string]$SubmitIssue = "",
+        [Parameter(Mandatory=$false)][string]$IssueType = "BUFFERING",
+        [Parameter(Mandatory=$false)][switch]$ListRequests,
+        [Parameter(Mandatory=$false)][switch]$ListIssues
     )
 
     $handlerScript = Join-Path $PSScriptRoot "Invoke-JellyWatchHandler.ps1"
@@ -1079,9 +1085,149 @@ function Invoke-MediaStackJellyWatchHandler {
         if ($AutoRepair) { $params["AutoRepair"] = $true }
         if ($GenerateMagicLink) { $params["GenerateMagicLink"] = $true }
         if ($SimulateError) { $params["SimulateError"] = $SimulateError }
+        if ($SubmitRequest) { $params["SubmitRequest"] = $SubmitRequest }
+        if ($MediaType) { $params["MediaType"] = $MediaType }
+        if ($SubmitIssue) { $params["SubmitIssue"] = $SubmitIssue }
+        if ($IssueType) { $params["IssueType"] = $IssueType }
+        if ($ListRequests) { $params["ListRequests"] = $true }
+        if ($ListIssues) { $params["ListIssues"] = $true }
         & $handlerScript @params
     } else {
         Test-MediaStackJellyWatchConnectivity
+    }
+}
+
+function Get-MediaStackJellyWatchRequests {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$false)][string]$Status,
+        [Parameter(Mandatory=$false)][string]$MediaType,
+        [Parameter(Mandatory=$false)][int]$Limit = 20,
+        [Parameter(Mandatory=$false)][string]$Endpoint = "http://127.0.0.1:3000/api/jellywatch/requests"
+    )
+
+    $uri = "$Endpoint`?limit=$Limit"
+    if ($Status) { $uri += "&status=$Status" }
+    if ($MediaType) { $uri += "&media_type=$MediaType" }
+
+    try {
+        $res = Invoke-RestMethod -Uri $uri -TimeoutSec 3 -ErrorAction Stop
+        return $res.requests
+    } catch {
+        Write-Error "Failed to retrieve JellyWatch requests: $_"
+    }
+}
+
+function New-MediaStackJellyWatchRequest {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)][string]$Title,
+        [Parameter(Mandatory=$false)][string]$MediaType = "movie",
+        [Parameter(Mandatory=$false)][int]$Year,
+        [Parameter(Mandatory=$false)][string]$Overview = "",
+        [Parameter(Mandatory=$false)][string]$Username = "walter",
+        [Parameter(Mandatory=$false)][string]$Endpoint = "http://127.0.0.1:3000/api/jellywatch/requests"
+    )
+
+    $payload = @{
+        title = $Title
+        media_type = $MediaType
+        year = $Year
+        overview = $Overview
+        requested_by_username = $Username
+        client_id = "PowerShellOps"
+    } | ConvertTo-Json
+
+    try {
+        $res = Invoke-RestMethod -Uri $Endpoint -Method Post -Body $payload -ContentType "application/json" -TimeoutSec 3 -ErrorAction Stop
+        return $res
+    } catch {
+        Write-Error "Failed to submit JellyWatch request: $_"
+    }
+}
+
+function Get-MediaStackJellyWatchIssues {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$false)][string]$Status,
+        [Parameter(Mandatory=$false)][string]$Severity,
+        [Parameter(Mandatory=$false)][string]$IssueType,
+        [Parameter(Mandatory=$false)][int]$Limit = 20,
+        [Parameter(Mandatory=$false)][string]$Endpoint = "http://127.0.0.1:3000/api/jellywatch/issues"
+    )
+
+    $uri = "$Endpoint`?limit=$Limit"
+    if ($Status) { $uri += "&status=$Status" }
+    if ($Severity) { $uri += "&severity=$Severity" }
+    if ($IssueType) { $uri += "&issue_type=$IssueType" }
+
+    try {
+        $res = Invoke-RestMethod -Uri $uri -TimeoutSec 3 -ErrorAction Stop
+        return $res.issues
+    } catch {
+        Write-Error "Failed to retrieve JellyWatch issues: $_"
+    }
+}
+
+function New-MediaStackJellyWatchIssue {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)][string]$ItemName,
+        [Parameter(Mandatory=$false)][string]$IssueType = "BUFFERING",
+        [Parameter(Mandatory=$false)][string]$Severity = "MEDIUM",
+        [Parameter(Mandatory=$false)][string]$Description = "",
+        [Parameter(Mandatory=$false)][string]$Username = "walter",
+        [Parameter(Mandatory=$false)][string]$Endpoint = "http://127.0.0.1:3000/api/jellywatch/issues"
+    )
+
+    $payload = @{
+        item_id = "cli_$(Get-Date -Format 'yyyyMMddHHmmss')"
+        item_name = $ItemName
+        issue_type = $IssueType
+        severity = $Severity
+        description = $Description
+        reported_by_username = $Username
+        client_id = "PowerShellOps"
+    } | ConvertTo-Json
+
+    try {
+        $res = Invoke-RestMethod -Uri $Endpoint -Method Post -Body $payload -ContentType "application/json" -TimeoutSec 3 -ErrorAction Stop
+        return $res
+    } catch {
+        Write-Error "Failed to submit JellyWatch issue: $_"
+    }
+}
+
+function Test-MediaStackJellyWatchServices {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$false)][string]$HostAddress = "127.0.0.1"
+    )
+
+    $reqUrl = "http://${HostAddress}:3000/api/jellywatch/requests/stats"
+    $issUrl = "http://${HostAddress}:3000/api/jellywatch/issues/stats"
+
+    $reqOk = $false
+    $issOk = $false
+    $reqData = $null
+    $issData = $null
+
+    try {
+        $reqData = Invoke-RestMethod -Uri $reqUrl -TimeoutSec 2 -ErrorAction Stop
+        $reqOk = ($reqData.status -eq 'success')
+    } catch {}
+
+    try {
+        $issData = Invoke-RestMethod -Uri $issUrl -TimeoutSec 2 -ErrorAction Stop
+        $issOk = ($issData.status -eq 'success')
+    } catch {}
+
+    return [PSCustomObject]@{
+        RequestsServerOnline = $reqOk
+        IssuesServerOnline   = $issOk
+        AllServicesHealthy   = ($reqOk -and $issOk)
+        RequestsStats        = $reqData
+        IssuesStats          = $issData
     }
 }
 
@@ -1101,6 +1247,11 @@ try {
             Invoke-MediaStackClusterUpdateCheck, `
             Test-MediaStackCrudLifecycle, `
             Test-MediaStackJellyWatchConnectivity, `
-            Invoke-MediaStackJellyWatchHandler -ErrorAction SilentlyContinue
+            Invoke-MediaStackJellyWatchHandler, `
+            Get-MediaStackJellyWatchRequests, `
+            New-MediaStackJellyWatchRequest, `
+            Get-MediaStackJellyWatchIssues, `
+            New-MediaStackJellyWatchIssue, `
+            Test-MediaStackJellyWatchServices -ErrorAction SilentlyContinue
     }
 } catch { }

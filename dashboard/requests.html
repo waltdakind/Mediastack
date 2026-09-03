@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="JellyWatch Media Requests Portal - Discover, request, and track movies, TV shows, and music.">
+    <title>JellyWatch Requests — Media Discovery & Request Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+    <style>
+        :root {
+            --bg-primary: #0a0c16;
+            --bg-card: rgba(18, 22, 39, 0.75);
+            --bg-card-hover: rgba(28, 34, 60, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-cyan: #06b6d4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(6, 182, 212, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.12) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        /* Ambient Glow Effects */
+        .ambient-glow {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            height: 250px;
+            background: radial-gradient(ellipse, rgba(6, 182, 212, 0.2) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            background: rgba(10, 12, 22, 0.8);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 0 15px var(--accent-cyan-glow);
+        }
+
+        .brand-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-badge {
+            font-size: 0.65rem;
+            padding: 2px 7px;
+            border-radius: 9999px;
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .header-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            border-color: rgba(6, 182, 212, 0.4);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px 16px 40px;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        /* Stats Bar */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            backdrop-filter: blur(12px);
+        }
+
+        .stat-num {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* Search Section */
+        .search-box-container {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input-wrapper i {
+            position: absolute;
+            left: 14px;
+            font-size: 18px;
+            color: var(--text-muted);
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(10, 12, 22, 0.8);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 14px 12px 42px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px var(--accent-cyan-glow);
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 0 20px;
+            font-weight: 600;
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.15s, opacity 0.15s;
+        }
+
+        .btn-search:active {
+            transform: scale(0.97);
+        }
+
+        /* Quick Category Filter Pills */
+        .category-pills {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .pill-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 9999px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            padding: 5px 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .pill-btn.active, .pill-btn:hover {
+            background: rgba(6, 182, 212, 0.15);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        /* Section Titles */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: var(--accent-cyan);
+        }
+
+        /* Search Results Grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+
+        .media-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .media-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(6, 182, 212, 0.4);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .media-poster-box {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            background: #151928;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .media-poster {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-type-tag {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .media-info {
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .media-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .media-year {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .btn-request {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-request.requested {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            cursor: default;
+        }
+
+        .btn-request.available {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            cursor: default;
+        }
+
+        /* Requests Activity Feed */
+        .feed-container {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px;
+            backdrop-filter: blur(12px);
+        }
+
+        .request-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            margin-bottom: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: background 0.15s;
+        }
+
+        .request-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .req-main {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .req-icon-box {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .req-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .req-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+        }
+
+        .status-pill {
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-approved {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-queued {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 10px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .empty-state i {
+            font-size: 32px;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        /* Toast notification */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(18, 22, 39, 0.95);
+            border: 1px solid var(--accent-cyan);
+            color: var(--text-primary);
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Responsive Mobile / Watch Adjustments */
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .media-poster-box {
+                height: 170px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <header>
+        <a href="/" class="brand" id="brand-link">
+            <div class="brand-icon">
+                <i class="ph-bold ph-paper-plane-tilt"></i>
+            </div>
+            <div>
+                <div class="brand-title">JellyWatch Requests</div>
+            </div>
+            <span class="brand-badge">Active Service</span>
+        </a>
+        <div class="header-links">
+            <a href="/issues" class="nav-btn" id="btn-goto-issues" title="Open Issues Portal">
+                <i class="ph-bold ph-warning-circle"></i> Issues
+            </a>
+            <a href="/watch" class="nav-btn" id="btn-goto-watch" title="Open Watch Companion">
+                <i class="ph-bold ph-watch"></i> Watch
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Stats Summary Bar -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-num" id="stat-total">0</div>
+                <div class="stat-label">Total Requests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="stat-pending">0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="stat-approved">0</div>
+                <div class="stat-label">Approved</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="stat-offline">0</div>
+                <div class="stat-label">Queued Offline</div>
+            </div>
+        </div>
+
+        <!-- Search & Request Box -->
+        <section class="search-box-container" aria-label="Media Search Box">
+            <form id="search-form" class="search-bar" onsubmit="event.preventDefault(); handleSearch();">
+                <div class="search-input-wrapper">
+                    <i class="ph-bold ph-magnifying-glass"></i>
+                    <input type="text" id="search-input" class="search-input" placeholder="Search movies, TV shows, anime, music..." autocomplete="off">
+                </div>
+                <button type="submit" id="btn-search-submit" class="btn-search">
+                    <i class="ph-bold ph-magnifying-glass"></i> Search
+                </button>
+            </form>
+
+            <div class="category-pills">
+                <button type="button" class="pill-btn active" data-type="all" onclick="filterCategory('all', this)">
+                    <i class="ph-bold ph-sparkle"></i> All
+                </button>
+                <button type="button" class="pill-btn" data-type="movie" onclick="filterCategory('movie', this)">
+                    <i class="ph-bold ph-film-strip"></i> Movies
+                </button>
+                <button type="button" class="pill-btn" data-type="tv" onclick="filterCategory('tv', this)">
+                    <i class="ph-bold ph-television"></i> TV Shows
+                </button>
+                <button type="button" class="pill-btn" data-type="music" onclick="filterCategory('music', this)">
+                    <i class="ph-bold ph-music-notes"></i> Music
+                </button>
+            </div>
+        </section>
+
+        <!-- Search Results -->
+        <section id="results-section" style="display: none;" aria-label="Search Results">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="ph-bold ph-film-slate"></i> Search Results
+                </div>
+                <span id="results-count" class="stat-label">0 items</span>
+            </div>
+            <div id="results-grid" class="results-grid"></div>
+        </section>
+
+        <!-- Active Requests Tracker -->
+        <section class="feed-container" aria-label="Requests Feed">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="ph-bold ph-clock-counter-clockwise"></i> Recent Requests Activity
+                </div>
+                <button type="button" id="btn-refresh-feed" class="nav-btn" onclick="loadRequestsFeed()">
+                    <i class="ph-bold ph-arrows-clockwise"></i> Refresh
+                </button>
+            </div>
+            <div id="requests-list">
+                <div class="empty-state">
+                    <i class="ph-duotone ph-tray"></i>
+                    <p>Loading recent media requests...</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="toast"><i class="ph-fill ph-check-circle" style="color: var(--accent-emerald);"></i> <span id="toast-msg">Request Submitted</span></div>
+
+    <script>
+        let currentCategory = 'all';
+
+        async function fetchStats() {
+            try {
+                const res = await fetch('/api/jellywatch/requests/stats');
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('stat-total').innerText = data.total || 0;
+                    document.getElementById('stat-pending').innerText = data.pending || 0;
+                    document.getElementById('stat-approved').innerText = data.approved || 0;
+                    document.getElementById('stat-offline').innerText = data.queued_offline || 0;
+                }
+            } catch (e) {}
+        }
+
+        async function handleSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            if (!query) return;
+
+            const resultsSection = document.getElementById('results-section');
+            const resultsGrid = document.getElementById('results-grid');
+            const countLabel = document.getElementById('results-count');
+
+            resultsSection.style.display = 'block';
+            resultsGrid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i class="ph-duotone ph-spinner ph-spin" style="color: var(--accent-cyan);"></i>
+                    <p>Searching MediaStack cluster & upstream catalogs...</p>
+                </div>
+            `;
+
+            try {
+                const res = await fetch(`/api/jellywatch/requests/search?query=${encodeURIComponent(query)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const items = data.results || [];
+                    countLabel.innerText = `${items.length} items found`;
+
+                    if (items.length === 0) {
+                        resultsGrid.innerHTML = `
+                            <div class="empty-state" style="grid-column: 1 / -1;">
+                                <i class="ph-duotone ph-magnifying-glass"></i>
+                                <p>No results found for "${query}". You can still submit a custom request below.</p>
+                                <button class="btn-request" style="max-width: 200px; margin: 12px auto 0;" onclick="submitCustomRequest('${query}')">
+                                    <i class="ph-bold ph-plus"></i> Request "${query}"
+                                </button>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    resultsGrid.innerHTML = items.map(item => {
+                        const poster = item.poster_url || 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=300&q=80';
+                        const isAvailable = item.status === 'AVAILABLE' || item.is_available;
+                        const btnText = isAvailable ? 'Available on Server' : (item.status === 'REQUESTED' ? 'Already Requested' : 'Request');
+                        const btnClass = isAvailable ? 'btn-request available' : (item.status === 'REQUESTED' ? 'btn-request requested' : 'btn-request');
+                        const actionAttr = isAvailable || item.status === 'REQUESTED' ? 'disabled' : `onclick="submitRequest('${escapeHtml(item.title)}', '${item.media_type}', '${item.id || ''}', ${item.year || 'null'}, '${escapeHtml(item.overview || '')}', '${poster}', this)"`;
+
+                        return `
+                            <div class="media-card">
+                                <div class="media-poster-box">
+                                    <img class="media-poster" src="${poster}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=300&q=80'">
+                                    <span class="media-type-tag">${item.media_type}</span>
+                                </div>
+                                <div class="media-info">
+                                    <div>
+                                        <div class="media-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div>
+                                        <div class="media-year">${item.year || 'Unknown Year'}</div>
+                                    </div>
+                                    <button class="${btnClass}" ${actionAttr}>
+                                        <i class="ph-bold ${isAvailable ? 'ph-check-circle' : 'ph-paper-plane-tilt'}"></i> ${btnText}
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                resultsGrid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1; color: var(--accent-rose);">
+                        <i class="ph-duotone ph-warning-circle"></i>
+                        <p>Search failed: ${err.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function submitRequest(title, mediaType, mediaId, year, overview, posterUrl, btnElement) {
+            if (btnElement) {
+                btnElement.disabled = true;
+                btnElement.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Submitting...';
+            }
+
+            try {
+                const res = await fetch('/api/jellywatch/requests', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: title,
+                        media_type: mediaType,
+                        media_id: mediaId,
+                        year: year,
+                        overview: overview,
+                        poster_url: posterUrl,
+                        client_id: 'JellyWatchWeb'
+                    })
+                });
+
+                const data = await res.json();
+                if (res.ok || res.status === 202) {
+                    showToast(data.message || `Request for '${title}' submitted!`);
+                    if (btnElement) {
+                        btnElement.className = 'btn-request requested';
+                        btnElement.innerHTML = '<i class="ph-bold ph-check"></i> Requested';
+                    }
+                    fetchStats();
+                    loadRequestsFeed();
+                } else {
+                    showToast(data.error || 'Failed to submit request');
+                    if (btnElement) {
+                        btnElement.disabled = false;
+                        btnElement.innerHTML = '<i class="ph-bold ph-paper-plane-tilt"></i> Request';
+                    }
+                }
+            } catch (e) {
+                showToast(`Error: ${e.message}`);
+                if (btnElement) {
+                    btnElement.disabled = false;
+                    btnElement.innerHTML = '<i class="ph-bold ph-paper-plane-tilt"></i> Request';
+                }
+            }
+        }
+
+        function submitCustomRequest(title) {
+            submitRequest(title, 'movie', null, new Date().getFullYear(), '', '', null);
+        }
+
+        async function loadRequestsFeed() {
+            const list = document.getElementById('requests-list');
+            try {
+                const res = await fetch('/api/jellywatch/requests?limit=15');
+                if (res.ok) {
+                    const data = await res.json();
+                    const items = data.requests || [];
+                    if (items.length === 0) {
+                        list.innerHTML = `
+                            <div class="empty-state">
+                                <i class="ph-duotone ph-tray"></i>
+                                <p>No media requests in queue. Search above to request titles.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    list.innerHTML = items.map(req => {
+                        let statusClass = 'status-pending';
+                        if (req.status === 'APPROVED' || req.status === 'AVAILABLE') statusClass = 'status-approved';
+                        if (req.status === 'QUEUED_OFFLINE') statusClass = 'status-queued';
+
+                        const icon = req.media_type === 'tv' ? 'ph-television' : (req.media_type === 'music' ? 'ph-music-notes' : 'ph-film-strip');
+
+                        return `
+                            <div class="request-row">
+                                <div class="req-main">
+                                    <div class="req-icon-box">
+                                        <i class="ph-bold ${icon}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="req-title">${escapeHtml(req.title)} ${req.year ? `(${req.year})` : ''}</div>
+                                        <div class="req-sub">
+                                            <span>By <strong>${escapeHtml(req.requested_by_username || 'User')}</strong></span>
+                                            <span>•</span>
+                                            <span>${new Date(req.created_at).toLocaleDateString()}</span>
+                                            <span>•</span>
+                                            <span>Via ${req.client_id || 'JellyWatch'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="status-pill ${statusClass}">${req.status}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (e) {
+                list.innerHTML = `<div class="empty-state" style="color: var(--accent-rose);">Failed to load requests feed.</div>`;
+            }
+        }
+
+        function filterCategory(cat, btn) {
+            currentCategory = cat;
+            document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            handleSearch();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // Init
+        fetchStats();
+        loadRequestsFeed();
+    </script>
+</body>
+</html>
