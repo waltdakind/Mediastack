@@ -1,15 +1,12 @@
 ﻿{
-    "last_session_timestamp":  "2026-09-03 01:21:58",
+    "last_session_timestamp":  "2026-09-03 02:07:19",
     "last_session_node":  "VOLTAIREDEUX",
     "local_ip":  "192.168.4.30",
     "peer_node":  "VOLTAIREUN",
     "peer_ip":  "fe80::2c3c:b2c6:ab71:6c09%6",
-    "peer_latency_ms":  9,
-    "databases_healthy":  true,
-    "anomalies_detected":  1,
-    "remediations_applied":  0,
-    "active_action_plan":  [
-                               "Soft-reload Caddy reverse proxy upstream definitions (\u0027docker exec caddy caddy reload\u0027)"
-                           ],
-    "latest_report_path":  "C:\\Users\\waltd\\OneDrive\\Mediastack\\handoffs\\AI_Collaboration_Session_VOLTAIREDEUX_20260903_012158.md"
+    "peer_services_online":  6,
+    "total_peer_probes":  6,
+    "staged_update_id":  "VOLTAIREDEUX_OPT_20260903_020719",
+    "latest_advice_file":  "AI_Expert_Advice_FOR_VOLTAIREUN_20260903_020719.md",
+    "latest_manifest_path":  "C:\\Users\\waltd\\OneDrive\\Mediastack\\handoffs\\cluster_update_manifest.json"
 }
