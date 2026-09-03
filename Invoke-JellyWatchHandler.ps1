@@ -186,39 +186,39 @@ Write-Host "`n[STAGE 2] Probing Multi-Tier Cascade Connection Pathways..." -Fore
 $routes = @(
     @{
         Tier = 1
-        Id = "voltaireun_direct"
-        Name = "VoltaireUn Direct Socket (Primary LAN)"
-        Url = "http://192.168.4.21:8096"
+        Id = "wan_gateway"
+        Name = "Remote WAN Gateway (Public DDNS - Main Login)"
+        Url = "https://waltdakind.xubi.org"
         ProbePath = "/System/Info/Public"
-        Protocol = "HTTP/REST"
-        IdealFor = "Apple Watch on Home WiFi (Zero TLS handshake friction, lowest latency)"
+        Protocol = "HTTPS/WAN"
+        IdealFor = "Primary Default Login (Anywhere, LTE/Cellular & External Networks)"
     },
     @{
         Tier = 2
+        Id = "voltaireun_direct"
+        Name = "VoltaireUn Direct Socket (Local Network Fallback)"
+        Url = "http://192.168.4.21:8096"
+        ProbePath = "/System/Info/Public"
+        Protocol = "HTTP/REST"
+        IdealFor = "Local Home Network Fallback (Zero TLS friction, lowest LAN latency)"
+    },
+    @{
+        Tier = 3
         Id = "voltaireun_caddy"
         Name = "VoltaireUn Ingress Gateway (Caddy HTTPS)"
         Url = "https://voltaireun.local"
         ProbePath = "/System/Info/Public"
         Protocol = "HTTPS/HTTP2"
-        IdealFor = "LAN Web Companion & Ingress with Caching"
+        IdealFor = "Local LAN Ingress & Web Companion"
     },
     @{
-        Tier = 3
+        Tier = 4
         Id = "voltairedeux_direct"
         Name = "VoltaireDeux AI Node (Failover LAN)"
         Url = "http://192.168.4.30:8096"
         ProbePath = "/System/Info/Public"
         Protocol = "HTTP/REST"
         IdealFor = "Automated Failover when VoltaireUn is restarting/updating"
-    },
-    @{
-        Tier = 4
-        Id = "wan_gateway"
-        Name = "Remote WAN Gateway (Public DDNS)"
-        Url = "https://waltdakind.xubi.org"
-        ProbePath = "/System/Info/Public"
-        Protocol = "HTTPS/WAN"
-        IdealFor = "Apple Watch on LTE/Cellular or Out-of-Home Remote Streaming"
     },
     @{
         Tier = 5

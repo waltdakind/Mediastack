@@ -1,4 +1,4 @@
-# =============================================================================
+﻿# =============================================================================
 # Caddyfile - MediaStack Primary Reverse Proxy
 # Supports Multi-Server Load Balancing, Failover, LAN (*.voltaireun.local / *.voltairedeux.local) & DDNS (waltdakind.xubi.org)
 # Full End-to-End TLS / HTTPS (:443) with Custom Root CA & Wildcard SANs
@@ -59,17 +59,6 @@
     handle /listen* {
         rewrite * /autologin.html
         root * /var/www/dashboard
-        file_server
-    }
-
-    # JellyWatch Companion Client & Simulator Routes
-    handle /watch* {
-        root * /var/www/dashboard/watch
-        file_server
-    }
-
-    handle /jellywatch* {
-        root * /var/www/dashboard/watch
         file_server
     }
 

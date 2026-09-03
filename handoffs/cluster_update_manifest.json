@@ -1,20 +1,16 @@
-{
-  "manifest_version": "2.1.0",
-  "update_id": "VOLTAIREDEUX_PARITY_20260902_133000",
-  "publisher_node": "VOLTAIREDEUX",
-  "publisher_role": "VoltaireDeux (AI Acceleration & Push Node)",
-  "publisher_ip": "192.168.4.30",
-  "target_node": "VOLTAIREUN",
-  "target_role": "VoltaireUn (Main 24/7 Server Node)",
-  "target_ip": "192.168.4.21",
-  "published_at": "2026-09-02 13:30:00",
-  "commit_sha": "a78ef40c9d92e59123849fca9e33418d184bfde1",
-  "commit_message": "Fleet Parity Update: Jellyfin Server ID, Port + 1 Fallbacks & Autonomous Handoff",
-  "git_branch": "main",
-  "requires_db_sync": true,
-  "status": "READY_FOR_VOLTAIREUN_PULL",
-  "execution_payload": {
-    "command": "powershell -ExecutionPolicy Bypass -File .\\Start-AutonomousMediaStackCollaborator.ps1 -SinglePass",
-    "description": "Generate full autonomous telemetry report for VoltaireUn with Jellyfin Server ID and Port+1 fallbacks"
-  }
+﻿{
+    "manifest_version":  "2.0.0",
+    "update_id":  "VOLTAIREDEUX_REL_20260902_173215",
+    "publisher_node":  "VOLTAIREDEUX",
+    "publisher_role":  "VoltaireDeux (AI Acceleration \u0026 Push Node)",
+    "publisher_ip":  "192.168.4.30",
+    "target_node":  "VOLTAIREUN",
+    "target_role":  "VoltaireUn (Main 24/7 Server Node)",
+    "target_ip":  "fe80::2c3c:b2c6:ab71:6c09%6",
+    "published_at":  "2026-09-02 17:32:15",
+    "commit_sha":  "ab54d51d86ef301111c5da6d1a959c445718fd52",
+    "commit_message":  "VoltaireDeux Main Execution Synchronization",
+    "git_branch":  "main",
+    "requires_db_sync":  true,
+    "status":  "READY_FOR_VOLTAIREUN_PULL"
 }

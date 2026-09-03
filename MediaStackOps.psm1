@@ -1009,10 +1009,10 @@ function Test-MediaStackJellyWatchConnectivity {
     )
 
     $routes = @(
-        @{ Tier = 1; Name = "VoltaireUn Direct Socket"; Url = "http://${PrimaryIP}:8096/System/Info/Public"; Protocol = "HTTP/REST" },
-        @{ Tier = 2; Name = "VoltaireUn Caddy Proxy";    Url = "https://voltaireun.local/System/Info/Public"; Protocol = "HTTPS/HTTP2" },
-        @{ Tier = 3; Name = "VoltaireDeux AI Node";      Url = "http://${SecondaryIP}:8096/System/Info/Public"; Protocol = "HTTP/REST" },
-        @{ Tier = 4; Name = "Remote WAN Gateway";        Url = "https://${ExternalDomain}/System/Info/Public"; Protocol = "HTTPS/WAN" },
+        @{ Tier = 1; Name = "Remote WAN Gateway (Main Login)"; Url = "https://${ExternalDomain}/System/Info/Public"; Protocol = "HTTPS/WAN" },
+        @{ Tier = 2; Name = "VoltaireUn Direct Socket (LAN Fallback)"; Url = "http://${PrimaryIP}:8096/System/Info/Public"; Protocol = "HTTP/REST" },
+        @{ Tier = 3; Name = "VoltaireUn Caddy Proxy";    Url = "https://voltaireun.local/System/Info/Public"; Protocol = "HTTPS/HTTP2" },
+        @{ Tier = 4; Name = "VoltaireDeux AI Node";      Url = "http://${SecondaryIP}:8096/System/Info/Public"; Protocol = "HTTP/REST" },
         @{ Tier = 5; Name = "Localhost Loopback";        Url = "http://127.0.0.1:8096/health"; Protocol = "HTTP/Loopback" }
     )
 

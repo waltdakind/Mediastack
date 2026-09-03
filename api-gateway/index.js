@@ -1248,18 +1248,27 @@ const JELLYFIN_SERVER_ID = 'd9fa4abb39204b6e9d680e4b8a0e7df9';
 // Connection Candidates definition
 const JELLYWATCH_CANDIDATES = [
     {
-        id: 'voltaireun_direct',
-        name: 'VoltaireUn Direct Socket (Primary LAN)',
+        id: 'wan_gateway',
+        name: 'Remote WAN Gateway (Public DDNS - Main Login)',
         tier: 1,
+        url: 'https://waltdakind.xubi.org',
+        internal_url: 'https://waltdakind.xubi.org',
+        protocol: 'HTTPS/WAN',
+        recommended_for: 'Primary Default Login (Anywhere, LTE/Cellular & Remote Streaming)'
+    },
+    {
+        id: 'voltaireun_direct',
+        name: 'VoltaireUn Direct Socket (Local Network Fallback)',
+        tier: 2,
         url: 'http://192.168.4.21:8096',
         internal_url: 'http://jellyfin:8096',
         protocol: 'HTTP/REST',
-        recommended_for: 'Apple Watch on Local WiFi (Zero SSL friction, sub-millisecond overhead)'
+        recommended_for: 'Local Home Network Fallback (Zero TLS friction, lowest LAN latency)'
     },
     {
         id: 'voltaireun_caddy',
         name: 'VoltaireUn Reverse Proxy (Caddy HTTPS)',
-        tier: 2,
+        tier: 3,
         url: 'https://voltaireun.local',
         internal_url: 'http://caddy:80',
         protocol: 'HTTPS/HTTP2',
@@ -1268,20 +1277,11 @@ const JELLYWATCH_CANDIDATES = [
     {
         id: 'voltairedeux_direct',
         name: 'VoltaireDeux AI Node (Failover LAN)',
-        tier: 3,
+        tier: 4,
         url: 'http://192.168.4.30:8096',
         internal_url: 'http://192.168.4.30:8096',
         protocol: 'HTTP/REST',
         recommended_for: 'Automated Failover when VoltaireUn is restarting'
-    },
-    {
-        id: 'wan_gateway',
-        name: 'Remote WAN Gateway (Public DDNS)',
-        tier: 4,
-        url: 'https://waltdakind.xubi.org',
-        internal_url: 'https://waltdakind.xubi.org',
-        protocol: 'HTTPS/WAN',
-        recommended_for: 'Apple Watch on LTE/Cellular or Out-of-Home Remote'
     },
     {
         id: 'localhost_direct',
