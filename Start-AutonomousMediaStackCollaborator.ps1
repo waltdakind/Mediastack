@@ -70,6 +70,8 @@ if (Test-Path $opsModule) {
 
 $nodeInfo = Get-MediaStackClusterNodeInfo
 $historyFile = Join-Path $HandoffsDir ".remediation_history.json"
+$nexusPath = Join-Path $HandoffsDir "ai_collaboration_nexus.json"
+$manifestPath = Join-Path $HandoffsDir "cluster_update_manifest.json"
 
 # Initialize or Load Remediation History
 function Get-RemediationHistory {
@@ -375,8 +377,9 @@ try {
                 }
                 $mdLines.Add("")
                 $mdLines.Add("### Diagnostic Artifacts & Blueprint Links:")
-                $mdLines.Add("- JSON Payload: [Incident_Alert_$($nodeInfo.LocalHostName)_${fileTag}.json](file:///$($incidentAlertPath.Replace('\', '/')))")
-                $mdLines.Add("- Update Manifest: [cluster_update_manifest.json](file:///$($HandoffsDir.Replace('\', '/'))/cluster_update_manifest.json)")
+                $mdLines.Add("- JSON Payload: [Incident_Alert_$($nodeInfo.LocalHostName)_${fileTag}.json](file:///$($incidentAlertPath -replace '\\', '/'))")
+                $mdLines.Add("- Update Manifest: [cluster_update_manifest.json](file:///$($manifestPath -replace '\\', '/'))")
+                $mdLines.Add("- Collaboration Nexus: [ai_collaboration_nexus.json](file:///$($nexusPath -replace '\\', '/'))")
                 $mdLines.Add("- Secrets Vault: [secrets.json](file:///c:/Users/waltd/OneDrive/Mediastack/config/secrets/secrets.json)")
                 $mdLines.Add("- Caddyfile Blueprint: [Caddyfile](file:///c:/Users/waltd/OneDrive/Mediastack/Caddyfile)")
                 $mdLines.Add("")
@@ -547,8 +550,8 @@ try {
             $reportLines.Add('```')
             $reportLines.Add("")
             $reportLines.Add("### Verified Artifacts:")
-            $reportLines.Add("- Cluster Manifest: [cluster_update_manifest.json](file:///$($manifestPath.Replace('\', '/')))")
-            $reportLines.Add("- Collaboration Nexus: [ai_collaboration_nexus.json](file:///$($nexusPath.Replace('\', '/')))")
+            $reportLines.Add("- Cluster Manifest: [cluster_update_manifest.json](file:///$($manifestPath -replace '\\', '/'))")
+            $reportLines.Add("- Collaboration Nexus: [ai_collaboration_nexus.json](file:///$($nexusPath -replace '\\', '/'))")
             $reportLines.Add("")
             $reportLines.Add("---")
             $reportLines.Add("*Report emitted by Autonomous Collaborator Engine.*")
@@ -572,7 +575,6 @@ try {
             }
 
             # Update AI Collaboration Nexus
-            $nexusPath = Join-Path $HandoffsDir "ai_collaboration_nexus.json"
             $nexusData = [ordered]@{
                 last_session_timestamp = $timestamp
                 last_session_node      = $nodeInfo.LocalHostName
