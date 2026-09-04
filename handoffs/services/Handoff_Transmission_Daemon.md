@@ -6,17 +6,17 @@
 | **Display Name** | Transmission BitTorrent |
 | **Service Category** | Downloader |
 | **Container Name** | transmission |
-| **Image Tag** | lscr.io/linuxserver/transmission:latest |
+| **Image Tag** | N/A |
 | **Primary Ingress Port** | 9091 |
 | **Associated Storage/DB**| settings.json |
-| **Container Status** | **RUNNING** |
+| **Container Status** | **STOPPED** |
 | **Restart Count** | 0 |
-| **Container Started** | 2026-09-01T20:20:39.757337751Z |
+| **Container Started** | N/A |
 | **L7 Response Code** | HTTP 301 |
-| **TTFB Latency** | 37.3 ms |
+| **TTFB Latency** | 10.2 ms |
 | **Vault Secrets Status**| SECURED IN VAULT |
 | **Error Lines Detected**| 0 |
-| **Audit Timestamp** | 2026-09-01 17:53:17 |
+| **Audit Timestamp** | 2026-09-03 20:39:20 |
 
 ---
 
@@ -46,7 +46,7 @@
 ## 4. Diagnostic Log Mining & Health Assessment
 ### Log Extraction (Last 40 Lines)
 `	ext
-[migrations] started [migrations] no migrations found ───────────────────────────────────────        ██╗     ███████╗██╗ ██████╗       ██║     ██╔════╝██║██╔═══██╗       ██║     ███████╗██║██║   ██║       ██║     ╚════██║██║██║   ██║       ███████╗███████║██║╚██████╔╝       ╚══════╝╚══════╝╚═╝ ╚═════╝     Brought to you by linuxserver.io ───────────────────────────────────────  To support LSIO projects visit: https://www.linuxserver.io/donate/  ─────────────────────────────────────── GID/UID ───────────────────────────────────────  User UID:    1000 User GID:    1000 ─────────────────────────────────────── Linuxserver.io version: 4.1.3-r0-ls357 Build-date: 2026-08-04T12:22:56+00:00 ───────────────────────────────────────      [custom-init] No custom files found, skipping... Connection to localhost (::1) 9091 port [tcp/*] succeeded! [ls.io-init] done.
+Container offline.
 `
 
 ---

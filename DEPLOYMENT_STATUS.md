@@ -60,14 +60,14 @@ tvheadend       ✓ running    (9981)     Live TV backend
 ## What's Pre-Configured
 
 ### Volumes & Paths
-| Container | Internal Path | Host (Absolute) | Status |
+| Container | Internal Path | Host (Absolute / Relative) | Status |
 |-----------|---------------|-----------------|--------|
-| Jellyfin | `/media/videos` | `C:\Users\Public\Videos` | ✓ Ready |
-| Jellyfin | `/media/music` | `C:\Users\Public\Music` | ✓ Ready |
-| Jellyfin | `/media/pictures` | `C:\Users\Public\Pictures` | ✓ Ready |
-| Sonarr/Radarr | `/media/videos` | `C:\Users\Public\Videos` | ✓ Ready |
-| All | `/downloads` | `C:\Users\Public\MediaStack\downloads` | ✓ Ready |
-| All | `/config` | `C:\Users\Public\MediaStack/<service>/config` | ✓ Ready |
+| Jellyfin | `/media/videos` | `C:\Users\waltd\OneDrive\Mediastack\Videos` | ✓ Ready |
+| Jellyfin | `/media/music` | `C:\Users\waltd\OneDrive\Mediastack\Music` | ✓ Ready |
+| Jellyfin | `/media/pictures` | `C:\Users\waltd\OneDrive\Mediastack\Pictures` | ✓ Ready |
+| Sonarr/Radarr | `/media/videos` | `C:\Users\waltd\OneDrive\Mediastack\Videos` | ✓ Ready |
+| All | `/downloads` | `C:\Users\waltd\OneDrive\Mediastack\downloads` | ✓ Ready |
+| All | `/config` | `C:\Users\waltd\OneDrive\Mediastack/config/<service>` | ✓ Ready |
 
 ### Networking
 - ✓ Internal DNS: services communicate via hostname (e.g., `http://sonarr:8989`)

@@ -37,6 +37,7 @@ $hostsEntries = @"
 192.168.4.30    db.voltairedeux.local
 192.168.4.30    home.voltairedeux.local
 192.168.4.30    homepage.voltairedeux.local
+192.168.4.30    portainer.voltairedeux.local
 
 # --- Node 1: VoltaireUn (192.168.4.21) Primary Server Ingress ---
 192.168.4.21    voltaireun.local
@@ -56,6 +57,7 @@ $hostsEntries = @"
 192.168.4.21    db.voltaireun.local
 192.168.4.21    home.voltaireun.local
 192.168.4.21    homepage.voltaireun.local
+192.168.4.21    portainer.voltaireun.local
 
 # --- Legacy Alias Mappings ---
 192.168.4.30    mediaserver.local

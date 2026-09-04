@@ -25,7 +25,7 @@ param (
     [switch]$Once,
 
     [Parameter()]
-    [switch]$Monitor = $true,
+    [switch]$Monitor,
 
     [Parameter()]
     [int]$IntervalSec = 30,
@@ -122,13 +122,13 @@ function Invoke-DockerCleanup {
     Write-Log "`n[+] Cleaning Abandoned Docker Resources..." "Yellow"
 
     try {
-        $containerPrune = docker container prune -f 2>&1
+        docker container prune -f 2>&1 | Out-Null
         Write-Log "    [OK] Pruned stopped containers." "Green"
 
-        $imagePrune = docker image prune -f 2>&1
+        docker image prune -f 2>&1 | Out-Null
         Write-Log "    [OK] Pruned dangling images." "Green"
 
-        $netPrune = docker network prune -f 2>&1
+        docker network prune -f 2>&1 | Out-Null
         Write-Log "    [OK] Pruned unused networks." "Green"
     } catch {
         Write-Log "    [WARN] Docker cleanup notice: $_" "DarkGray"
@@ -142,7 +142,7 @@ function Test-SqliteFileIntegrity([string]$FilePath) {
     try {
         $fs = [System.IO.File]::Open($FilePath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
         $buffer = New-Object byte[] 16
-        $read = $fs.Read($buffer, 0, 16)
+        $null = $fs.Read($buffer, 0, 16)
         $fs.Close()
         $header = [System.Text.Encoding]::ASCII.GetString($buffer)
         if ($header.StartsWith("SQLite format 3")) {
@@ -155,7 +155,7 @@ function Test-SqliteFileIntegrity([string]$FilePath) {
     }
 }
 
-function Check-DatabaseIntegrity {
+function Test-DatabaseIntegrity {
     Write-Log "`n[+] Reviewing Database Integrity Across Stack..." "Yellow"
 
     $sqliteTargets = @(
@@ -251,7 +251,7 @@ function Start-AllContainers {
 # -----------------------------------------------------------------------------
 # 5. Caddy Routing & Reverse Proxy Verification
 # -----------------------------------------------------------------------------
-function Verify-CaddyRouting {
+function Test-CaddyRouting {
     Write-Log "`n[+] Validating Caddy Configuration & Verifying Routes..." "Yellow"
 
     try {
@@ -306,7 +306,7 @@ function Verify-CaddyRouting {
 # -----------------------------------------------------------------------------
 # 6. Auto-Repair & Sentinel Engine
 # -----------------------------------------------------------------------------
-function Auto-RepairContainer([string]$ContainerName, [string]$Reason) {
+function Invoke-ContainerAutoRepair([string]$ContainerName, [string]$Reason) {
     $now = Get-Date
 
     # Prevent restarting the same container more than once every 60 seconds
@@ -331,7 +331,7 @@ function Auto-RepairContainer([string]$ContainerName, [string]$Reason) {
     }
 }
 
-function Run-SentinelMonitor {
+function Start-SentinelMonitor {
     Write-Log "`n[+] Entering Continuous Self-Healing Sentinel Mode (Poll Interval: ${IntervalSec}s)..." "Cyan"
     Write-Log "    Press [Ctrl+C] to gracefully stop monitoring.`n" "DarkGray"
 
@@ -363,7 +363,7 @@ function Run-SentinelMonitor {
 
             # State check: Dead or Exited
             if ($state -eq "exited" -or $state -eq "dead") {
-                Auto-RepairContainer -ContainerName $cName -Reason "Container State was $state"
+                Invoke-ContainerAutoRepair -ContainerName $cName -Reason "Container State was $state"
             }
             # Health check: Only trigger if sustained unhealthy (ignore 'health: starting')
             elseif ($status -match "unhealthy") {
@@ -375,7 +375,7 @@ function Run-SentinelMonitor {
 
                 # Only restart if unhealthy across 3 consecutive cycles (90+ seconds)
                 if ($Global:UnhealthyStreak[$cName] -ge 3) {
-                    Auto-RepairContainer -ContainerName $cName -Reason "Sustained unhealthy state for 3+ cycles"
+                    Invoke-ContainerAutoRepair -ContainerName $cName -Reason "Sustained unhealthy state for 3+ cycles"
                     $Global:UnhealthyStreak[$cName] = 0
                 } else {
                     Write-Log "    [MONITOR] '$cName' flagged unhealthy (cycle $($Global:UnhealthyStreak[$cName])/3). Waiting for stabilization..." "DarkGray"
@@ -415,9 +415,9 @@ function Run-SentinelMonitor {
 Show-Banner
 Initialize-Environment
 Invoke-DockerCleanup
-Check-DatabaseIntegrity
+Test-DatabaseIntegrity
 Start-AllContainers
-Verify-CaddyRouting
+Test-CaddyRouting
 
 if ($Once) {
     Write-Host "`n================================================================================" -ForegroundColor Cyan
@@ -426,6 +426,6 @@ if ($Once) {
     exit 0
 }
 
-if ($Monitor) {
-    Run-SentinelMonitor
+if ($Monitor -or (-not $Once)) {
+    Start-SentinelMonitor
 }

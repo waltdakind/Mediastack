@@ -586,7 +586,6 @@ function Repair-MediaStackPortConflict {
         [Parameter(Mandatory=$false)][string]$ServiceName = ""
     )
 
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $actions = @()
     $repaired = $false
 
@@ -855,7 +854,7 @@ function Invoke-MediaStackClusterUpdateCheck {
     Write-Host "================================================================================" -ForegroundColor DarkCyan
 
     Write-Host "`n[1/3] Generating System Status Handoff & Architecture Report..." -ForegroundColor Yellow
-    $handoff = New-MediaStackClusterHandoff -HandoffsDir $HandoffsDir
+    [void](New-MediaStackClusterHandoff -HandoffsDir $HandoffsDir)
 
     Write-Host "`n[2/3] Checking for Inbound Cluster Updates..." -ForegroundColor Yellow
     $manifestPath = Join-Path $HandoffsDir "cluster_update_manifest.json"

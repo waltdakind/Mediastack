@@ -1,19 +1,23 @@
-﻿<#
+<#
 .SYNOPSIS
     Set-MediaStackNetworkUsers.ps1 - Multi-Node Network User Accounts & Reciprocal Read-Write SMB Share Provisioner.
 
 .DESCRIPTION
     Creates local service accounts on both VoltaireUn (192.168.4.21) and VoltaireDeux (192.168.4.30),
-    ensures required media directories exist, grants reciprocal Read-Write NTFS ACLs, and configures
-    SMB network shares for:
-    - Music    -> \\<host>\Public-Music
-    - TV       -> \\<host>\Public-TV
-    - Videos   -> \\<host>\Public-Videos
-    - Radio    -> \\<host>\Public-Radio
-    - Podcasts -> \\<host>\Public-Podcasts
+    ensures required media directories exist as subfolders of Mediastack (C:\Users\waltd\OneDrive\Mediastack\),
+    grants reciprocal Read-Write NTFS ACLs, and configures SMB network shares for:
+    - Movies    -> \\<host>\MediaStack-Movies     (C:\Users\waltd\OneDrive\Mediastack\Movies)
+    - Shows     -> \\<host>\MediaStack-Shows      (C:\Users\waltd\OneDrive\Mediastack\Shows)
+    - Music     -> \\<host>\MediaStack-Music      (C:\Users\waltd\OneDrive\Mediastack\Music)
+    - TV        -> \\<host>\MediaStack-TV         (C:\Users\waltd\OneDrive\Mediastack\TV)
+    - Videos    -> \\<host>\MediaStack-Videos     (C:\Users\waltd\OneDrive\Mediastack\Videos)
+    - Radio     -> \\<host>\MediaStack-Radio      (C:\Users\waltd\OneDrive\Mediastack\Radio)
+    - Podcasts  -> \\<host>\MediaStack-Podcasts   (C:\Users\waltd\OneDrive\Mediastack\Podcasts)
+    - Downloads -> \\<host>\MediaStack-Downloads  (C:\Users\waltd\OneDrive\Mediastack\downloads)
+    - Documents -> \\<host>\MediaStack-Documents  (C:\Users\waltd\OneDrive\Mediastack\documents)
 
 .PARAMETER MediaBasePath
-    Base directory where media folders reside (default: parent of script directory or C:\MediastackMedia).
+    Base directory where media folders reside (default: C:\Users\waltd\OneDrive\Mediastack or script root).
 
 .PARAMETER SharedFolders
     List of media subdirectories to share with Read-Write access.
@@ -25,7 +29,7 @@
     Plaintext password for the cluster account (automatically loaded from config\secrets\secrets.json if omitted).
 
 .PARAMETER SharePrefix
-    Prefix for SMB share names (default: Public-).
+    Prefix for SMB share names (default: MediaStack-).
 
 .PARAMETER CheckOnly
     Audits current accounts, permissions, and shares without making system modifications.
@@ -39,16 +43,16 @@
 .EXAMPLE
     .\Set-MediaStackNetworkUsers.ps1
     .\Set-MediaStackNetworkUsers.ps1 -CheckOnly
-    .\Set-MediaStackNetworkUsers.ps1 -MediaBasePath "C:\MediastackMedia"
+    .\Set-MediaStackNetworkUsers.ps1 -MediaBasePath "C:\Users\waltd\OneDrive\Mediastack"
 #>
 
 [CmdletBinding()]
 param(
     [string]$MediaBasePath = "",
-    [string[]]$SharedFolders = @("Music", "TV", "Videos", "Radio", "Podcasts"),
+    [string[]]$SharedFolders = @("Movies", "Shows", "Music", "TV", "Videos", "Radio", "Podcasts", "downloads", "documents"),
     [string]$ClusterUser = "mediasync",
     [string]$ClusterSecret = "",
-    [string]$SharePrefix = "Public-",
+    [string]$SharePrefix = "MediaStack-",
     [switch]$CheckOnly,
     [switch]$CreateUsersOnly,
     [switch]$CreateSharesOnly,
@@ -69,15 +73,9 @@ Write-Host "   Reciprocal Read-Write Provisioning for VoltaireUn & VoltaireDeux"
 Write-Host "   Timestamp: $timestamp | Mode: $(if ($CheckOnly) { 'Audit / CheckOnly' } else { 'Active Provisioning' })" -ForegroundColor DarkGray
 Write-Host "================================================================================" -ForegroundColor Cyan
 
-# 1. Determine Media Base Directory
+# 1. Determine Media Base Directory (Relative to Mediastack Root)
 if (-not $MediaBasePath) {
-    $parentDir = Split-Path -Parent $BaseDir
-    $testMusic = Join-Path $parentDir "Music"
-    if (Test-Path $testMusic) {
-        $MediaBasePath = $parentDir
-    } else {
-        $MediaBasePath = Join-Path $BaseDir "media"
-    }
+    $MediaBasePath = $BaseDir
 }
 Write-Host "  * Media Base Directory: $MediaBasePath" -ForegroundColor Cyan
 

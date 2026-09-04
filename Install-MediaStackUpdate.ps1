@@ -21,7 +21,7 @@
 .EXAMPLE
     .\Install-MediaStackUpdate.ps1
     .\Install-MediaStackUpdate.ps1 -Force
-    .\Install-MediaStackUpdate.ps1 -ZipPath "\\192.168.4.21\Public-Downloads\MediaStack_Cluster_Node_Installer.zip"
+    .\Install-MediaStackUpdate.ps1 -ZipPath "\\192.168.4.21\MediaStack-Downloads\MediaStack_Cluster_Node_Installer.zip"
 #>
 
 [CmdletBinding()]
@@ -50,8 +50,8 @@ Write-Host "====================================================================
 if (-not $ZipPath) {
     $searchPaths = @(
         (Join-Path $BaseDir "dist\MediaStack_Cluster_Node_Installer.zip"),
-        "\\192.168.4.21\Public-Downloads\MediaStack_Cluster_Node_Installer.zip",
-        "\\192.168.4.30\Public-Downloads\MediaStack_Cluster_Node_Installer.zip",
+        "\\192.168.4.21\MediaStack-Downloads\MediaStack_Cluster_Node_Installer.zip",
+        "\\192.168.4.30\MediaStack-Downloads\MediaStack_Cluster_Node_Installer.zip",
         (Join-Path $BaseDir "backups\MediaStack_Cluster_Node_Installer.zip")
     )
 

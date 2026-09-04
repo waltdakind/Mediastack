@@ -1,4 +1,4 @@
-﻿# =============================================================================
+# =============================================================================
 # docker-compose.x64.yml - MediaStack x64 (Main Server) Services
 # =============================================================================
 #
@@ -245,11 +245,26 @@ services:
       - "22000:22000"
       - "22000:22000/udp"
       - "21027:21027/udp"
+  # -----------------------------------------------------------------------------
+  # Portainer - Centralized Container Management Web UI
+  # Docs: https://docs.portainer.io/
+  # -----------------------------------------------------------------------------
+  portainer:
+    <<: [*common, *no-ipv6]
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    ports:
+      - "9000:9000"
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${CONFIG_ROOT:-./config}/portainer:/data
+      - ${MEDIASTACK_ROOT:-C:/Users/Public/Mediastack}:/mediastack
     healthcheck:
-      test: ["CMD", "curl", "-fSs", "http://localhost:8384/rest/noauth/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9000/api/system/status"]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 3
       start_period: 20s
 
 networks:

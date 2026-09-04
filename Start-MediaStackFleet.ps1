@@ -1,4 +1,4 @@
-﻿<#
+<#
 ====================================================================================================
  .SYNOPSIS
     MediaStack Primary Fleet Controller, Port Publisher, Database Sentinel & Interactive Console.
@@ -287,6 +287,20 @@ $CanonicalServices = @(
         DbEngine     = "none"
         MountCheck   = ""
         Description  = "MediaStack API Gateway"
+    },
+    @{
+        Service      = "portainer"
+        Container    = "portainer"
+        HostPort     = 9000
+        TargetPort   = 9000
+        Protocol     = "tcp"
+        Category     = "Management"
+        HealthUrl    = "http://127.0.0.1:9000/api/system/status"
+        DbPath       = "$BaseDir\config\portainer\portainer.db"
+        DbFallback   = ""
+        DbEngine     = "bbolt"
+        MountCheck   = "/data"
+        Description  = "Portainer CE Container Management Web UI"
     }
 )
 

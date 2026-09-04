@@ -284,3 +284,9 @@ http://db.ordinateur.local, http://db.voltaireun.local, http://db.voltairedeux.l
 	import security_headers
 	reverse_proxy mediastack-db:8080
 }
+
+http://portainer.ordinateur.local, http://portainer.voltaireun.local, http://portainer.voltairedeux.local {
+	import security_headers
+	reverse_proxy portainer:9000
+}
+

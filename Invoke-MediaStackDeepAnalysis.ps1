@@ -313,7 +313,7 @@ $sLogs
 | **LAN Ping Latency** | $([math]::Round($pingTime, 2)) ms |
 | **VoltaireUn MusicBrainz**| HTTP $mbCode (:5000) |
 | **Hardware Tuner (HDHomeRun)**| $TunerIp ($(if ($tunerPing) { 'ONLINE' } else { 'OFFLINE' })) |
-| **Reciprocal Shares** | \\$PrimaryIp\Public-Music, TV, Videos, Radio, Podcasts |
+| **Reciprocal Shares** | \\$PrimaryIp\MediaStack-Music, TV, Videos, Radio, Podcasts |
 | **Sync Service Accounts** | mediasync, voltaireun, voltairedeux |
 
 ---

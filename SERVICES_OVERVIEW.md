@@ -25,6 +25,7 @@ All services in the MediaStack ecosystem are pre-configured to use their officia
 | **JellyWatch Issues** | Playback & Defect Triage Server | `3000` / `80` | `3000:3000`, `80/443` | TCP | `http://<HOST_IP>:80/issues` | `https://issues.voltaireun.local` |
 | **Homepage** | Unified Media Dashboard | `3000` (Internal) | `3000` or Caddy Proxy | TCP | `http://<HOST_IP>:80` | `http://homepage.voltairedeux.local` |
 | **Mediastack-DB** | SQLite Web Database Explorer | `8080` | `8080:8080` | TCP | `http://<HOST_IP>:8080` | `http://db.voltairedeux.local` |
+| **Portainer** | Container & Cluster Management Web UI | `9000` (HTTP), `9443` (HTTPS) | `9000:9000`, `9443:9443` | TCP | `http://<HOST_IP>:9000` | `http://portainer.voltairedeux.local` |
 | **MusicBrainz** | Local Music Metadata Mirror API | `5000` (Primary), `5001` (Sec) | `5001:5000` / `5000:5000` | TCP | `http://<HOST_IP>:5001` | `http://musicbrainz.voltairedeux.local` |
 | **HDHomeRun** | Physical Hardware Tuner (LAN) | `80` (Discovery / Lineup) | `80` (Direct Hardware IP) | TCP | `http://192.168.4.45:80` | `http://hdhomerun.voltairedeux.local` |
 
@@ -53,6 +54,8 @@ When configuring connections inside Docker (e.g. Sonarr connecting to Prowlarr, 
   * `reverse_proxy tvheadend:9981`
   * `reverse_proxy mediastack-db:8080`
   * `reverse_proxy api-gateway:3000`
+  * `reverse_proxy portainer:9000`
+
 
 ### Rule 2: Host Port Publishing (`docker-compose.yml`)
 When publishing container ports to the host operating system, always map the **host port directly to the identical container default port** in `"HOST_PORT:CONTAINER_PORT"` format:

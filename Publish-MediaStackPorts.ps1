@@ -204,6 +204,28 @@ $ServicePortDefinitions = @(
         HealthUrl    = "http://127.0.0.1:3000"
         ExpectedCode = 200
         Description  = "MediaStack API Gateway"
+    },
+    @{
+        Service      = "portainer"
+        Container    = "portainer"
+        HostPort     = 9000
+        TargetPort   = 9000
+        Protocol     = "tcp"
+        Category     = "Management"
+        HealthUrl    = "http://127.0.0.1:9000/api/system/status"
+        ExpectedCode = 200
+        Description  = "Portainer Community Edition Container Management Web UI"
+    },
+    @{
+        Service      = "portainer"
+        Container    = "portainer"
+        HostPort     = 9443
+        TargetPort   = 9443
+        Protocol     = "tcp"
+        Category     = "Management"
+        HealthUrl    = ""
+        ExpectedCode = 0
+        Description  = "Portainer HTTPS Interface"
     }
 )
 

@@ -181,6 +181,8 @@ services:
     profiles: [disabled]
   diun:
     profiles: [disabled]
+  portainer:
+    profiles: [disabled]
 
 volumes:
   caddy_data:

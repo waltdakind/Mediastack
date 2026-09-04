@@ -57,6 +57,7 @@ $domainsToAdd = @(
     @{ IP="127.0.0.1"; Domain="db.voltaireun.local" },
     @{ IP="127.0.0.1"; Domain="api.voltaireun.local" },
     @{ IP="127.0.0.1"; Domain="homepage.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="portainer.voltaireun.local" },
     @{ IP="127.0.0.1"; Domain="hdhomerun.voltaireun.local" },
 
     # VoltaireDeux Local Domains
@@ -75,6 +76,7 @@ $domainsToAdd = @(
     @{ IP="127.0.0.1"; Domain="db.voltairedeux.local" },
     @{ IP="127.0.0.1"; Domain="api.voltairedeux.local" },
     @{ IP="127.0.0.1"; Domain="homepage.voltairedeux.local" },
+    @{ IP="127.0.0.1"; Domain="portainer.voltairedeux.local" },
     @{ IP="127.0.0.1"; Domain="hdhomerun.voltairedeux.local" },
 
     # Ordinateur Local Domains
@@ -91,12 +93,14 @@ $domainsToAdd = @(
     @{ IP="127.0.0.1"; Domain="db.voltaireun.local" },
     @{ IP="127.0.0.1"; Domain="api.voltaireun.local" },
     @{ IP="127.0.0.1"; Domain="homepage.voltaireun.local" },
+    @{ IP="127.0.0.1"; Domain="portainer.voltaireun.local" },
     @{ IP="127.0.0.1"; Domain="hdhomerun.voltaireun.local" },
 
     # MediaServer Local Domains
     @{ IP="127.0.0.1"; Domain="db.mediaserver.local" },
     @{ IP="127.0.0.1"; Domain="api.mediaserver.local" },
     @{ IP="127.0.0.1"; Domain="homepage.mediaserver.local" },
+    @{ IP="127.0.0.1"; Domain="portainer.mediaserver.local" },
     @{ IP="127.0.0.1"; Domain="musicbrainz.mediaserver.local" },
     @{ IP="127.0.0.1"; Domain="hdhomerun.mediaserver.local" }
 )

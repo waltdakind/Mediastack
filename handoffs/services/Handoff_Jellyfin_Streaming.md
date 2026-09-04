@@ -6,17 +6,17 @@
 | **Display Name** | Jellyfin Streaming Server |
 | **Service Category** | Streaming |
 | **Container Name** | jellyfin |
-| **Image Tag** | lscr.io/linuxserver/jellyfin:latest |
+| **Image Tag** | N/A |
 | **Primary Ingress Port** | 8096 |
 | **Associated Storage/DB**| jellyfin.db |
-| **Container Status** | **RUNNING** |
+| **Container Status** | **STOPPED** |
 | **Restart Count** | 0 |
-| **Container Started** | 2026-09-01T20:07:40.214983852Z |
-| **L7 Response Code** | HTTP 302 |
-| **TTFB Latency** | 33.8 ms |
+| **Container Started** | N/A |
+| **L7 Response Code** | HTTP 000 |
+| **TTFB Latency** | 1143.3 ms |
 | **Vault Secrets Status**| SECURED IN VAULT |
-| **Error Lines Detected**| 7 |
-| **Audit Timestamp** | 2026-09-01 17:53:17 |
+| **Error Lines Detected**| 0 |
+| **Audit Timestamp** | 2026-09-03 20:39:20 |
 
 ---
 
@@ -46,7 +46,7 @@
 ## 4. Diagnostic Log Mining & Health Assessment
 ### Log Extraction (Last 40 Lines)
 `	ext
-   at lambda_method2476(Closure, Object, Object[])    at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.SyncObjectResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)    at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeActionMethodAsync()    at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)    at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeNextActionFilterAsync() --- End of stack trace from previous location ---    at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)    at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)    at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync() --- End of stack trace from previous location ---    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync() --- End of stack trace from previous location ---    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)    at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)    at Jellyfin.Api.Middleware.ServerStartupMessageMiddleware.Invoke(HttpContext httpContext, IServerApplicationHost serverApplicationHost, ILocalizationManager localizationManager)    at Jellyfin.Api.Middleware.WebSocketHandlerMiddleware.Invoke(HttpContext httpContext, IWebSocketManager webSocketManager)    at Jellyfin.Api.Middleware.IPBasedAccessValidationMiddleware.Invoke(HttpContext httpContext, INetworkManager networkManager)    at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)    at Jellyfin.Api.Middleware.QueryStringDecodingMiddleware.Invoke(HttpContext httpContext)    at Swashbuckle.AspNetCore.ReDoc.ReDocMiddleware.Invoke(HttpContext httpContext)    at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)    at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)    at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)    at Jellyfin.Api.Middleware.RobotsRedirectionMiddleware.Invoke(HttpContext httpContext)    at Jellyfin.Api.Middleware.LegacyEmbyRouteRewriteMiddleware.Invoke(HttpContext httpContext)    at Microsoft.AspNetCore.ResponseCompression.ResponseCompressionMiddleware.InvokeCore(HttpContext context)    at Jellyfin.Api.Middleware.ResponseTimeMiddleware.Invoke(HttpContext context, IServerConfigurationManager serverConfigurationManager)    at Jellyfin.Api.Middleware.ExceptionMiddleware.Invoke(HttpContext context) [17:40:00] [INF] [33] Jellyfin.Api.Auth.CustomAuthenticationHandler: CustomAuthentication was not authenticated. Failure message: Invalid token. [17:40:00] [INF] [33] Jellyfin.Api.Auth.CustomAuthenticationHandler: CustomAuthentication was not authenticated. Failure message: Invalid token. [17:40:00] [INF] [33] Jellyfin.Api.Auth.CustomAuthenticationHandler: AuthenticationScheme: CustomAuthentication was challenged. [17:45:00] [INF] [13] Jellyfin.Api.Auth.CustomAuthenticationHandler: CustomAuthentication was not authenticated. Failure message: Invalid token. [17:45:00] [INF] [13] Jellyfin.Api.Auth.CustomAuthenticationHandler: CustomAuthentication was not authenticated. Failure message: Invalid token. [17:45:00] [INF] [13] Jellyfin.Api.Auth.CustomAuthenticationHandler: AuthenticationScheme: CustomAuthentication was challenged. [17:50:00] [INF] [51] Jellyfin.Api.Auth.CustomAuthenticationHandler: CustomAuthentication was not authenticated. Failure message: Invalid token. [17:50:00] [INF] [51] Jellyfin.Api.Auth.CustomAuthenticationHandler: CustomAuthentication was not authenticated. Failure message: Invalid token. [17:50:00] [INF] [51] Jellyfin.Api.Auth.CustomAuthenticationHandler: AuthenticationScheme: CustomAuthentication was challenged.
+Container offline.
 `
 
 ---

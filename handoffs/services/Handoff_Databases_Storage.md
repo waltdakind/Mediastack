@@ -10,13 +10,13 @@
 | **Primary Ingress Port** | 8080 |
 | **Associated Storage/DB**| mediastack_backup.db |
 | **Container Status** | **RUNNING** |
-| **Restart Count** | 0 |
-| **Container Started** | 2026-09-01T19:28:09.4927248Z |
+| **Restart Count** | 14 |
+| **Container Started** | 2026-09-04T00:29:37.10292262Z |
 | **L7 Response Code** | HTTP 200 |
-| **TTFB Latency** | 351.8 ms |
+| **TTFB Latency** | 1674 ms |
 | **Vault Secrets Status**| SYSTEM MANAGED |
-| **Error Lines Detected**| 0 |
-| **Audit Timestamp** | 2026-09-01 17:53:17 |
+| **Error Lines Detected**| 4 |
+| **Audit Timestamp** | 2026-09-03 20:39:20 |
 
 ---
 
@@ -46,7 +46,7 @@
 ## 4. Diagnostic Log Mining & Health Assessment
 ### Log Extraction (Last 40 Lines)
 `	ext
-172.18.0.1 - - [31/Aug/2026 22:59:45] "GET / HTTP/1.1" 200 -  * Serving Flask app 'sqlite_web.sqlite_web'  * Debug mode: off [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m  * Running on all addresses (0.0.0.0)  * Running on http://127.0.0.1:8080  * Running on http://172.18.0.2:8080 [33mPress CTRL+C to quit[0m 172.18.0.1 - - [31/Aug/2026 23:58:46] "GET / HTTP/1.1" 200 - 172.18.0.1 - - [31/Aug/2026 23:59:05] "GET / HTTP/1.1" 200 - 172.18.0.1 - - [31/Aug/2026 23:59:51] "GET / HTTP/1.1" 200 - 172.18.0.1 - - [01/Sep/2026 00:00:24] "GET / HTTP/1.1" 200 -  * Serving Flask app 'sqlite_web.sqlite_web'  * Debug mode: off [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m  * Running on all addresses (0.0.0.0)  * Running on http://127.0.0.1:8080  * Running on http://172.18.0.13:8080 [33mPress CTRL+C to quit[0m  * Serving Flask app 'sqlite_web.sqlite_web'  * Debug mode: off [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m  * Running on all addresses (0.0.0.0)  * Running on http://127.0.0.1:8080  * Running on http://172.18.0.10:8080 [33mPress CTRL+C to quit[0m  * Serving Flask app 'sqlite_web.sqlite_web'  * Debug mode: off [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m  * Running on all addresses (0.0.0.0)  * Running on http://127.0.0.1:8080  * Running on http://172.18.0.16:8080 [33mPress CTRL+C to quit[0m 172.18.0.1 - - [01/Sep/2026 19:52:30] "GET / HTTP/1.1" 200 - 172.18.0.1 - - [01/Sep/2026 19:52:57] "GET / HTTP/1.1" 200 - 172.18.0.14 - - [01/Sep/2026 20:23:14] "GET / HTTP/1.1" 200 - 172.18.0.14 - - [01/Sep/2026 20:26:52] "GET / HTTP/1.1" 200 - 172.18.0.14 - - [01/Sep/2026 20:33:11] "GET / HTTP/1.1" 200 - 172.18.0.1 - - [01/Sep/2026 20:54:36] "GET / HTTP/1.1" 200 - 172.18.0.14 - - [01/Sep/2026 21:15:28] "GET / HTTP/1.1" 200 -
+    self._state.set_connection(self._connect())   File "/usr/local/lib/python3.7/site-packages/peewee.py", line 3605, in _connect     isolation_level=None, **self.connect_params) peewee.OperationalError: disk I/O error Traceback (most recent call last):   File "/usr/local/lib/python3.7/site-packages/peewee.py", line 3263, in connect     self._state.set_connection(self._connect())   File "/usr/local/lib/python3.7/site-packages/peewee.py", line 3605, in _connect     isolation_level=None, **self.connect_params) sqlite3.OperationalError: disk I/O error  During handling of the above exception, another exception occurred:  Traceback (most recent call last):   File "/usr/local/bin/sqlite_web", line 8, in <module>     sys.exit(main())   File "/usr/local/lib/python3.7/site-packages/sqlite_web/sqlite_web.py", line 1396, in main     options.extensions, options.foreign_keys)   File "/usr/local/lib/python3.7/site-packages/sqlite_web/sqlite_web.py", line 1348, in initialize_app     dataset = SqliteDataSet(db, bare_fields=True, **dataset_kw)   File "/usr/local/lib/python3.7/site-packages/playhouse/dataset.py", line 44, in __init__     self._database.connect(reuse_if_open=True)   File "/usr/local/lib/python3.7/site-packages/peewee.py", line 3266, in connect     self._initialize_connection(self._state.conn)   File "/usr/local/lib/python3.7/site-packages/peewee.py", line 3088, in __exit__     reraise(new_type, new_type(exc_value, *exc_args), traceback)   File "/usr/local/lib/python3.7/site-packages/peewee.py", line 196, in reraise     raise value.with_traceback(tb)   File "/usr/local/lib/python3.7/site-packages/peewee.py", line 3263, in connect     self._state.set_connection(self._connect())   File "/usr/local/lib/python3.7/site-packages/peewee.py", line 3605, in _connect     isolation_level=None, **self.connect_params) peewee.OperationalError: disk I/O error  * Serving Flask app 'sqlite_web.sqlite_web'  * Debug mode: off [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m  * Running on all addresses (0.0.0.0)  * Running on http://127.0.0.1:8080  * Running on http://172.21.0.10:8080 [33mPress CTRL+C to quit[0m
 `
 
 ---

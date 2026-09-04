@@ -1,14 +1,14 @@
-﻿# Expert Operational Handoff: Cluster Interconnect & VoltaireUn Peer Node
+# Expert Operational Handoff: Cluster Interconnect & VoltaireUn Peer Node
 
 | Parameter | Cluster Specification |
 | :--- | :--- |
 | **Local Node** | VoltaireDeux (192.168.4.30) - AI Node & Ingress |
 | **Primary Peer Node** | VoltaireUn (192.168.4.21) - Primary 24/7 Server |
 | **Cluster Naming Standard**| French Ordinal (VoltaireUn, VoltaireDeux, VoltaireTrois...) |
-| **LAN Ping Latency** | 7.67 ms |
+| **LAN Ping Latency** | 0 ms |
 | **VoltaireUn MusicBrainz**| HTTP 000 (:5000) |
 | **Hardware Tuner (HDHomeRun)**| 192.168.4.45 (OFFLINE) |
-| **Reciprocal Shares** | \\192.168.4.21\Public-Music, TV, Videos, Radio, Podcasts |
+| **Reciprocal Shares** | \\192.168.4.21\MediaStack-Music, TV, Videos, Radio, Podcasts |
 | **Sync Service Accounts** | mediasync, voltaireun, voltairedeux |
 
 ---

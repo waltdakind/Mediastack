@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Invoke-MediaStackFullRebootSuite.ps1 - End-to-End Diagnostic, Backup, Clean Shutdown, Repull, Restart & AI Sentinel.
 
@@ -360,7 +360,7 @@ $nexusData | ConvertTo-Json -Depth 5 | Set-Content -Path $NexusFile -Encoding UT
 Write-Host "  [OK] Updated local AI Collaboration Nexus: $NexusFile" -ForegroundColor Green
 
 # Sync nexus to VoltaireUn via reciprocal SMB share if reachable
-$peerShareHandoffs = "\\${PrimaryIp}\Public-Downloads\handoffs"
+$peerShareHandoffs = "\\${PrimaryIp}\MediaStack-Downloads\handoffs"
 if (Test-Path $peerShareHandoffs -ErrorAction SilentlyContinue) {
     try {
         Copy-Item -Path $NexusFile -Destination (Join-Path $peerShareHandoffs "ai_collaboration_nexus.json") -Force

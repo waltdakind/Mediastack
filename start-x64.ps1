@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env pwsh
+#!/usr/bin/env pwsh
 # =============================================================================
 # start-x64.ps1  --  MediaStack  x64  Main Server Launcher
 # =============================================================================
@@ -75,15 +75,18 @@ function Show-Banner {
 function Show-EnvSummary {
     param([string]$Domain, [string]$ConfigRoot, [string]$DownloadRoot, [string]$MusicRoot, [string]$MediaRoot)
     Hdr "ENVIRONMENT" Cyan
+    $puidVal = Get-EnvVal "PUID" "1000"
+    $pgidVal = Get-EnvVal "PGID" "1000"
+    $tzVal   = Get-EnvVal "TZ" "America/New_York"
     $rows = @(
-        @{ K="ARCH_PROFILE"  ; V="x64 (Full Stack -- Main Server)"    ; C="Cyan"     }
-        @{ K="CADDY_DOMAIN"  ; V=$Domain                               ; C="White"    }
-        @{ K="CONFIG_ROOT"   ; V=$ConfigRoot                           ; C="DarkCyan" }
-        @{ K="MUSIC_ROOT"    ; V=$MusicRoot                            ; C="DarkCyan" }
-        @{ K="MEDIA_ROOT"    ; V=$MediaRoot                            ; C="DarkCyan" }
-        @{ K="DOWNLOAD_ROOT" ; V=$DownloadRoot                         ; C="DarkCyan" }
-        @{ K="TZ"            ; V=(Get-EnvVal "TZ" "America/New_York")  ; C="DarkGray" }
-        @{ K="PUID/PGID"     ; V="$(Get-EnvVal 'PUID' '1000') / $(Get-EnvVal 'PGID' '1000')"; C="DarkGray" }
+        @{ K="ARCH_PROFILE"  ; V="x64 (Full Stack -- Main Server)" ; C="Cyan"     }
+        @{ K="CADDY_DOMAIN"  ; V=$Domain                            ; C="White"    }
+        @{ K="CONFIG_ROOT"   ; V=$ConfigRoot                        ; C="DarkCyan" }
+        @{ K="MUSIC_ROOT"    ; V=$MusicRoot                         ; C="DarkCyan" }
+        @{ K="MEDIA_ROOT"    ; V=$MediaRoot                         ; C="DarkCyan" }
+        @{ K="DOWNLOAD_ROOT" ; V=$DownloadRoot                      ; C="DarkCyan" }
+        @{ K="TZ"            ; V=$tzVal                             ; C="DarkGray" }
+        @{ K="PUID/PGID"     ; V="$puidVal / $pgidVal"              ; C="DarkGray" }
     )
     foreach ($r in $rows) {
         Write-Host ("    {0,-16}" -f $r.K) -ForegroundColor DarkGray -NoNewline
@@ -150,26 +153,27 @@ function Show-DatabaseMap {
         @{ Svc="Jellyfin";     Host="$ConfigRoot/jellyfin";                  Ct="/config";                  Type="SQLite+config"  }
         @{ Svc="Jellyfin";     Host="/dev/shm/jellyfin_cache";               Ct="/cache";                   Type="RAM disk"       }
         @{ Svc="Jellyfin";     Host="$MusicRoot";                            Ct="/data/music";              Type="Media :ro"      }
-        @{ Svc="Jellyfin";     Host="//VoltaireUn/.../Movies";          Ct="/data/movies";             Type="NAS share :ro"  }
-        @{ Svc="Jellyfin";     Host="//VoltaireUn/.../Videos";          Ct="/data/tv";                 Type="NAS share :ro"  }
-        @{ Svc="Jellyfin";     Host="//VoltaireUn/.../Pictures";        Ct="/data/photos";             Type="NAS share :ro"  }
+        @{ Svc="Jellyfin";     Host='\\VoltaireUn\MediaStack-Movies';         Ct="/data/movies";             Type="UNC share :ro"  }
+        @{ Svc="Jellyfin";     Host='\\VoltaireUn\MediaStack-Shows';          Ct="/data/shows";              Type="UNC share :ro"  }
+        @{ Svc="Jellyfin";     Host='\\VoltaireUn\MediaStack-TV';             Ct="/data/tv";                 Type="UNC share :ro"  }
         @{ Svc="Prowlarr";     Host="$ConfigRoot/prowlarr";                  Ct="/config";                  Type="SQLite+config"  }
         @{ Svc="Radarr";       Host="$ConfigRoot/radarr";                    Ct="/config";                  Type="SQLite+config"  }
-        @{ Svc="Radarr";       Host="//VoltaireUn/.../Movies";          Ct="/movies";                  Type="NAS share rw"   }
+        @{ Svc="Radarr";       Host='\\VoltaireUn\MediaStack-Movies';         Ct="/movies";                  Type="UNC share rw"   }
         @{ Svc="Radarr";       Host="$DownloadRoot";                         Ct="/downloads";               Type="Downloads rw"   }
         @{ Svc="Sonarr";       Host="$ConfigRoot/sonarr";                    Ct="/config";                  Type="SQLite+config"  }
-        @{ Svc="Sonarr";       Host="//VoltaireUn/.../Videos";          Ct="/tv";                      Type="NAS share rw"   }
+        @{ Svc="Sonarr";       Host='\\VoltaireUn\MediaStack-Shows';          Ct="/shows";                   Type="UNC share rw"   }
+        @{ Svc="Sonarr";       Host='\\VoltaireUn\MediaStack-TV';             Ct="/tv";                      Type="UNC share rw"   }
         @{ Svc="Sonarr";       Host="$DownloadRoot";                         Ct="/downloads";               Type="Downloads rw"   }
         @{ Svc="Transmission"; Host="$ConfigRoot/transmission";              Ct="/config";                  Type="Config+settings"}
         @{ Svc="Transmission"; Host="$DownloadRoot";                         Ct="/downloads";               Type="Downloads rw"   }
         @{ Svc="TVHeadend";    Host="$ConfigRoot/tvheadend";                 Ct="/config";                  Type="SQLite+config"  }
-        @{ Svc="TVHeadend";    Host="//VoltaireUn/.../Recordings";      Ct="/recordings";              Type="NAS share rw"   }
+        @{ Svc="TVHeadend";    Host='\\VoltaireUn\MediaStack-Videos\Record';  Ct="/recordings";              Type="UNC share rw"   }
         @{ Svc="Syncthing";    Host="$ConfigRoot/syncthing";                 Ct="/var/syncthing/config";    Type="Config+index DB"}
         @{ Svc="Syncthing";    Host="$ConfigRoot/jellyfin/web";              Ct="/data/jellyfin-theme";     Type="Theme share rw" }
-        @{ Svc="healthguard";  Host="C:/Users/Public/Mediastack";            Ct="/mediastack";              Type="Logs+scripts"   }
+        @{ Svc="healthguard";  Host="$BaseDir";                              Ct="/mediastack";              Type="Logs+scripts"   }
         @{ Svc="healthguard";  Host="/var/run/docker.sock";                   Ct="/var/run/docker.sock";     Type="Docker socket"  }
         @{ Svc="db-init";      Host="$ConfigRoot (ro)";                       Ct="/opt/mediastack/config";   Type="Backup src :ro" }
-        @{ Svc="db-init";      Host="C:/Users/Public/Mediastack";            Ct="/mediastack";              Type="Backup target"  }
+        @{ Svc="db-init";      Host="$BaseDir";                              Ct="/mediastack";              Type="Backup target"  }
     )
 
     $lastSvc = ""
@@ -196,7 +200,7 @@ function Show-DatabaseMap {
     Ln DarkGray
     NL
     Write-Host "  SQLite DB files: radarr.db  sonarr.db  prowlarr.db  jellyfin.db  (inside /config)" -ForegroundColor DarkGray
-    Write-Host "  Backups:  C:\Users\Public\Mediastack\backups\<timestamp>\  (created by db-init every start)" -ForegroundColor DarkGray
+    Write-Host "  Backups:  $BaseDir\backups\<timestamp>\  (created by db-init every start)" -ForegroundColor DarkGray
     NL
 }
 
@@ -283,7 +287,7 @@ function Show-ConnectivityReport {
     $checks = @(
         @{ Label="Internet (Google DNS)";  Host="8.8.8.8";        Desc="outbound internet"         }
         @{ Label="External Domain";        Host=$Domain;           Desc="CADDY_DOMAIN target"       }
-        @{ Label="Media NAS (primary)";    Host="VoltaireUn"; Desc="\\VoltaireUn shares"  }
+        @{ Label="Media NAS (primary)";    Host="VoltaireUn"; Desc='\\VoltaireUn\MediaStack-*'  }
     )
     foreach ($c in $checks) {
         if ([string]::IsNullOrWhiteSpace($c.Host)) { continue }
@@ -337,7 +341,7 @@ function Show-ConnectivityReport {
 # == healthguard Log Tail =======================================================
 function Show-HealthguardStatus {
     Hdr "HEALTHGUARD SUMMARY" Cyan
-    $logPath = Join-Path $env:PUBLIC "Mediastack\logs\healthguard.log"
+    $logPath = Join-Path $BaseDir "logs\healthguard.log"
     if (Test-Path $logPath) {
         $lines = Get-Content $logPath -Tail 12
         foreach ($l in $lines) {
@@ -422,10 +426,10 @@ if ($procArch -match "ARM" -and -not $Force -and $Command -notin @("ps", "diag",
 
 # Load .env values
 $envDomain     = Get-EnvVal "CADDY_DOMAIN"        "media.local"
-$configRoot    = Get-EnvVal "CONFIG_ROOT"          "/opt/mediastack/config"
-$downloadRoot  = Get-EnvVal "DOWNLOAD_ROOT"        "/mnt/media/downloads"
-$musicRoot     = Get-EnvVal "MUSIC_ROOT"           "C:/Users/Public/Music"
-$mediaRoot     = Get-EnvVal "MEDIA_ROOT"           "/mnt/media"
+$configRoot    = Get-EnvVal "CONFIG_ROOT"          "$BaseDir/config"
+$downloadRoot  = Get-EnvVal "DOWNLOAD_ROOT"        "$BaseDir/downloads"
+$musicRoot     = Get-EnvVal "MUSIC_ROOT"           "$BaseDir/Music"
+$mediaRoot     = Get-EnvVal "MEDIA_ROOT"           "$BaseDir"
 $watchtowerSch = Get-EnvVal "WATCHTOWER_SCHEDULE"  "0 0 4 * * *"
 
 Ok "Domain       : http://$envDomain"

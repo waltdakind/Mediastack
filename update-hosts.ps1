@@ -34,6 +34,7 @@ $primaryServices = @(
     "noc.voltaireun.local",
     "portal.voltaireun.local",
     "hub.voltaireun.local",
+    "portainer.voltaireun.local",
     "mediaserver.local"
 )
 
@@ -43,6 +44,7 @@ $secondaryServices = @(
     "jellyfin.voltairedeux.local",
     "musicbrainz.voltairedeux.local",
     "dashboard.voltairedeux.local",
+    "portainer.voltairedeux.local",
     "syncthing.voltairedeux.local"
 )
 

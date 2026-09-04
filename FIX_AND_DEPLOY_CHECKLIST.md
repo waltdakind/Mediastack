@@ -1,24 +1,23 @@
-﻿# MediaStack Fix & Deploy Checklist
+# MediaStack Fix & Deploy Checklist
 # Hand this to another AI agent or human to complete deployment
 
 ## Pre-Deployment Tasks
 
 ### Directory Creation
-- [x] Verify `C:\Users\Public\MediaStack` exists
-- [x] Run bash script: `cd MediaStack && bash setup.sh`
-- [x] Or manually create all subdirectories (see AGENT_HANDOFF.md)
-- [x] Verify external paths: `C:\Users\Public\Videos`, `C:\Users\Public\Music`, `C:\Users\Public\Pictures`
+- [x] Verify `C:\Users\waltd\OneDrive\Mediastack` exists
+- [x] Run setup script: `.\Set-MediaStackNetworkUsers.ps1`
+- [x] Verify media library paths: `Music`, `TV`, `Videos`, `Radio`, `Podcasts`, `downloads`, `documents`
 
 ### Windows Configuration
 - [ ] Enable Network Discovery (Settings → Network & Internet → Advanced)
 - [ ] Enable File & Printer Sharing
 - [ ] Configure Windows Firewall to allow SMB (if using network shares)
-- [ ] Create SMB shares (see SHARES_SETUP.md for 5 shares to create)
+- [ ] Create SMB shares (see SHARES_SETUP.md for MediaStack-* shares)
 
 ### Docker Configuration
 - [x] Docker Desktop installed and running
 - [x] WSL2 integration enabled (if on Windows)
-- [x] Docker daemon has access to `C:\Users\Public\` directory
+- [x] Docker daemon has access to `C:\Users\waltd\OneDrive\Mediastack\` directory
 
 ## Validation Tasks
 

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env pwsh
+#!/usr/bin/env pwsh
 # =============================================================================
 # start-arm.ps1  --  MediaStack ARM Satellite Launcher (Windows ARM / Pi)
 # =============================================================================
@@ -80,16 +80,22 @@ function Show-Banner {
 function Show-EnvSummary {
     param([string]$LanIP, [string]$MainHost, [string]$DeviceName, [string]$ConfigRoot, [string]$MusicRoot)
     Hdr "ENVIRONMENT" Magenta
+    $puidVal = Get-EnvVal "PUID" "1000"
+    $pgidVal = Get-EnvVal "PGID" "1000"
+    $tzVal   = Get-EnvVal "TZ" "America/New_York"
+    $lanDom  = Get-EnvVal "LAN_DOMAIN" "mediastack.local"
+    $mainSvc = if ($MainHost) { "http://$MainHost" } else { "(not set -- MAIN_SERVER_HOST missing)" }
+    $mainCol = if ($MainHost) { "DarkCyan" } else { "Yellow" }
     $rows = @(
-        @{ K="ARCH_PROFILE"   ; V="arm (Satellite -- Music + Theming)"  ; C="Magenta"     }
-        @{ K="LAN IP"          ; V=$LanIP                                 ; C="White"       }
-        @{ K="DEVICE NAME"     ; V=$DeviceName                            ; C="White"       }
-        @{ K="MAIN_SERVER"     ; V=if ($MainHost) { "http://$MainHost" } else { "(not set -- MAIN_SERVER_HOST missing)" }; C=if ($MainHost) {"DarkCyan"} else {"Yellow"} }
-        @{ K="LAN_DOMAIN"      ; V=(Get-EnvVal "LAN_DOMAIN" "mediastack.local"); C="DarkGray" }
-        @{ K="CONFIG_ROOT"     ; V=$ConfigRoot                            ; C="DarkMagenta" }
-        @{ K="MUSIC_ROOT"      ; V=$MusicRoot                             ; C="DarkMagenta" }
-        @{ K="TZ"              ; V=(Get-EnvVal "TZ" "America/New_York")   ; C="DarkGray"    }
-        @{ K="PUID/PGID"       ; V="$(Get-EnvVal 'PUID' '1000') / $(Get-EnvVal 'PGID' '1000')"; C="DarkGray" }
+        @{ K="ARCH_PROFILE"   ; V="arm (Satellite -- Music + Theming)" ; C="Magenta"     }
+        @{ K="LAN IP"         ; V=$LanIP                                ; C="White"       }
+        @{ K="DEVICE NAME"    ; V=$DeviceName                           ; C="White"       }
+        @{ K="MAIN_SERVER"    ; V=$mainSvc                              ; C=$mainCol      }
+        @{ K="LAN_DOMAIN"     ; V=$lanDom                               ; C="DarkGray"    }
+        @{ K="CONFIG_ROOT"    ; V=$ConfigRoot                           ; C="DarkMagenta" }
+        @{ K="MUSIC_ROOT"     ; V=$MusicRoot                            ; C="DarkMagenta" }
+        @{ K="TZ"             ; V=$tzVal                                ; C="DarkGray"    }
+        @{ K="PUID/PGID"      ; V="$puidVal / $pgidVal"                 ; C="DarkGray"    }
     )
     foreach ($r in $rows) {
         Write-Host ("    {0,-16}" -f $r.K) -ForegroundColor DarkGray -NoNewline
@@ -159,10 +165,10 @@ function Show-DatabaseMap {
         @{ Svc="Jellyfin";   Host="$ConfigRoot/jellyfin/web";            Ct="/config/web";             Type="Theme sync rw"  }
         @{ Svc="Syncthing";  Host="$ConfigRoot/syncthing";               Ct="/var/syncthing/config";   Type="Config+index DB"}
         @{ Svc="Syncthing";  Host="$ConfigRoot/jellyfin/web";            Ct="/data/jellyfin-theme";    Type="Theme target rw"}
-        @{ Svc="healthguard";Host="C:/Users/Public/Mediastack";          Ct="/mediastack";             Type="Logs+scripts"   }
+        @{ Svc="healthguard";Host="$BaseDir";                            Ct="/mediastack";             Type="Logs+scripts"   }
         @{ Svc="healthguard";Host="/var/run/docker.sock";                 Ct="/var/run/docker.sock";    Type="Docker socket"  }
         @{ Svc="db-init";    Host="$ConfigRoot (ro)";                     Ct="/opt/mediastack/config";  Type="Backup src :ro" }
-        @{ Svc="db-init";    Host="C:/Users/Public/Mediastack";          Ct="/mediastack";             Type="Backup target"  }
+        @{ Svc="db-init";    Host="$BaseDir";                            Ct="/mediastack";             Type="Backup target"  }
     )
 
     $lastSvc = ""
@@ -275,7 +281,7 @@ function Show-ConnectivityReport {
     $checks = @(
         @{ Label="Internet (Google DNS)"; Host="8.8.8.8";        Desc="outbound internet"  }
         @{ Label="Main Server (x64)";     Host=$MainHost;         Desc="MAIN_SERVER_HOST"   }
-        @{ Label="Media NAS (primary)";   Host="VoltaireUn"; Desc="\\VoltaireUn"  }
+        @{ Label="Media NAS (primary)";   Host="VoltaireUn"; Desc='\\VoltaireUn\MediaStack-*'  }
     )
     foreach ($c in $checks) {
         if ([string]::IsNullOrWhiteSpace($c.Host)) {

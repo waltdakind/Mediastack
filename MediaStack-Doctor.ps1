@@ -11,7 +11,7 @@ function Show-Header {
     Write-Host ""
 }
 
-function Check-FileStructure {
+function Test-FileStructure {
     Show-Header
     Write-Host "[+] Verifying File Structure & Configurations..." -ForegroundColor Yellow
     
@@ -54,7 +54,7 @@ function Check-FileStructure {
     }
 
     Write-Host "`n[+] Verifying Windows SMB Shares..." -ForegroundColor Yellow
-    $RequiredShares = @("Public-Music", "Public-Videos", "Public-Pictures", "Public-Downloads", "MediaStack-Documents")
+    $RequiredShares = @("MediaStack-Movies", "MediaStack-Shows", "MediaStack-Music", "MediaStack-TV", "MediaStack-Videos", "MediaStack-Radio", "MediaStack-Podcasts", "MediaStack-Downloads", "MediaStack-Documents")
     $MissingShares = 0
     foreach ($share in $RequiredShares) {
         $shareObj = Get-SmbShare -Name $share -ErrorAction SilentlyContinue
@@ -70,7 +70,7 @@ function Check-FileStructure {
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
-function Check-DatabaseIntegrity {
+function Test-DatabaseIntegrity {
     Show-Header
     Write-Host "[+] Verifying SQLite Database Integrity..." -ForegroundColor Yellow
     
@@ -122,7 +122,7 @@ function Update-DockerImages {
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
-function Safe-Restore {
+function Restore-MediaStackSafe {
     Show-Header
     Write-Host "[!] INITIATING SAFE RESTORE PROCEDURE [!]" -ForegroundColor Red
     Write-Host "This will OVERWRITE your current configuration." -ForegroundColor Yellow
@@ -203,10 +203,10 @@ while ($DoctorRunning) {
     $choice = Read-Host "  Select a diagnostic option"
     
     switch ($choice) {
-        '1' { Check-FileStructure }
-        '2' { Check-DatabaseIntegrity }
+        '1' { Test-FileStructure }
+        '2' { Test-DatabaseIntegrity }
         '3' { Update-DockerImages }
-        '4' { Safe-Restore }
+        '4' { Restore-MediaStackSafe }
         '5' { 
             Write-Host "`n  Exiting MediaStack Doctor..." -ForegroundColor DarkCyan
             $DoctorRunning = $false 

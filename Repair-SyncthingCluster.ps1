@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Repair-SyncthingCluster.ps1 - Syncthing P2P Mesh & Cluster Folder Repair Engine.
 
@@ -62,8 +62,8 @@ if ($cIsUp) {
 
 # 2. Folder Marker (.stfolder) Verification
 Write-Host "`n[2/4] Verifying Synchronized Folder Markers (.stfolder)..." -ForegroundColor Yellow
-$mediaFolders = @("Music", "TV", "Videos", "Radio", "Podcasts", "Downloads", "Public-Music", "Public-TV", "Public-Videos")
-$rootShares = @("C:\MediastackShares", "C:\Shares", "$BaseDir\shares", "C:\Media")
+$mediaFolders = @("Music", "TV", "Videos", "Radio", "Podcasts", "downloads", "documents", "MediaStack-Music", "MediaStack-TV", "MediaStack-Videos")
+$rootShares = @("$BaseDir", "$BaseDir\media", "C:\MediastackShares", "C:\Media")
 
 foreach ($root in $rootShares) {
     if (Test-Path $root) {

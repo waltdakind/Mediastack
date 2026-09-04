@@ -147,3 +147,9 @@ http://hdhomerun.voltaireun.local, http://hdhomerun.mediaserver.local {
 http://db.voltaireun.local, http://db.mediaserver.local {
     reverse_proxy mediastack-db:8080
 }
+
+# 15. Portainer Container Management
+http://portainer.voltaireun.local, http://portainer.voltairedeux.local, http://portainer.mediaserver.local {
+    reverse_proxy portainer:9000
+}
+

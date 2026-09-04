@@ -317,6 +317,10 @@ $testResults += Test-Endpoint -ServiceName "Requests Web Portal" -Url "http://lo
 # 15. JellyWatch Issues Web Portal
 $testResults += Test-Endpoint -ServiceName "Issues Web Portal" -Url "http://localhost:80/issues" -Headers $jwIssHeaders -TimeoutMs 3000
 
+# 16. Portainer CE API & Web UI
+$portainerHeaders = @{ "Host" = "portainer.voltairedeux.local" }
+$testResults += Test-Endpoint -ServiceName "Portainer API" -Url "http://localhost:9000/api/system/status" -Headers $portainerHeaders -ExpectedContentField "Version"
+
 # --- 3. EXPORT AUDIT REPORT & SQLITE LOGGING ---
 Write-Host "`n[3/3] Exporting API Audit Trail..." -ForegroundColor Yellow
 

@@ -220,6 +220,24 @@ const SERVICES = [
         status: "UP",
         latency: 38.2,
         docKey: "Handoff_Databases_Storage.md"
+    },
+    {
+        id: "portainer",
+        name: "Portainer CE",
+        category: "servarr",
+        container: "portainer",
+        image: "portainer/portainer-ce:latest",
+        port: 9000,
+        subdomain: "portainer.voltairedeux.local",
+        launchPath: ":9000",
+        probePath: "/api/system/status",
+        db: "portainer.db (BoltDB)",
+        icon: "ph-cube",
+        color: "#0284c7",
+        desc: "Centralized container management, docker cluster telemetry and image lifecycle UI.",
+        status: "UP",
+        latency: 4.1,
+        docKey: "Handoff_Portainer_Management.md"
     }
 ];
 

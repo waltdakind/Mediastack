@@ -1,44 +1,30 @@
-# Jellyfin Media Path Configuration
+# Jellyfin & Servarr Media Library Path Configuration
 
-## Primary Source (Local VoltaireDeux)
-- **Container Path:** `/media/music`
-- **Windows Local Path:** `C:\Users\Public\Music`
-- **Network Share:** `//VoltaireDeux/Users/Public/Music`
-- **Status:** Currently mapped and active
+All media libraries are structured as direct subfolders under `C:\Users\waltd\OneDrive\Mediastack\`.
 
-## Fallback Source (Remote OrdinateurdeVolt)
-- **Container Path:** `/media/music_remote`
-- **Windows Remote Path:** `//OrdinateurdeVolt/Users/waltda/Music`
-- **Status:** Available but commented out (requires SMB mount)
+---
 
-## Setup Instructions
+## Media Library Mappings
 
-### If serving from VoltaireDeux (local - current default):
-- No additional setup needed; the local path `C:\Users\Public\Music` is mounted directly
-- Jellyfin accesses music at `/media/music` inside the container
+| Library Type | Host Path (Local Node) | Container Path | Network UNC Share | Status / Available Titles |
+| :--- | :--- | :--- | :--- | :--- |
+| **Movies** | `C:\Users\waltd\OneDrive\Mediastack\Movies` | `/media/movies` (Jellyfin)<br>`/movies` (Radarr) | `\\<Node>\MediaStack-Movies` | - *Marcel the Shell with Shoes On (2022)* (4K HDR)<br>- *Supergirl (2026)* (4K DV/HDR) |
+| **Shows / TV** | `C:\Users\waltd\OneDrive\Mediastack\Shows`<br>`C:\Users\waltd\OneDrive\Mediastack\TV` | `/media/shows` (Jellyfin)<br>`/tv` (Sonarr) | `\\<Node>\MediaStack-Shows`<br>`\\<Node>\MediaStack-TV` | - *Lanterns (Season 01)* |
+| **Music** | `C:\Users\waltd\OneDrive\Mediastack\Music` | `/media/music` (Jellyfin) | `\\<Node>\MediaStack-Music` | Local & Syncthing synced |
+| **Personal Videos** | `C:\Users\waltd\OneDrive\Mediastack\Videos` | `/media/videos` (Jellyfin) | `\\<Node>\MediaStack-Videos` | - *French Midterm: A Day in France*<br>- *Special Education Presentation*<br>- *Zoom recordings* |
+| **Downloads** | `C:\Users\waltd\OneDrive\Mediastack\downloads` | `/downloads` (Transmission / Servarr) | `\\<Node>\MediaStack-Downloads` | Active download pipeline |
 
-### If switching to OrdinateurdeVolt (remote):
+---
 
-**Option A: Mount as SMB share on Windows**
-1. Open File Explorer → "Map network drive"
-2. Folder: `\\OrdinateurdeVolt\Users\waltda\Music`
-3. Assign to drive letter (e.g., `Z:`)
-4. In docker-compose.yml, uncomment the `media_music_remote` volume
-5. Update the path if using a different drive letter
-6. Run: `docker compose up -d jellyfin`
+## Peer Reciprocal SMB Mounting
 
-**Option B: Use SMB mount inside container**
-Replace the commented volume with:
-```yaml
-- type: bind
-  source: //OrdinateurdeVolt/Users/waltda/Music
-  target: /media/music
-  read_only: true
+To mount shares from the peer machine (e.g., `192.168.4.21` or `192.168.4.30`):
+```powershell
+.\Mount-MediaStackNetworkShares.ps1 -PeerIP "192.168.4.21"
 ```
-(Note: This requires the SMB share to be mounted on the Docker host first)
 
-## Syncthing Sync
-If you enable Syncthing to sync music between machines:
-1. Configure Syncthing to watch `C:\Users\Public\Music` (VoltaireDeux)
-2. Share the folder with OrdinateurdeVolt
-3. Music will automatically sync and be available on both machines
+To re-align or audit local SMB shares:
+```powershell
+.\Fix-MediaStackNetworkShares.ps1 -CheckOnly
+```
+

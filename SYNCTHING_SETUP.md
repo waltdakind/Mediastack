@@ -20,7 +20,7 @@
 #
 # Network Shares:
 # - //OrdinateurdeVolt (remote media libraries)
-# - //VoltaireDeux (local media libraries at c:\Users\Public\)
+# - //VoltaireDeux (local media libraries at C:\Users\waltd\OneDrive\Mediastack\)
 #
 # To add more services:
 # 1. Uncomment the example services in docker-compose.yml

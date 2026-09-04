@@ -5,11 +5,15 @@
 .DESCRIPTION
     Authenticates and tests reciprocal SMB file sharing between VoltaireUn (192.168.4.21)
     and VoltaireDeux (192.168.4.30). Automatically connects to peer shares:
-    - \\<PeerIP>\Public-Music
-    - \\<PeerIP>\Public-TV
-    - \\<PeerIP>\Public-Videos
-    - \\<PeerIP>\Public-Radio
-    - \\<PeerIP>\Public-Podcasts
+    - \\<PeerIP>\MediaStack-Movies
+    - \\<PeerIP>\MediaStack-Shows
+    - \\<PeerIP>\MediaStack-Music
+    - \\<PeerIP>\MediaStack-TV
+    - \\<PeerIP>\MediaStack-Videos
+    - \\<PeerIP>\MediaStack-Radio
+    - \\<PeerIP>\MediaStack-Podcasts
+    - \\<PeerIP>\MediaStack-Downloads
+    - \\<PeerIP>\MediaStack-Documents
 
     Performs end-to-end Read/Write canary validation to confirm both nodes have active read-write access.
 
@@ -26,7 +30,7 @@
     List of media subdirectories to probe/mount.
 
 .PARAMETER SharePrefix
-    Prefix for share names (default: Public-).
+    Prefix for share names (default: MediaStack-).
 
 .PARAMETER TestWrite
     Performs active Read-Write canary file verification across the network shares.
@@ -46,8 +50,8 @@ param(
     [string]$PeerIP = "",
     [string]$Username = "mediasync",
     [string]$Password = "",
-    [string[]]$SharedFolders = @("Music", "TV", "Videos", "Radio", "Podcasts"),
-    [string]$SharePrefix = "Public-",
+    [string[]]$SharedFolders = @("Movies", "Shows", "Music", "TV", "Videos", "Radio", "Podcasts", "downloads", "documents"),
+    [string]$SharePrefix = "MediaStack-",
     [switch]$SkipWriteTest,
     [switch]$CheckOnly
 )

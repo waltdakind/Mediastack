@@ -1,10 +1,10 @@
-﻿# Test-NetworkDiagnostics.ps1 - Comprehensive Network Diagnostic & WAN Health Suite
+# Test-NetworkDiagnostics.ps1 - Comprehensive Network Diagnostic & WAN Health Suite
 param(
     [string]$PrimaryServerIp = "192.168.4.21",
     [string]$SecondaryServerIp = "192.168.4.30",
     [string]$HdhomerunIp = "192.168.4.45",
-    [switch]$Detailed = $true,
-    [switch]$ExportReport = $true
+    [bool]$Detailed = $true,
+    [bool]$ExportReport = $true
 )
 
 $ErrorActionPreference = "Continue"

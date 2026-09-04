@@ -255,7 +255,7 @@ $template = @'
 # =============================================================================
 
 # External DDNS & Jellyfin HTTP Redirection
-http://__EXTERNAL_DOMAIN__, http://jellyfin.__EXTERNAL_DOMAIN__, http://jellyseerr.__EXTERNAL_DOMAIN__, http://requests.__EXTERNAL_DOMAIN__, http://issues.__EXTERNAL_DOMAIN__, http://sonarr.__EXTERNAL_DOMAIN__, http://radarr.__EXTERNAL_DOMAIN__, http://prowlarr.__EXTERNAL_DOMAIN__, http://bazarr.__EXTERNAL_DOMAIN__, http://musicbrainz.__EXTERNAL_DOMAIN__ {
+http://__EXTERNAL_DOMAIN__, http://jellyfin.__EXTERNAL_DOMAIN__, http://jellyseerr.__EXTERNAL_DOMAIN__, http://requests.__EXTERNAL_DOMAIN__, http://issues.__EXTERNAL_DOMAIN__, http://sonarr.__EXTERNAL_DOMAIN__, http://radarr.__EXTERNAL_DOMAIN__, http://prowlarr.__EXTERNAL_DOMAIN__, http://bazarr.__EXTERNAL_DOMAIN__, http://musicbrainz.__EXTERNAL_DOMAIN__, http://portainer.__EXTERNAL_DOMAIN__ {
     import security_headers
     encode gzip zstd
     redir https://{host}{uri} permanent
@@ -269,7 +269,7 @@ http://voltaireun.local, http://voltaireun.local, http://voltairedeux.local, htt
 }
 
 # Internal Subdomains HTTP Redirection
-http://jellyfin.voltaireun.local, http://jellyfin.voltaireun.local, http://jellyfin.voltairedeux.local, http://jellyfin.mediaserver.local, http://dashboard.voltaireun.local, http://dashboard.voltaireun.local, http://dashboard.voltairedeux.local, http://noc.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltairedeux.local, http://sonarr.voltaireun.local, http://sonarr.voltaireun.local, http://sonarr.voltairedeux.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltairedeux.local, http://requests.voltaireun.local, http://requests.voltairedeux.local, http://issues.voltaireun.local, http://issues.voltairedeux.local, http://prowlarr.voltaireun.local, http://prowlarr.voltaireun.local, http://prowlarr.voltairedeux.local, http://bazarr.voltaireun.local, http://bazarr.voltaireun.local, http://bazarr.voltairedeux.local, http://transmission.voltaireun.local, http://transmission.voltaireun.local, http://transmission.voltairedeux.local, http://tvheadend.voltaireun.local, http://tvheadend.voltaireun.local, http://tvheadend.voltairedeux.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltairedeux.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltairedeux.local, http://db.voltaireun.local, http://db.voltaireun.local, http://db.voltairedeux.local {
+http://jellyfin.voltaireun.local, http://jellyfin.voltaireun.local, http://jellyfin.voltairedeux.local, http://jellyfin.mediaserver.local, http://dashboard.voltaireun.local, http://dashboard.voltaireun.local, http://dashboard.voltairedeux.local, http://noc.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltairedeux.local, http://sonarr.voltaireun.local, http://sonarr.voltaireun.local, http://sonarr.voltairedeux.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltairedeux.local, http://requests.voltaireun.local, http://requests.voltairedeux.local, http://issues.voltaireun.local, http://issues.voltairedeux.local, http://prowlarr.voltaireun.local, http://prowlarr.voltaireun.local, http://prowlarr.voltairedeux.local, http://bazarr.voltaireun.local, http://bazarr.voltaireun.local, http://bazarr.voltairedeux.local, http://transmission.voltaireun.local, http://transmission.voltaireun.local, http://transmission.voltairedeux.local, http://tvheadend.voltaireun.local, http://tvheadend.voltaireun.local, http://tvheadend.voltairedeux.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltairedeux.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltairedeux.local, http://db.voltaireun.local, http://db.voltaireun.local, http://db.voltairedeux.local, http://portainer.voltaireun.local, http://portainer.voltairedeux.local {
     import security_headers
     encode gzip zstd
     redir https://{host}{uri} permanent
@@ -445,6 +445,16 @@ https://db.voltaireun.local, https://db.voltaireun.local, https://db.voltairedeu
     import security_headers
     import custom_tls
     reverse_proxy mediastack-db:8080 __PRIMARY_IP__:8080
+}
+
+# --- N. Portainer Container Management ---
+https://portainer.__EXTERNAL_DOMAIN__, https://portainer.voltaireun.local, https://portainer.voltairedeux.local {
+    import security_headers
+    import custom_tls
+    reverse_proxy portainer:9000 __PRIMARY_IP__:9000 {
+        lb_policy first
+        fail_duration 10s
+    }
 }
 '@
 

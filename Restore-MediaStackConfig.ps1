@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Restores the MediaStack and Caddy reverse proxy to the verified working configuration.
 
@@ -114,12 +114,12 @@ CONFIG_DIR=C:\MediastackConfig
 CONFIG_ROOT=C:\MediastackConfig
 
 # Unified Media Root for hardlinking
-MEDIA_ROOT=C:\Users\Public
+MEDIA_ROOT=C:\Users\waltd\OneDrive\Mediastack
 MEDIA_DIR=C:\Users\waltd\OneDrive
-MUSIC_ROOT=C:\Users\waltd\OneDrive\Music
-VIDEO_ROOT=C:\Users\waltd\OneDrive\Video
-TV_ROOT=C:\Users\waltd\OneDrive\TV
-LIVESTREAM_ROOT=C:\Users\waltd\OneDrive\LiveStream
+MUSIC_ROOT=C:\Users\waltd\OneDrive\Mediastack\Music
+VIDEO_ROOT=C:\Users\waltd\OneDrive\Mediastack\Videos
+TV_ROOT=C:\Users\waltd\OneDrive\Mediastack\TV
+LIVESTREAM_ROOT=C:\Users\waltd\OneDrive\Mediastack\LiveStream
 MAIN_SERVER_HOST=192.168.4.21
 LAN_DOMAIN=voltairedeux.local
 '@
