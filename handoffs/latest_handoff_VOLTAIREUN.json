@@ -1,16 +1,10 @@
 ﻿{
     "author_node":  "VOLTAIREUN",
-    "timestamp":  "2026-09-01 19:31:40",
+    "timestamp":  "2026-09-03 08:19:03",
     "overall_status":  "DEGRADED",
     "requires_remediation":  true,
-    "active_incident":  "INCIDENT_20260901_193140",
+    "active_incident":  "INCIDENT_20260903_081903",
     "service_anomalies":  [
-                              {
-                                  "Service":  "Transmission Web UI",
-                                  "Port":  9091,
-                                  "Container":  "transmission",
-                                  "Reason":  "Port 9091 Unreachable / Closed",
-                                  "Severity":  "CRITICAL"
-                              }
+
                           ]
 }

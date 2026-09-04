@@ -1,17 +1,16 @@
 ﻿{
-    "update_id":  "VOLTAIREDEUX_OPT_20260903_020719",
-    "staged_at":  "2026-09-03 02:07:19",
-    "staged_by_node":  "VOLTAIREDEUX",
+    "manifest_version":  "2.0.0",
+    "update_id":  "VOLTAIREDEUX_REL_20260903_021436",
+    "publisher_node":  "VOLTAIREDEUX",
+    "publisher_role":  "VoltaireDeux (AI Acceleration \u0026 Push Node)",
+    "publisher_ip":  "192.168.4.30",
     "target_node":  "VOLTAIREUN",
-    "status":  "READY_FOR_VOLTAIREUN_PULL",
-    "commit_message":  "AI Stack Optimization, Persistent Data Protection \u0026 24/7 Sentinel Suite",
-    "advice_document":  "AI_Expert_Advice_FOR_VOLTAIREUN_20260903_020719.md",
-    "action_items":  [
-                         "Purge snapshot archives older than 7 days in db-backup/snapshots/",
-                         "Apply PRAGMA wal_autocheckpoint=1000 and PRAGMA busy_timeout=5000 across core DBs",
-                         "Synchronize primary Caddyfile with dynamic host routing and HA failover",
-                         "Route AI model offloading and Picard batch jobs to VoltaireDeux (192.168.4.30)",
-                         "Enforce atomic pre-sync database snapshotting before every code or config merge"
-                     ],
-    "mandatory_pre_sync_backup":  true
+    "target_role":  "VoltaireUn (Main 24/7 Server Node)",
+    "target_ip":  "fe80::2c3c:b2c6:ab71:6c09%6",
+    "published_at":  "2026-09-03 02:14:36",
+    "commit_sha":  "dca7e0e4adb190a818af62a5da3d6eaadd0761fd",
+    "commit_message":  "VoltaireDeux Main Execution Synchronization",
+    "git_branch":  "main",
+    "requires_db_sync":  true,
+    "status":  "READY_FOR_VOLTAIREUN_PULL"
 }
