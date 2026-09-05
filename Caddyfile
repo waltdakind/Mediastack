@@ -1,4 +1,4 @@
-﻿# =============================================================================
+# =============================================================================
 # Caddyfile - MediaStack Primary Reverse Proxy
 # Supports Multi-Server Load Balancing, Failover, LAN (*.voltaireun.local / *.voltairedeux.local) & DDNS (waltdakind.xubi.org)
 # Full End-to-End TLS / HTTPS (:443) with Custom Root CA & Wildcard SANs
@@ -142,7 +142,7 @@
 # =============================================================================
 
 # External DDNS & Jellyfin HTTP Redirection
-http://waltdakind.xubi.org, http://jellyfin.waltdakind.xubi.org, http://jellyseerr.waltdakind.xubi.org, http://requests.waltdakind.xubi.org, http://issues.waltdakind.xubi.org, http://sonarr.waltdakind.xubi.org, http://radarr.waltdakind.xubi.org, http://prowlarr.waltdakind.xubi.org, http://bazarr.waltdakind.xubi.org, http://musicbrainz.waltdakind.xubi.org, http://portainer.waltdakind.xubi.org {
+http://waltdakind.xubi.org, http://jellyfin.waltdakind.xubi.org, http://jellyseerr.waltdakind.xubi.org, http://requests.waltdakind.xubi.org, http://issues.waltdakind.xubi.org, http://sonarr.waltdakind.xubi.org, http://radarr.waltdakind.xubi.org, http://prowlarr.waltdakind.xubi.org, http://bazarr.waltdakind.xubi.org, http://musicbrainz.waltdakind.xubi.org, http://portainer.waltdakind.xubi.org, http://tdarr.waltdakind.xubi.org {
     import security_headers
     encode gzip zstd
     redir https://{host}{uri} permanent
@@ -156,7 +156,7 @@ http://voltaireun.local, http://voltaireun.local, http://voltairedeux.local, htt
 }
 
 # Internal Subdomains HTTP Redirection
-http://jellyfin.voltaireun.local, http://jellyfin.voltaireun.local, http://jellyfin.voltairedeux.local, http://jellyfin.mediaserver.local, http://dashboard.voltaireun.local, http://dashboard.voltaireun.local, http://dashboard.voltairedeux.local, http://noc.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltairedeux.local, http://sonarr.voltaireun.local, http://sonarr.voltaireun.local, http://sonarr.voltairedeux.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltairedeux.local, http://requests.voltaireun.local, http://requests.voltairedeux.local, http://issues.voltaireun.local, http://issues.voltairedeux.local, http://prowlarr.voltaireun.local, http://prowlarr.voltaireun.local, http://prowlarr.voltairedeux.local, http://bazarr.voltaireun.local, http://bazarr.voltaireun.local, http://bazarr.voltairedeux.local, http://transmission.voltaireun.local, http://transmission.voltaireun.local, http://transmission.voltairedeux.local, http://tvheadend.voltaireun.local, http://tvheadend.voltaireun.local, http://tvheadend.voltairedeux.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltairedeux.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltairedeux.local, http://db.voltaireun.local, http://db.voltaireun.local, http://db.voltairedeux.local, http://portainer.voltaireun.local, http://portainer.voltairedeux.local {
+http://jellyfin.voltaireun.local, http://jellyfin.voltaireun.local, http://jellyfin.voltairedeux.local, http://jellyfin.mediaserver.local, http://dashboard.voltaireun.local, http://dashboard.voltaireun.local, http://dashboard.voltairedeux.local, http://noc.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltairedeux.local, http://sonarr.voltaireun.local, http://sonarr.voltaireun.local, http://sonarr.voltairedeux.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltairedeux.local, http://requests.voltaireun.local, http://requests.voltairedeux.local, http://issues.voltaireun.local, http://issues.voltairedeux.local, http://prowlarr.voltaireun.local, http://prowlarr.voltaireun.local, http://prowlarr.voltairedeux.local, http://bazarr.voltaireun.local, http://bazarr.voltaireun.local, http://bazarr.voltairedeux.local, http://transmission.voltaireun.local, http://transmission.voltaireun.local, http://transmission.voltairedeux.local, http://tvheadend.voltaireun.local, http://tvheadend.voltaireun.local, http://tvheadend.voltairedeux.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltairedeux.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltairedeux.local, http://db.voltaireun.local, http://db.voltaireun.local, http://db.voltairedeux.local, http://portainer.voltaireun.local, http://portainer.voltairedeux.local, http://tdarr.voltaireun.local, http://tdarr.voltairedeux.local {
     import security_headers
     encode gzip zstd
     redir https://{host}{uri} permanent
@@ -339,6 +339,17 @@ https://portainer.waltdakind.xubi.org, https://portainer.voltaireun.local, https
     import security_headers
     import custom_tls
     reverse_proxy portainer:9000 192.168.4.21:9000 {
+        lb_policy first
+        fail_duration 10s
+    }
+}
+
+# --- O. Tdarr Transcode Automation ---
+https://tdarr.waltdakind.xubi.org, https://tdarr.voltaireun.local, https://tdarr.voltairedeux.local {
+    import security_headers
+    import custom_tls
+    encode gzip zstd
+    reverse_proxy tdarr:8265 192.168.4.21:8265 {
         lb_policy first
         fail_duration 10s
     }

@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Test-MediaStackFleetConnectivity.ps1 - Primary Multi-Service Connectivity & Authenticated Handshake Probe.
 
@@ -73,7 +73,8 @@ $fleetEndpoints = @(
     @{ Name="Syncthing P2P Mesh";  Group="Syncthing";    Port=8384; Path="";                   Expected=200; HostHeader="syncthing.voltairedeux.local" },
     @{ Name="Transmission Web";    Group="Transmission"; Port=9091; Path="/transmission/web/"; Expected=200; HostHeader="transmission.voltairedeux.local" },
     @{ Name="TVHeadend Live TV";    Group="LiveTV";       Port=9981; Path="";                   Expected=302; HostHeader="tvheadend.voltairedeux.local" },
-    @{ Name="HDHomeRun Gateway";   Group="LiveTV";       Port=80;   Path="/discover.json";     Expected=200; HostHeader="hdhomerun.voltairedeux.local" }
+    @{ Name="HDHomeRun Gateway";   Group="LiveTV";       Port=80;   Path="/discover.json";     Expected=200; HostHeader="hdhomerun.voltairedeux.local" },
+    @{ Name="Tdarr Transcoder";    Group="MediaCore";    Port=8265; Path="/";                  Expected=200; HostHeader="tdarr.voltairedeux.local" }
 )
 
 $activeProbes = if ($Service -eq "All") {

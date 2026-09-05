@@ -97,7 +97,9 @@ $dockerInfo = docker info --format '{{.ServerVersion}}' 2>$null
 Assert-Verification -Category "Runtime" -Item "Docker Engine Daemon" -Condition ($null -ne $dockerInfo) -Details "Version $dockerInfo" -Weight 2
 
 $seerrTarget = if (docker inspect seerr 2>$null) { "seerr" } else { "jellyseerr" }
+$hasTdarr = (docker inspect tdarr 2>$null) -ne $null
 $targetContainers = @("caddy", "jellyfin", "sonarr", "radarr", "prowlarr", "bazarr", $seerrTarget, "syncthing", "transmission", "mediastack-db")
+if ($hasTdarr) { $targetContainers += "tdarr" }
 foreach ($c in $targetContainers) {
     $inspect = docker inspect $c 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue
     $isUp = ($inspect -and $inspect[0].State.Status -eq "running")
@@ -193,7 +195,7 @@ Assert-Verification -Category "Databases" -Item "SQLite Web Interface (:8080)" -
 # ==============================================================================
 Write-Host "`n[PHASE 5/6] Ingress Proxy & Virtual Host Routing Verification..." -ForegroundColor Yellow
 
-$vhosts = @("voltairedeux.local", "jellyfin.voltairedeux.local", "radarr.voltairedeux.local", "sonarr.voltairedeux.local", "musicbrainz.voltairedeux.local")
+$vhosts = @("voltairedeux.local", "jellyfin.voltairedeux.local", "radarr.voltairedeux.local", "sonarr.voltairedeux.local", "musicbrainz.voltairedeux.local", "tdarr.voltairedeux.local")
 foreach ($vh in $vhosts) {
     $code = curl.exe -s -o NUL -w "%{http_code}" --max-time 3 -H "Host: $vh" "http://localhost:80/" 2>$null
     Assert-Verification -Category "Ingress" -Item "Virtual Host: $vh" -Condition ($code -ge 200 -and $code -lt 500) -Details "HTTP $code" -Weight 1

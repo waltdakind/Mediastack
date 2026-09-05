@@ -93,6 +93,7 @@ $ServiceCatalog = [ordered]@{
     "Portainer"      = @{ Script="Repair-PortainerServer.ps1";    Category="Management"; Description="Portainer CE Container Management" }
     "MediaStackDb"   = @{ Script="Repair-MediaStackDb.ps1";       Category="Management"; Description="MediaStack SQLite Web Database GUI" }
     "Diun"           = @{ Script="Repair-DiunNotifier.ps1";       Category="Management"; Description="Diun Container Image Update Notifier" }
+    "Tdarr"          = @{ Script="Repair-TdarrServer.ps1";        Category="MediaCore";  Description="Tdarr Transcode & Audio/Video Automation" }
 }
 
 # Aliases

@@ -263,6 +263,32 @@ services:
       - ./config/portainer:/data
     restart: unless-stopped
 
+  tdarr:
+    image: ghcr.io/haveagitgat/tdarr:latest
+    container_name: tdarr
+    restart: unless-stopped
+    ports:
+      - "8265:8265"
+      - "8266:8266"
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+      - serverIP=0.0.0.0
+      - serverPort=8266
+      - webUIPort=8265
+      - internalNode=true
+      - nodeID=MediaStackNode
+    volumes:
+      - ./config/tdarr/server:/app/server
+      - ./config/tdarr/configs:/app/configs
+      - ./config/tdarr/logs:/app/logs
+      - ${MEDIA_DIR}:/data
+      - ./config/tdarr/cache:/temp
+    labels:
+      - "autoheal=true"
+
+
 
   # =============================================================================
   # MUSICBRAINZ LOCAL DB, SEARCH & MIRROR API STACK (MERGED SERVICES)
