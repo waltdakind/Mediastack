@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Invoke-VoltaireUnDailyPoller.ps1 - VoltaireUn Daily Update Poller, Database Sync & Health Sentinel.
 
@@ -37,7 +37,7 @@ param(
     [Parameter(Mandatory=$false)][switch]$ForceSync,
     [Parameter(Mandatory=$false)][switch]$DryRun,
     [Parameter(Mandatory=$false)][int]$IntervalHours = 24,
-    [Parameter(Mandatory=$false)][switch]$Once = $true
+    [Parameter(Mandatory=$false)][bool]$Once = $true
 )
 
 # ==============================================================================
@@ -101,17 +101,18 @@ $ErrorActionPreference = "Continue"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 [System.Console]::InputEncoding  = [System.Text.Encoding]::UTF8
 
-$modulePath = Join-Path $PSScriptRoot "MediaStackOps.psm1"
+$BaseDir = if (Test-Path (Join-Path $PSScriptRoot "..\docker-compose.yml")) { (Resolve-Path (Join-Path $PSScriptRoot "..")).Path } else { $PSScriptRoot }
+$modulePath = Join-Path $BaseDir "MediaStackOps.psm1"
 if (Test-Path $modulePath) { 
     Import-Module $modulePath -Force 
-} elseif (Test-Path "$PSScriptRoot\MediaStackOps.ps1") {
-    . "$PSScriptRoot\MediaStackOps.ps1"
+} elseif (Test-Path "$BaseDir\MediaStackOps.ps1") {
+    . "$BaseDir\MediaStackOps.ps1"
 }
 
-$HandoffsDir = Join-Path $PSScriptRoot "handoffs"
+$HandoffsDir = Join-Path $BaseDir "handoffs"
 if (-not (Test-Path $HandoffsDir)) { New-Item -ItemType Directory -Force -Path $HandoffsDir | Out-Null }
 
-function Execute-DailyPollPass {
+function Invoke-DailyPollPass {
     $nodeInfo = Get-MediaStackClusterNodeInfo
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $fileTag   = Get-Date -Format "yyyyMMdd_HHmmss"
@@ -185,7 +186,7 @@ function Execute-DailyPollPass {
         }
 
         # Reconcile OneDrive configs
-        $mergeScript = Join-Path $PSScriptRoot "Merge-OneDriveMediaStack.ps1"
+        $mergeScript = if (Test-Path (Join-Path $BaseDir "sync-files\Merge-OneDriveMediaStack.ps1")) { Join-Path $BaseDir "sync-files\Merge-OneDriveMediaStack.ps1" } else { Join-Path $BaseDir "Merge-OneDriveMediaStack.ps1" }
         if (Test-Path $mergeScript) {
             & $mergeScript -PurgeStaleConflictFiles:$true -CreateBackupArchive:$false
         }
@@ -196,7 +197,7 @@ function Execute-DailyPollPass {
     # --- 4. TWO-WAY DATABASE SYNCHRONIZATION ---
     Write-Host "`n[STEP 4/6] Synchronizing & Validating Cluster Databases..." -ForegroundColor Yellow
     if (-not $DryRun) {
-        $syncDbScript = Join-Path $PSScriptRoot "Sync-MediaStackDatabases.ps1"
+        $syncDbScript = if (Test-Path (Join-Path $BaseDir "sync-files\Sync-MediaStackDatabases.ps1")) { Join-Path $BaseDir "sync-files\Sync-MediaStackDatabases.ps1" } else { Join-Path $BaseDir "Sync-MediaStackDatabases.ps1" }
         if (Test-Path $syncDbScript) {
             & $syncDbScript -RunOnce
         }
@@ -206,7 +207,7 @@ function Execute-DailyPollPass {
 
     # --- 5. COMPREHENSIVE PROXY & PORT SELF-HEALING DIAGNOSTICS ---
     Write-Host "`n[STEP 5/6] Probing Proxies & Ports with Auto-Remediation..." -ForegroundColor Yellow
-    $diagScript = Join-Path $PSScriptRoot "Test-MediaStackProxyAndPorts.ps1"
+    $diagScript = if (Test-Path (Join-Path $BaseDir "test-files\Test-MediaStackProxyAndPorts.ps1")) { Join-Path $BaseDir "test-files\Test-MediaStackProxyAndPorts.ps1" } else { Join-Path $BaseDir "Test-MediaStackProxyAndPorts.ps1" }
     $portDiagPassed = $true
     if (Test-Path $diagScript) {
         if (-not $DryRun) {
@@ -241,8 +242,8 @@ function Execute-DailyPollPass {
 **Peer AI Node:** $($nodeInfo.PeerHostName) ($($nodeInfo.PeerIP))  
 **Update Found:** $(if ($hasUpdate) { "YES" } else { "NO" })  
 **Update Summary:** $updateDetails  
-**Database Backup Status:** $(if ($backupResult.AllPassed) { "âœ… All Snapshots Pristine" } else { "âš ï¸ Completed with warnings" })  
-**Proxy & Port Health:** $(if ($portDiagPassed) { "âœ… 100% Operational" } else { "âŒ Port Anomalies Detected" })  
+**Database Backup Status:** $(if ($backupResult.AllPassed) { "[OK] All Snapshots Pristine" } else { "[WARN] Completed with warnings" })  
+**Proxy & Port Health:** $(if ($portDiagPassed) { "[OK] 100% Operational" } else { "[ERROR] Port Anomalies Detected" })  
 
 ---
 
@@ -280,13 +281,13 @@ function Execute-DailyPollPass {
 # CONTROLLER LOOP / SINGLE PASS
 # ==============================================================================
 if ($Once) {
-    Execute-DailyPollPass
+    Invoke-DailyPollPass
     exit 0
 }
 
 Write-Host ("Starting continuous VoltaireUn daily poller loop every {0} hours. Press Ctrl+C to terminate." -f $IntervalHours) -ForegroundColor DarkGray
 while ($true) {
-    Execute-DailyPollPass
+    Invoke-DailyPollPass
     Start-Sleep -Seconds ($IntervalHours * 3600)
 }
 
