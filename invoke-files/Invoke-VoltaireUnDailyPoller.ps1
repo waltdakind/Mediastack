@@ -177,9 +177,14 @@ function Invoke-DailyPollPass {
     Write-Host "`n[STEP 3/6] Applying Cluster Code & Configuration Updates..." -ForegroundColor Yellow
     if ($hasUpdate -and -not $DryRun) {
         if ($hasRemote) {
-            Write-Host "  â€¢ Pulling commits from GitHub (git pull origin main)..." -ForegroundColor DarkCyan
+            Write-Host "  • Pulling commits from GitHub (git pull origin main)..." -ForegroundColor DarkCyan
             $pullOut = git pull origin main 2>&1
-            Write-Host ("  [OK] Git pull result: {0}" -f $pullOut) -ForegroundColor Green
+            if ($LASTEXITCODE -ne 0 -or ($pullOut -match "refusing to merge unrelated histories") -or ($pullOut -match "divergent") -or ($pullOut -match "fatal")) {
+                Write-Host "  • Resetting local branch to align with upstream GitHub origin/main..." -ForegroundColor DarkYellow
+                git fetch origin main 2>&1 | Out-Null
+                $pullOut = git reset --hard origin/main 2>&1
+            }
+            Write-Host ("  [OK] Git sync result: {0}" -f $pullOut) -ForegroundColor Green
         }
 
         # Reconcile OneDrive configs
