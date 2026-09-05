@@ -2,6 +2,7 @@ services:
 
   api-gateway:
     build: ./api-gateway
+    image: mediastack-api-gateway:latest
     container_name: api-gateway
     ports:
       - "3000:3000"

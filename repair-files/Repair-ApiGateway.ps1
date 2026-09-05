@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Repair-ApiGateway.ps1 - MediaStack Core API Gateway Diagnostic & Auto-Remediation Engine.
 
@@ -51,10 +51,39 @@ Write-Host "====================================================================
 $remediations = @()
 $shouldFix = ($AutoFix -or -not $DiagOnly)
 
-# 1. Container Status Check
+# 1. Container Status Check & Orphan/Prefix Reconciliation
 Write-Host "`n[1/4] Auditing API Gateway Container..." -ForegroundColor Yellow
 $inspect = docker inspect api-gateway 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue
 $isUp = ($inspect -and $inspect[0].State.Status -eq "running")
+
+if (-not $isUp) {
+    # Check for orphaned or hash-prefixed containers (e.g. b99f16a6f279_api-gateway)
+    $altContainers = docker ps -a --filter "name=api-gateway" --format "{{.Names}}|{{.Status}}" 2>$null
+    foreach ($entry in $altContainers) {
+        $parts = $entry.Split("|")
+        $cName = $parts[0]
+        $cStatus = if ($parts.Length -gt 1) { $parts[1] } else { "" }
+        if ($cName -and $cName -ne "api-gateway") {
+            Write-Host "  [INFO] Detected prefixed/orphaned API Gateway container: $cName ($cStatus)" -ForegroundColor Yellow
+            if ($shouldFix) {
+                if ($cStatus -like "*Up*") {
+                    Write-Host "  [REPAIR] Renaming running container '$cName' to canonical 'api-gateway'..." -ForegroundColor Cyan
+                    docker rename $cName api-gateway 2>$null | Out-Null
+                    $inspect = docker inspect api-gateway 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue
+                    $isUp = ($inspect -and $inspect[0].State.Status -eq "running")
+                    if ($isUp) {
+                        Write-Host "  [REPAIR] Successfully recovered canonical 'api-gateway' container." -ForegroundColor Green
+                        $remediations += "Reconciled and renamed orphaned container '$cName' to 'api-gateway'."
+                    }
+                } else {
+                    Write-Host "  [REPAIR] Purging stale non-running container '$cName'..." -ForegroundColor Cyan
+                    docker rm -f $cName 2>$null | Out-Null
+                    $remediations += "Purged stale non-running container '$cName'."
+                }
+            }
+        }
+    }
+}
 
 if ($isUp) {
     Write-Host "  [OK] Container 'api-gateway': RUNNING" -ForegroundColor Green
@@ -64,10 +93,25 @@ if ($isUp) {
         if ($inspect) {
             docker start api-gateway 2>$null | Out-Null
             Start-Sleep -Seconds 2
-            Write-Host "  [REPAIR] Started 'api-gateway' container." -ForegroundColor Green
-            $remediations += "Started 'api-gateway' container."
+            $inspect = docker inspect api-gateway 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue
+            if ($inspect -and $inspect[0].State.Status -eq "running") {
+                Write-Host "  [REPAIR] Started 'api-gateway' container." -ForegroundColor Green
+                $remediations += "Started 'api-gateway' container."
+            }
         } else {
-            docker compose up -d api-gateway 2>$null | Out-Null
+            # Ensure port 3000 isn't held by an orphan before compose up
+            $port3000Holders = docker ps --filter "publish=3000" --format "{{.Names}}" 2>$null
+            foreach ($holder in $port3000Holders) {
+                if ($holder -ne "api-gateway") {
+                    Write-Host "  [REPAIR] Stopping conflicting container on port 3000: $holder" -ForegroundColor Yellow
+                    docker stop $holder 2>$null | Out-Null
+                }
+            }
+            Write-Host "  [DEPLOY] Running 'docker compose up -d api-gateway'..." -ForegroundColor Cyan
+            Push-Location $BaseDir
+            docker compose up -d api-gateway 2>&1 | Out-String | Write-Host
+            Pop-Location
+            Start-Sleep -Seconds 2
             $remediations += "Deployed 'api-gateway' container via compose."
         }
     }
