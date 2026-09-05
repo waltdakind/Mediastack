@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Repair-ServarrFleet.ps1 - Automated Diagnostic & Recovery Engine for Servarr Applications.
 
@@ -115,6 +115,23 @@ foreach ($svc in $services) {
             @($pidFiles) | Remove-Item -Force -ErrorAction SilentlyContinue
             Write-Host "    [OK] Stale lock files successfully purged." -ForegroundColor Green
             $remediationLog += "$svc : Purged $lockCount database lock and journal files."
+        }
+
+        # Database Integrity & Recovery Audit
+        if (Test-Path $dbPath) {
+            $integrityCheck = docker exec mediastack-db sqlite3 "/mediastack/config/$svc/$dbName" "PRAGMA quick_check;" 2>$null
+            $isCorrupt = ($integrityCheck -and $integrityCheck -notmatch "ok")
+            Write-Host ("  * Database Health  : {0}" -f $(if ($isCorrupt) { "[WARN] CORRUPT ($integrityCheck)" } else { "[OK] PRISTINE" })) -ForegroundColor $(if ($isCorrupt) { "Red" } else { "Green" })
+            if ($isCorrupt -and $AutoFix -and -not $DiagOnly) {
+                if ($svc -eq "sonarr") {
+                    Write-Host "    [REPAIR] Launching automated sonarr.db schema & migration recovery..." -ForegroundColor Cyan
+                    $fixSonarr = Join-Path $PSScriptRoot "Fix-SonarrDatabase.ps1"
+                    if (Test-Path $fixSonarr) {
+                        & $fixSonarr
+                        $remediationLog += "sonarr : Repaired corrupt SQLite database and realigned VersionInfo."
+                    }
+                }
+            }
         }
 
         # 3. Config.xml XML Validation & API Key Alignment
