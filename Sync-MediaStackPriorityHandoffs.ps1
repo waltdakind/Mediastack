@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Sync-MediaStackPriorityHandoffs.ps1 - Priority Cluster Reconciliation & Handoff Sync.
 
@@ -118,14 +118,20 @@ Write-Host ("    • VoltaireUn  ($PrimaryIP)   : Primary 24/7 Media Hub, Ingres
 Write-Host ("    • VoltaireDeux ($SecondaryIP)   : AI Acceleration (Ollama :11434), MusicBrainz (:5001), Picard, Push Hub") -ForegroundColor Green
 
 # Optimize LCP across Web Assets
-$lcpScript = Join-Path $BaseDir "Optimize-DualNodeLcp.ps1"
+$lcpScript = if (Test-Path (Join-Path $BaseDir "optimize-files\Optimize-DualNodeLcp.ps1")) {
+    Join-Path $BaseDir "optimize-files\Optimize-DualNodeLcp.ps1"
+} else { Join-Path $BaseDir "Optimize-DualNodeLcp.ps1" }
+
 if (Test-Path $lcpScript) {
     & $lcpScript -NonInteractive | Out-Null
     Write-Host "  [OK] Sub-second LCP rules and font preconnects active across dashboards." -ForegroundColor Green
 }
 
 # Ensure Host Safeguards
-$safeguardScript = Join-Path $BaseDir "Set-MediaStackHostSafeguards.ps1"
+$safeguardScript = if (Test-Path (Join-Path $BaseDir "setup-files\Set-MediaStackHostSafeguards.ps1")) {
+    Join-Path $BaseDir "setup-files\Set-MediaStackHostSafeguards.ps1"
+} else { Join-Path $BaseDir "Set-MediaStackHostSafeguards.ps1" }
+
 if (Test-Path $safeguardScript) {
     & $safeguardScript -ApplyPowerPolicies -NonInteractive | Out-Null
     Write-Host "  [OK] 24/7 Always-On host power & Docker auto-restart policies enforced." -ForegroundColor Green

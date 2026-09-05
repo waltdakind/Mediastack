@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # Invoke-MediaStackSuite.ps1 - Primary Orchestrated Verification, Health & Startup Suite
 # ==============================================================================
 param(
@@ -76,8 +76,14 @@ $phaseResults["Phase 1: Network & WAN Foundation"] = "PASS"
 # ==============================================================================
 Print-PhaseHeader -PhaseNum "2/5" -PhaseTitle "Database Liveness, PRAGMA Integrity & Vacuum Compression"
 
-if (Test-Path "$PSScriptRoot\Optimize-MediaStackDatabase.ps1") {
-    & "$PSScriptRoot\Optimize-MediaStackDatabase.ps1"
+$optDbScript = if (Test-Path "$PSScriptRoot\optimize-files\Optimize-MediaStackDatabase.ps1") {
+    "$PSScriptRoot\optimize-files\Optimize-MediaStackDatabase.ps1"
+} elseif (Test-Path "$PSScriptRoot\Optimize-MediaStackDatabase.ps1") {
+    "$PSScriptRoot\Optimize-MediaStackDatabase.ps1"
+} else { $null }
+
+if ($optDbScript) {
+    & $optDbScript
     $phaseResults["Phase 2: Database Integrity & Compression"] = "PASS (7 DBs Verified)"
 } else {
     Write-Host "  [SKIP] Optimize-MediaStackDatabase.ps1 not found." -ForegroundColor DarkGray
@@ -97,6 +103,7 @@ $routes = @(
     @{ Route="radarr.voltairedeux.local"; Container="radarr"; Path="/ping" },
     @{ Route="sonarr.voltairedeux.local"; Container="sonarr"; Path="/ping" },
     @{ Route="prowlarr.voltairedeux.local"; Container="prowlarr"; Path="/ping" },
+    @{ Route="seerr.voltairedeux.local"; Container="seerr"; Path="/api/v1/status" },
     @{ Route="jellyseerr.voltairedeux.local"; Container="jellyseerr"; Path="/api/v1/status" },
     @{ Route="bazarr.voltairedeux.local"; Container="bazarr"; Path="" },
     @{ Route="transmission.voltairedeux.local"; Container="transmission"; Path="/transmission/web/" },

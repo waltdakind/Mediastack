@@ -49,7 +49,7 @@ if ($VoltaireDeux) {
     return
 }
 if ($Lcp) {
-    & "$PSScriptRoot\Optimize-DualNodeLcp.ps1"
+    & "$PSScriptRoot\optimize-files\Optimize-DualNodeLcp.ps1"
     return
 }
 if ($Radar) {
@@ -57,7 +57,7 @@ if ($Radar) {
     return
 }
 if ($Repair) {
-    & "$PSScriptRoot\Repair-JellyfinServer.ps1" -AutoFix
+    & "$PSScriptRoot\repair-files\Repair-JellyfinServer.ps1" -AutoFix
     return
 }
 if ($Sync) {
@@ -69,7 +69,7 @@ if ($Lifecycle) {
     return
 }
 if ($NetworkShares) {
-    & "$PSScriptRoot\Set-MediaStackNetworkUsers.ps1"
+    & "$PSScriptRoot\setup-files\Set-MediaStackNetworkUsers.ps1"
     return
 }
 if ($Update) {
@@ -193,7 +193,7 @@ Write-Host "`nSelect an option [0-9, O, F, T, R, B, C, S, V, D, I, Q]: " -NoNewl
 
 if ($NonInteractive) {
     Write-Host "3 (Default NonInteractive: Dual-Node LCP)" -ForegroundColor Cyan
-    & "$PSScriptRoot\Optimize-DualNodeLcp.ps1"
+    & "$PSScriptRoot\optimize-files\Optimize-DualNodeLcp.ps1"
     return
 }
 
@@ -206,23 +206,23 @@ switch ($key.ToString().ToUpper()) {
     "U" { & "$PSScriptRoot\Start-VoltaireUn.ps1" }
     "2" { & "$PSScriptRoot\Start-VoltaireDeux.ps1" }
     "D" { & "$PSScriptRoot\Start-VoltaireDeux.ps1" }
-    "3" { & "$PSScriptRoot\Optimize-DualNodeLcp.ps1" }
-    "L" { & "$PSScriptRoot\Optimize-DualNodeLcp.ps1" }
+    "3" { & "$PSScriptRoot\optimize-files\Optimize-DualNodeLcp.ps1" }
+    "L" { & "$PSScriptRoot\optimize-files\Optimize-DualNodeLcp.ps1" }
     "4" { & "$PSScriptRoot\Test-LocalNetworkSwitch.ps1" }
-    "5" { & "$PSScriptRoot\Repair-JellyfinServer.ps1" -AutoFix }
-    "J" { & "$PSScriptRoot\Repair-JellyfinServer.ps1" -AutoFix }
+    "5" { & "$PSScriptRoot\repair-files\Repair-JellyfinServer.ps1" -AutoFix }
+    "J" { & "$PSScriptRoot\repair-files\Repair-JellyfinServer.ps1" -AutoFix }
     "6" { & "$PSScriptRoot\Merge-OneDriveMediaStack.ps1" }
     "M" { & "$PSScriptRoot\Merge-OneDriveMediaStack.ps1" }
-    "7" { & "$PSScriptRoot\Set-MediaStackHostSafeguards.ps1" }
-    "P" { & "$PSScriptRoot\Set-MediaStackHostSafeguards.ps1" }
+    "7" { & "$PSScriptRoot\setup-files\Set-MediaStackHostSafeguards.ps1" }
+    "P" { & "$PSScriptRoot\setup-files\Set-MediaStackHostSafeguards.ps1" }
     "8" { & "$PSScriptRoot\Invoke-MediaStackMainLifecycle.ps1" }
     "A" { & "$PSScriptRoot\Invoke-MediaStackMainLifecycle.ps1" }
-    "9" { & "$PSScriptRoot\Set-MediaStackNetworkUsers.ps1" }
-    "N" { & "$PSScriptRoot\Set-MediaStackNetworkUsers.ps1" }
+    "9" { & "$PSScriptRoot\setup-files\Set-MediaStackNetworkUsers.ps1" }
+    "N" { & "$PSScriptRoot\setup-files\Set-MediaStackNetworkUsers.ps1" }
     "0" { & "$PSScriptRoot\Install-MediaStackUpdate.ps1" }
     "F" { & "$PSScriptRoot\Invoke-MediaStackFullRebootSuite.ps1" }
     "T" { & "$PSScriptRoot\Test-MediaStackSslViability.ps1" }
-    "R" { & "$PSScriptRoot\Repair-MediaStackFleet.ps1" -All -AutoFix }
+    "R" { & "$PSScriptRoot\Invoke-MediaStackRepairSuite.ps1" -All -AutoFix }
     "B" { & "$PSScriptRoot\Backup-MediaStackFleet.ps1" -All }
     "C" { & "$PSScriptRoot\Test-MediaStackFleetConnectivity.ps1" -All -DeepAuth }
     "S" { & "$PSScriptRoot\Replicate-MediaStackCluster.ps1" -All -RunOnce }
@@ -232,6 +232,6 @@ switch ($key.ToString().ToUpper()) {
     "Q" { Write-Host "Exited." -ForegroundColor DarkGray; return }
     default {
         Write-Host "Executing default: Dual-Node LCP and Performance Optimization..." -ForegroundColor Cyan
-        & "$PSScriptRoot\Optimize-DualNodeLcp.ps1"
+        & "$PSScriptRoot\optimize-files\Optimize-DualNodeLcp.ps1"
     }
 }

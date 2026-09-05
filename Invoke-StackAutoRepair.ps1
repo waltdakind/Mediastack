@@ -37,7 +37,17 @@ foreach ($line in $containers) {
     if ($parts.Count -eq 2) { $containerMap[$parts[0]] = $parts[1] }
 }
 
-$expectedFleet = @("caddy", "jellyfin", "sonarr", "radarr", "prowlarr", "bazarr", "jellyseerr", "transmission", "tvheadend", "mediastack-db", "homepage", "api-gateway")
+$expectedFleet = @("caddy", "jellyfin", "sonarr", "radarr", "prowlarr", "bazarr", "transmission", "tvheadend", "mediastack-db", "homepage", "api-gateway")
+# Check Seerr or Jellyseerr
+if (-not $containerMap.ContainsKey("seerr") -and -not $containerMap.ContainsKey("jellyseerr")) {
+    $diagnosedIncidents += [PSCustomObject]@{
+        Component = "seerr"
+        Category  = "MISSING_CONTAINER"
+        Severity  = "HIGH"
+        Details   = "Container 'seerr' (or legacy 'jellyseerr') is not present in Docker fleet"
+        FixType   = "DEPLOY_CONTAINER"
+    }
+}
 foreach ($c in $expectedFleet) {
     if (-not $containerMap.ContainsKey($c)) {
         $diagnosedIncidents += [PSCustomObject]@{
@@ -80,6 +90,7 @@ $routesToProbe = @(
     @{ Route="sonarr.voltaireun.local"; Container="sonarr"; Path="/ping" },
     @{ Route="radarr.voltaireun.local"; Container="radarr"; Path="/ping" },
     @{ Route="prowlarr.voltaireun.local"; Container="prowlarr"; Path="" },
+    @{ Route="seerr.voltaireun.local"; Container="seerr"; Path="/api/v1/status" },
     @{ Route="jellyseerr.voltaireun.local"; Container="jellyseerr"; Path="/api/v1/status" },
     @{ Route="db.mediaserver.local"; Container="mediastack-db"; Path="" }
 )
