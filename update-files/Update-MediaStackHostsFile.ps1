@@ -39,6 +39,7 @@ $hostsEntries = @"
 192.168.4.30    homepage.voltairedeux.local
 192.168.4.30    portainer.voltairedeux.local
 192.168.4.30    tdarr.voltairedeux.local
+192.168.4.30    qbittorrent.voltairedeux.local
 
 # --- Node 1: VoltaireUn (192.168.4.21) Primary Server Ingress ---
 192.168.4.21    voltaireun.local
@@ -52,6 +53,7 @@ $hostsEntries = @"
 192.168.4.21    requests.voltaireun.local
 192.168.4.21    issues.voltaireun.local
 192.168.4.21    transmission.voltaireun.local
+192.168.4.21    qbittorrent.voltaireun.local
 192.168.4.21    tvheadend.voltaireun.local
 192.168.4.21    hdhomerun.voltaireun.local
 192.168.4.21    musicbrainz.voltaireun.local

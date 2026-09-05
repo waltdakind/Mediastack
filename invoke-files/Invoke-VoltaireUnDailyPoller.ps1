@@ -37,7 +37,8 @@ param(
     [Parameter(Mandatory=$false)][switch]$ForceSync,
     [Parameter(Mandatory=$false)][switch]$DryRun,
     [Parameter(Mandatory=$false)][int]$IntervalHours = 24,
-    [Parameter(Mandatory=$false)][bool]$Once = $true
+    [Parameter(Mandatory=$false)][switch]$Loop,
+    [Parameter(Mandatory=$false)][switch]$Once
 )
 
 # ==============================================================================
@@ -75,8 +76,7 @@ function Assert-ClusterNodeTarget {
 
     if ($isNonInteractive) {
         Write-Host " [ABORT] Non-interactive run on incorrect cluster machine. Exiting." -ForegroundColor Red
-        Write-Host " Use -Force or set $env:MEDIASTACK_FORCE_NODE=1 to bypass.
-" -ForegroundColor DarkGray
+        Write-Host " Use -Force or set $env:MEDIASTACK_FORCE_NODE=1 to bypass." -ForegroundColor DarkGray
         exit 1
     }
 
@@ -86,15 +86,12 @@ function Assert-ClusterNodeTarget {
     Write-Host ""
     $choice = Read-Host " Enter choice [C/P] (Default: C)"
     if ($choice -ne "P" -and $choice -ne "p") {
-        Write-Host "
- [EXITED] Operation cancelled by user.
-" -ForegroundColor DarkGray
+        Write-Host "`n [EXITED] Operation cancelled by user.`n" -ForegroundColor DarkGray
         exit 0
     }
-    Write-Host "
- [OVERRIDE] Proceeding on current machine ($currentHost) as requested.
-" -ForegroundColor Yellow
+    Write-Host "`n [OVERRIDE] Proceeding on current machine ($currentHost) as requested.`n" -ForegroundColor Yellow
 }
+
 Assert-ClusterNodeTarget -ExpectedNode "VoltaireUn" -Force:$Force -NonInteractive:$NonInteractive
 
 $ErrorActionPreference = "Continue"
@@ -280,7 +277,7 @@ function Invoke-DailyPollPass {
 # ==============================================================================
 # CONTROLLER LOOP / SINGLE PASS
 # ==============================================================================
-if ($Once) {
+if (-not $Loop) {
     Invoke-DailyPollPass
     exit 0
 }

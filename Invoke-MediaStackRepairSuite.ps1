@@ -46,8 +46,8 @@ param(
 
     [Parameter(ParameterSetName="Service")]
     [ValidateSet("Caddy", "Jellyfin", "Seerr", "Jellyseerr", "Sonarr", "Radarr", "Prowlarr", "Bazarr",
-                 "Transmission", "MusicBrainz", "Picard", "Syncthing", "LiveTV", "Homepage",
-                 "Portainer", "ApiGateway", "MediaStackDb", "Diun", "MediaLibraries")]
+                 "Transmission", "Qbittorrent", "MusicBrainz", "Picard", "Syncthing", "LiveTV", "Homepage",
+                 "Portainer", "ApiGateway", "MediaStackDb", "Diun", "Tdarr", "MediaLibraries")]
     [string]$Service,
 
     [Parameter(ParameterSetName="All")]
@@ -94,6 +94,7 @@ $ServiceCatalog = [ordered]@{
     "MediaStackDb"   = @{ Script="Repair-MediaStackDb.ps1";       Category="Management"; Description="MediaStack SQLite Web Database GUI" }
     "Diun"           = @{ Script="Repair-DiunNotifier.ps1";       Category="Management"; Description="Diun Container Image Update Notifier" }
     "Tdarr"          = @{ Script="Repair-TdarrServer.ps1";        Category="MediaCore";  Description="Tdarr Transcode & Audio/Video Automation" }
+    "Qbittorrent"    = @{ Script="Repair-QbittorrentServer.ps1";  Category="Storage";    Description="qBittorrent BitTorrent Client" }
 }
 
 # Aliases

@@ -74,7 +74,8 @@ $fleetEndpoints = @(
     @{ Name="Transmission Web";    Group="Transmission"; Port=9091; Path="/transmission/web/"; Expected=200; HostHeader="transmission.voltairedeux.local" },
     @{ Name="TVHeadend Live TV";    Group="LiveTV";       Port=9981; Path="";                   Expected=302; HostHeader="tvheadend.voltairedeux.local" },
     @{ Name="HDHomeRun Gateway";   Group="LiveTV";       Port=80;   Path="/discover.json";     Expected=200; HostHeader="hdhomerun.voltairedeux.local" },
-    @{ Name="Tdarr Transcoder";    Group="MediaCore";    Port=8265; Path="/";                  Expected=200; HostHeader="tdarr.voltairedeux.local" }
+    @{ Name="Tdarr Transcoder";    Group="MediaCore";    Port=8265; Path="/";                  Expected=200; HostHeader="tdarr.voltairedeux.local" },
+    @{ Name="qBittorrent Client";  Group="Storage";      Port=8085; Path="/";                  Expected=200; HostHeader="qbittorrent.voltairedeux.local" }
 )
 
 $activeProbes = if ($Service -eq "All") {

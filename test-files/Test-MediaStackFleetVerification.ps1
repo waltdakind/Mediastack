@@ -98,8 +98,10 @@ Assert-Verification -Category "Runtime" -Item "Docker Engine Daemon" -Condition 
 
 $seerrTarget = if (docker inspect seerr 2>$null) { "seerr" } else { "jellyseerr" }
 $hasTdarr = (docker inspect tdarr 2>$null) -ne $null
+$hasQbit = (docker inspect qbittorrent 2>$null) -ne $null
 $targetContainers = @("caddy", "jellyfin", "sonarr", "radarr", "prowlarr", "bazarr", $seerrTarget, "syncthing", "transmission", "mediastack-db")
 if ($hasTdarr) { $targetContainers += "tdarr" }
+if ($hasQbit) { $targetContainers += "qbittorrent" }
 foreach ($c in $targetContainers) {
     $inspect = docker inspect $c 2>$null | ConvertFrom-Json -ErrorAction SilentlyContinue
     $isUp = ($inspect -and $inspect[0].State.Status -eq "running")
@@ -123,6 +125,9 @@ $endpoints = @(
     @{ Name="Syncthing P2P Mesh";  Port=8384; Path="";                   Expected=200; Host="syncthing.voltairedeux.local" },
     @{ Name="Transmission Web";    Port=9091; Path="/transmission/web/"; Expected=200; Host="transmission.voltairedeux.local" }
 )
+if ($hasQbit) {
+    $endpoints += @{ Name="qBittorrent WebUI"; Port=8085; Path="/"; Expected=200; Host="qbittorrent.voltairedeux.local" }
+}
 
 foreach ($ep in $endpoints) {
     $pName = $ep.Name

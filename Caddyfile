@@ -302,6 +302,17 @@ https://transmission.voltaireun.local, https://transmission.voltaireun.local, ht
     }
 }
 
+# --- I2. qBittorrent Torrent Client ---
+https://qbittorrent.waltdakind.xubi.org, https://qbittorrent.voltaireun.local, https://qbittorrent.voltairedeux.local {
+    import security_headers
+    import custom_tls
+    encode gzip zstd
+    reverse_proxy qbittorrent:8085 192.168.4.21:8085 {
+        lb_policy first
+        fail_duration 10s
+    }
+}
+
 # --- J. Tvheadend Live TV & DVR ---
 https://tvheadend.voltaireun.local, https://tvheadend.voltaireun.local, https://tvheadend.voltairedeux.local {
     import security_headers
