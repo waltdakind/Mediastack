@@ -7,9 +7,9 @@
     "target_node": "VOLTAIREUN",
     "target_role": "VoltaireUn (Main 24/7 Server Node)",
     "target_ip": "192.168.4.21",
-    "published_at": "2026-09-05 12:51:33",
-    "commit_sha": "fc33bb67e659635860979f75e3ee00ac1e7db3b0",
-    "commit_message": "feat(qbittorrent): integrate qBittorrent into main fleet compose, Caddyfile, and repair suite; fix daily poller loop param and syntax",
+    "published_at": "2026-09-05 13:25:00",
+    "commit_sha": "9961959",
+    "commit_message": "feat(qbittorrent): integrate qBittorrent, add poller forwarder, sanitize git history and push to origin/main",
     "git_branch": "main",
     "requires_db_sync": true,
     "status": "READY_FOR_VOLTAIREUN_PULL"
