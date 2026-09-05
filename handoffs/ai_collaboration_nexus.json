@@ -1,12 +1,11 @@
 ﻿{
-    "last_session_timestamp":  "2026-09-04 18:52:08",
+    "last_session_timestamp":  "2026-09-05 00:40:39",
     "last_session_node":  "VOLTAIREDEUX",
     "local_ip":  "192.168.4.30",
     "peer_node":  "VOLTAIREUN",
-    "peer_ip":  "fe80::a161:849b:78cc:574f%13",
-    "peer_services_online":  6,
-    "total_peer_probes":  6,
-    "staged_update_id":  "VOLTAIREDEUX_OPT_20260904_185208",
-    "latest_advice_file":  "AI_Expert_Advice_FOR_VOLTAIREUN_20260904_185208.md",
-    "latest_manifest_path":  "C:\\Users\\waltd\\OneDrive\\Mediastack\\handoffs\\cluster_update_manifest.json"
+    "peer_ip":  "fe80::a161:849b:78cc:574f%14",
+    "databases_healthy":  true,
+    "anomalies_detected":  0,
+    "remediations_applied":  29,
+    "latest_report_path":  "C:\\Users\\waltd\\OneDrive\\Mediastack\\handoffs\\AI_Remediation_Execution_Report_20260905_004039.md"
 }

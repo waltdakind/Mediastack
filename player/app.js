@@ -228,10 +228,19 @@ async function fetchLibrary() {
     emptyState.classList.add('hidden');
     
     try {
+        let itemTypes = activeCategory;
+        if (activeCategory === 'Video') {
+            itemTypes = 'Video,Movie';
+        } else if (activeCategory === 'Downloads') {
+            itemTypes = 'Movie,Series,Video,Episode';
+        } else if (activeCategory === 'Music') {
+            itemTypes = 'MusicAlbum,Audio';
+        }
+
         const queryParams = new URLSearchParams({
             Recursive: 'true',
-            IncludeItemTypes: activeCategory,
-            Fields: 'PrimaryImageAspectRatio,Overview',
+            IncludeItemTypes: itemTypes,
+            Fields: 'PrimaryImageAspectRatio,Overview,Path,MediaSources',
             SortBy: 'SortName',
             SortOrder: 'Ascending'
         });
@@ -245,7 +254,18 @@ async function fetchLibrary() {
         if (!response.ok) throw new Error('Failed to retrieve items');
         
         const data = await response.json();
-        const items = data.Items || [];
+        let items = data.Items || [];
+
+        // Category-specific client filtering if needed
+        if (activeCategory === 'Video') {
+            items = items.filter(it => (it.Path && it.Path.toLowerCase().includes('/videos')) || it.Type === 'Video');
+        } else if (activeCategory === 'Downloads') {
+            items = items.filter(it => it.Path && it.Path.toLowerCase().includes('/downloads'));
+            // If none matched directly with /downloads, fallback to showing all completed items
+            if (items.length === 0) {
+                items = data.Items || [];
+            }
+        }
         
         loadingSpinner.classList.add('hidden');
         
@@ -273,6 +293,8 @@ function renderMediaCard(item) {
     const posterUrl = `/jellyfin/Items/${item.Id}/Images/Primary?maxWidth=400`;
     const fallbackSvg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'><rect width='200' height='300' fill='%2312131a'/><text x='50%25' y='50%25' fill='%236c5ce7' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif'>No Image</text></svg>`;
     
+    let metaText = item.ProductionYear || (item.Type === 'Audio' ? (item.ArtistItems ? item.ArtistItems.map(a => a.Name).join(', ') : 'Audio Track') : item.Type);
+
     card.innerHTML = `
         <div class="card-img-wrapper">
             <img src="${posterUrl}" onerror="this.src='${fallbackSvg}'" alt="${item.Name}">
@@ -282,7 +304,7 @@ function renderMediaCard(item) {
         </div>
         <div class="card-info">
             <div class="card-title">${item.Name}</div>
-            <div class="card-meta">${item.ProductionYear || 'Unknown Year'}</div>
+            <div class="card-meta">${metaText}</div>
         </div>
     `;
     
@@ -295,17 +317,76 @@ function renderMediaCard(item) {
 
 // --- Player Controls ---
 function playMedia(item) {
-    // Check if it's a Movie or a Series folder
+    // Check if it's a TV Series or Music Album folder
     if (item.Type === 'Series') {
-        // If they click on a TV Show card, fetch seasons and episodes
         fetchEpisodes(item.Id);
-    } else {
-        // Direct stream url
-        const streamUrl = `/jellyfin/Videos/${item.Id}/stream?static=true&PlaySessionId=MediaStackPlay&api_key=${accessToken}`;
-        
+    } else if (item.Type === 'MusicAlbum') {
+        fetchAlbumTracks(item.Id);
+    } else if (item.Type === 'Audio') {
+        const streamUrl = `/jellyfin/Audio/${item.Id}/stream?static=true&PlaySessionId=MediaStackPlay&api_key=${accessToken}`;
         playerModal.classList.remove('hidden');
         videoElement.src = streamUrl;
         videoElement.play().catch(e => console.warn('Autoplay prevented:', e));
+    } else {
+        // Direct video stream url
+        const streamUrl = `/jellyfin/Videos/${item.Id}/stream?static=true&PlaySessionId=MediaStackPlay&api_key=${accessToken}`;
+        playerModal.classList.remove('hidden');
+        videoElement.src = streamUrl;
+        videoElement.play().catch(e => console.warn('Autoplay prevented:', e));
+    }
+}
+
+// Handle Music Album track navigation
+async function fetchAlbumTracks(albumId) {
+    mediaGrid.innerHTML = '';
+    loadingSpinner.classList.remove('hidden');
+    
+    try {
+        const queryParams = new URLSearchParams({
+            Recursive: 'true',
+            IncludeItemTypes: 'Audio',
+            ParentId: albumId,
+            Fields: 'PrimaryImageAspectRatio,Overview,MediaSources',
+            SortBy: 'IndexNumber',
+            SortOrder: 'Ascending'
+        });
+        
+        const response = await fetch(`/jellyfin/Users/${userId}/Items?${queryParams.toString()}`, {
+            headers: {
+                'X-Emby-Token': accessToken
+            }
+        });
+        
+        if (!response.ok) throw new Error('Failed to retrieve album tracks');
+        
+        const data = await response.json();
+        const items = data.Items || [];
+        
+        loadingSpinner.classList.add('hidden');
+        
+        const backBtn = document.createElement('button');
+        backBtn.className = 'btn icon-btn';
+        backBtn.style.marginBottom = '20px';
+        backBtn.innerHTML = `<i class="ph ph-arrow-left"></i> Back to Albums`;
+        backBtn.addEventListener('click', fetchLibrary);
+        mediaGrid.appendChild(backBtn);
+        
+        const div = document.createElement('div');
+        div.style.gridColumn = '1 / -1';
+        mediaGrid.appendChild(div);
+
+        if (items.length === 0) {
+            emptyState.classList.remove('hidden');
+            return;
+        }
+        
+        items.forEach(item => {
+            renderMediaCard(item);
+        });
+    } catch (err) {
+        console.error(err);
+        loadingSpinner.classList.add('hidden');
+        fetchLibrary();
     }
 }
 

@@ -6,13 +6,17 @@ param(
     [switch]$Force,
     [switch]$Watchdog,
     [int]$PollIntervalSeconds = 10,
-    [string]$ConfigDir = "$env:SystemDrive\MediastackConfig",
+    [string]$ConfigDir = "",
     [string]$Image = "lscr.io/linuxserver/radarr:latest"
 )
 
+if (-not $ConfigDir) {
+    $ConfigDir = if (Test-Path (Join-Path $PSScriptRoot "config")) { Join-Path $PSScriptRoot "config" } else { "$env:SystemDrive\MediastackConfig" }
+}
+
 $ErrorActionPreference = "Continue"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-[System.Console]::InputEncoding  = [System.Text.Encoding]::UTF8
+[System.Console]::InputEncoding = [System.Text.Encoding]::UTF8
 
 $HandoffsDir = Join-Path $PSScriptRoot "handoffs"
 if (-not (Test-Path $HandoffsDir)) { New-Item -ItemType Directory -Force -Path $HandoffsDir | Out-Null }
@@ -36,8 +40,8 @@ function Invoke-RadarrFullRecovery {
     $crashLogs = cmd.exe /c "docker logs --tail 60 radarr 2>&1"
 
     $cStatusStr = if ($cState) { $cState.Status } else { "NOT_FOUND" }
-    $cExitStr   = if ($cState) { $cState.ExitCode } else { "N/A" }
-    $cRestartStr= if ($cState) { $cState.Restarting } else { "N/A" }
+    $cExitStr = if ($cState) { $cState.ExitCode } else { "N/A" }
+    $cRestartStr = if ($cState) { $cState.Restarting } else { "N/A" }
 
     Write-Host ("  * Container Status : {0}" -f $cStatusStr) -ForegroundColor DarkGray
     Write-Host ("  * Exit Code        : {0}" -f $cExitStr) -ForegroundColor DarkGray
@@ -51,7 +55,7 @@ function Invoke-RadarrFullRecovery {
 
     # --- 3. FRESH DOWNLOAD OF THE LATEST RADARR IMAGE ---
     Write-Host "`n[3/6] Pulling Fresh Download of Latest Radarr Image ($Image)..." -ForegroundColor Yellow
-    $pullOutput = docker pull $Image 2>&1
+    docker pull $Image 2>&1 | Out-Null
     Write-Host "  [OK] Fresh image downloaded from registry" -ForegroundColor Green
     
     # Prune untagged radarr images
@@ -73,7 +77,6 @@ function Invoke-RadarrFullRecovery {
 
     # Verify SQLite DB Integrity
     $dbIntegrityPass = $false
-    $dbRestored = $false
     $dbStatusMsg = "OK"
 
     if (Test-Path $radarrDbPath) {
@@ -81,7 +84,8 @@ function Invoke-RadarrFullRecovery {
         if ($chk -match "ok") {
             $dbIntegrityPass = $true
             Write-Host "  [OK] Radarr Database passes integrity check" -ForegroundColor Green
-        } else {
+        }
+        else {
             Write-Host ("  [WARN] Radarr Database is malformed: {0}. Initiating auto-restore..." -f $chk) -ForegroundColor Yellow
         }
     }
@@ -121,7 +125,8 @@ function Invoke-RadarrFullRecovery {
             $healthy = $true
             Write-Host ("  [SUCCESS] Radarr responded with HTTP 200 OK on Port 7878 in {0}s!" -f ($retries * 2)) -ForegroundColor Green
             break
-        } else {
+        }
+        else {
             Write-Host ("  ... Waiting for Radarr startup (Attempt {0}/{1}, Status: HTTP {2})" -f $retries, $maxRetries, $pingCode) -ForegroundColor DarkGray
         }
     }
@@ -137,7 +142,8 @@ function Invoke-RadarrFullRecovery {
         $cleanRsn = $Reason -replace "'", "''"
         $sqlIns = "INSERT INTO radarr_recovery_events_log (event_timestamp, trigger_reason, image_version, db_status, healed) VALUES ('$now', '$cleanRsn', '$Image', '$dbStatusMsg', $healedInt); "
         docker exec mediastack-db sqlite3 /config/mediastack_backup.db "$sqlInit $sqlIns" 2>$null
-    } catch { }
+    }
+    catch { }
 
     $logBlock = ($crashLogs | Out-String)
     $lines = @(
@@ -194,10 +200,12 @@ if ($Watchdog) {
         if (-not $cStatus -or $cStatus -eq "exited" -or $cStatus -eq "dead") {
             $needsRepair = $true
             $triggerReason = "Container status is '$cStatus'"
-        } elseif ($cStatus -eq "restarting") {
+        }
+        elseif ($cStatus -eq "restarting") {
             $needsRepair = $true
             $triggerReason = "Container is trapped in a crash-restart loop"
-        } else {
+        }
+        else {
             # Check 2: Port 7878 /ping probe
             $httpRes = curl.exe -s -o NUL -w "%{http_code}" --max-time 3 "http://localhost:7878/ping"
             if ($httpRes -ne "200") {
@@ -213,19 +221,22 @@ if ($Watchdog) {
 
         if ($needsRepair) {
             Invoke-RadarrFullRecovery -Reason $triggerReason
-        } else {
+        }
+        else {
             $ts = Get-Date -Format "HH:mm:ss"
             Write-Host ("[{0}] Radarr is healthy (Status: {1}, HTTP 200 OK)" -f $ts, $cStatus) -ForegroundColor DarkGray
         }
 
         Start-Sleep -Seconds $PollIntervalSeconds
     }
-} else {
+}
+else {
     # Default: Run single-pass diagnostic and repair if broken
     $pingTest = curl.exe -s -o NUL -w "%{http_code}" --max-time 3 "http://localhost:7878/ping"
     if ($pingTest -ne "200") {
         Invoke-RadarrFullRecovery -Reason "Diagnostic probe failed (HTTP $pingTest)"
-    } else {
+    }
+    else {
         Write-Host "[OK] Radarr is currently healthy and responding on Port 7878 (HTTP 200 OK)." -ForegroundColor Green
         Write-Host "     To force a fresh pull and rebuild, run: .\Repair-RadarrCrashLoop.ps1 -Force" -ForegroundColor DarkGray
         Write-Host "     To run as a continuous crash watchdog, run: .\Repair-RadarrCrashLoop.ps1 -Watchdog" -ForegroundColor DarkGray

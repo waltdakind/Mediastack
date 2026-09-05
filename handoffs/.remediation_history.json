@@ -1,5 +1,5 @@
 ﻿{
-    "last_watermark":  "2026-09-03T20:42:02.4627030-04:00",
+    "last_watermark":  "2026-09-05T00:41:35.9883338-04:00",
     "executed_scripts":  [
                              "AutoFix_20260830_132239.ps1",
                              "AutoFix_20260829_234027.ps1",
@@ -27,6 +27,8 @@
                              "AutoFix_20260902_221032.ps1",
                              "VOLTAIREDEUX_REL_20260902_220510",
                              "VOLTAIREDEUX_REL_20260903_010651",
-                             "VOLTAIREDEUX_REL_20260903_021436"
+                             "VOLTAIREDEUX_REL_20260903_021436",
+                             "AutoFix_20260903_204951.ps1",
+                             "VOLTAIREDEUX_REL_20260904_185744"
                          ]
 }
