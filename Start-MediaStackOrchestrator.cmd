@@ -1,2 +1,2 @@
 @echo off
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0Start-MediaStackOrchestrator.ps1" %*
+powershell.exe -ExecutionPolicy Bypass -NoProfile -File "%~dp0start-files\Start-MediaStackOrchestrator.ps1" %*

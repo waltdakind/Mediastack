@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    s-sync.ps1 - Fast Launcher for Priority Cluster Sync (VoltaireDeux First, then VoltaireUn).
+    s-sync.ps1 - Fast Priority Cluster Sync Forwarder.
 #>
 [CmdletBinding()]
 param(
@@ -10,9 +10,5 @@ param(
     [Parameter(Mandatory = $false)][switch]$NonInteractive
 )
 
-$targetScript = Join-Path $PSScriptRoot "Sync-MediaStackPriorityHandoffs.ps1"
-if (Test-Path $targetScript) {
-    & $targetScript -PrimaryIP $PrimaryIP -SecondaryIP $SecondaryIP -ExternalDomain $ExternalDomain -NonInteractive:$NonInteractive
-} else {
-    Write-Error "Sync-MediaStackPriorityHandoffs.ps1 not found in $PSScriptRoot"
-}
+$target = Join-Path $PSScriptRoot "sync-files\s-sync.ps1"
+& $target @PSBoundParameters

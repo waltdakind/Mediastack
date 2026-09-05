@@ -61,7 +61,7 @@ if ($Repair) {
     return
 }
 if ($Sync) {
-    & "$PSScriptRoot\Merge-OneDriveMediaStack.ps1"
+    & "$PSScriptRoot\Invoke-MediaStackSyncSuite.ps1" -NonInteractive:$NonInteractive
     return
 }
 if ($Lifecycle) {

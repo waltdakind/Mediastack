@@ -1,28 +1,9 @@
 <#
 .SYNOPSIS
-    MediaStack Primary Entry Point
-.DESCRIPTION
-    Launches the Primary Stack Orchestrator with Database Integrity, Caddy Routing, Image Cleanup, and Self-Healing.
+    Start-MediaStack.ps1 - Master Control Panel Startup Forwarder.
 #>
-
 [CmdletBinding()]
-param (
-    [Parameter()]
-    [switch]$Once,
+param()
 
-    [Parameter()]
-    [switch]$Monitor = $true,
-
-    [Parameter()]
-    [int]$IntervalSec = 30,
-
-    [Parameter()]
-    [switch]$SkipCleanup
-)
-
-$primaryScript = Join-Path $PSScriptRoot "Start-PrimaryStack.ps1"
-if (Test-Path $primaryScript) {
-    & $primaryScript @PSBoundParameters
-} else {
-    Write-Host "[ERROR] Start-PrimaryStack.ps1 not found in $PSScriptRoot" -ForegroundColor Red
-}
+$target = Join-Path $PSScriptRoot "start-files\Start-MediaStack.ps1"
+& $target @PSBoundParameters

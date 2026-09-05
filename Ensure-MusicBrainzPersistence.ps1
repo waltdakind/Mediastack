@@ -64,18 +64,25 @@ Write-Host "`n[1/4] Inspecting Local MusicBrainz PostgreSQL Engine & Persistence
 $dbContainer = "musicbrainz-docker-db-1"
 $dbStatus = docker inspect $dbContainer 2>$null | ConvertFrom-Json
 
-if (-not $dbStatus -or -not $dbStatus[0].State.Running) {
+$safeStart = Join-Path $ScriptDir "sync-files\Start-MusicBrainzSafeDb.ps1"
+if (Test-Path $safeStart) {
+    & $safeStart -NonInteractive
+} elseif (-not $dbStatus -or -not $dbStatus[0].State.Running) {
     Write-Host "  [WARN] $dbContainer is offline. Starting database container..." -ForegroundColor Yellow
     docker compose up -d musicbrainz-db 2>&1 | Out-Null
     Start-Sleep -Seconds 4
 }
 
-$pgReady = docker exec $dbContainer pg_isready -U musicbrainz 2>&1
+# Accept either primary or alternate local database container
+$inspectJson = docker inspect $dbContainer 2>$null | ConvertFrom-Json
+$activeDbContainer = if ($inspectJson -and $inspectJson[0].State.Running) { $dbContainer } else { "musicbrainz-docker-db-alt" }
+$pgReady = docker exec $activeDbContainer pg_isready -U musicbrainz 2>&1
 if ($pgReady -notmatch "accepting connections") {
-    Write-Host "  [ERROR] PostgreSQL engine is not accepting connections." -ForegroundColor Red
+    Write-Host "  [WARN] Neither primary nor alternate local PostgreSQL engine is accepting connections." -ForegroundColor Yellow
     return
 }
-Write-Host "  [OK] PostgreSQL engine is online and accepting connections." -ForegroundColor Green
+$dbContainer = $activeDbContainer
+Write-Host "  [OK] Local PostgreSQL engine ($dbContainer) is online and accepting connections." -ForegroundColor Green
 
 # -----------------------------------------------------------------------------
 # 2. Check Database Schema & Table Population

@@ -124,8 +124,21 @@ foreach ($s in $serviceDefs) {
     $startedAt = if ($inspect) { $inspect[0].State.StartedAt } else { "N/A" }
     $image = if ($inspect) { $inspect[0].Config.Image } else { "N/A" }
     
-    # Extract recent container logs
-    $recentLogs = if ($isUp) { cmd.exe /c "docker logs --tail 40 $cName 2>&1" } else { "Container offline." }
+    # Extract recent container logs safely with process timeout
+    $recentLogs = "Container running."
+    if ($isUp) {
+        $tmpLog = Join-Path $env:TEMP "docker_log_tail_$cName.tmp"
+        $p = Start-Process docker -ArgumentList @("logs", "--tail", "25", $cName) -NoNewWindow -PassThru -RedirectStandardOutput $tmpLog -RedirectStandardError "$tmpLog.err" -ErrorAction SilentlyContinue
+        if ($p -and $p.WaitForExit(1000)) {
+            if (Test-Path $tmpLog) { $recentLogs = Get-Content $tmpLog -Raw -ErrorAction SilentlyContinue }
+        } else {
+            if ($p) { try { $p.Kill() } catch {} }
+            $recentLogs = "Container $cName active (tail timeout)."
+        }
+        Remove-Item $tmpLog, "$tmpLog.err" -Force -ErrorAction SilentlyContinue
+    } else {
+        $recentLogs = "Container offline."
+    }
     $errorLines = @($recentLogs -split "`n" | Where-Object { $_ -match "error|fatal|exception|fail" })
 
     # Measure L7 HTTP Response

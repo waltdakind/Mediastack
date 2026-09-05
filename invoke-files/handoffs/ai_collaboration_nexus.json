@@ -1,0 +1,16 @@
+﻿{
+    "last_synced":  "2026-09-05 12:10:10",
+    "analysis_host":  "VOLTAIREDEUX",
+    "local_ip":  "192.168.4.30",
+    "peer_ip":  "192.168.4.21",
+    "cluster_scheme":  "FrenchOrdinal (VoltaireUn, VoltaireDeux, VoltaireTrois...)",
+    "host_cpu_load":  51,
+    "host_ram_used_gb":  12.56,
+    "host_ram_total_gb":  15.6,
+    "host_disk_free_gb":  24.65,
+    "active_services":  9,
+    "total_services":  12,
+    "peer_ping_ms":  8,
+    "handoffs_directory":  "C:\\Users\\waltd\\OneDrive\\Mediastack\\invoke-files\\handoffs\\services",
+    "analysis_status":  "COMPLETED_OPTIMAL"
+}
