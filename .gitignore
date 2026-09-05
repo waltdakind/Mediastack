@@ -53,6 +53,10 @@ config/
 data/
 downloads/
 media/
+movies/
+Shows/
+TV/
+Videos/
 music/
 torrents/
 watch/
@@ -63,6 +67,23 @@ certs/
 node_modules/
 api-gateway/node_modules/
 HomepageInstaller/node_modules/
+
+# Media & archive file extensions
+*.mkv
+*.mp4
+*.avi
+*.mov
+*.m4v
+*.wmv
+*.flv
+*.webm
+*.iso
+*.zip
+*.tar.gz
+*.7z
+handoffs/*.zip
+install-tools/*.zip
+dist/*.zip
 
 # OS junk
 .DS_Store
