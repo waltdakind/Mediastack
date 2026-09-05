@@ -7,10 +7,10 @@
     "target_node": "VOLTAIREUN",
     "target_role": "VoltaireUn (Main 24/7 Server Node)",
     "target_ip": "192.168.4.21",
-    "published_at": "2026-09-05 13:25:00",
-    "commit_sha": "9961959",
-    "commit_message": "feat(qbittorrent): integrate qBittorrent, add poller forwarder, sanitize git history and push to origin/main",
+    "published_at": "2026-09-05 13:42:00",
+    "commit_sha": "473c9b8",
+    "commit_message": "feat(cleanup): add Sync-VoltaireUnCleanSubfolders to purge root duplicates and OneDrive conflicts",
     "git_branch": "main",
-    "requires_db_sync": true,
+    "requires_db_sync": false,
     "status": "READY_FOR_VOLTAIREUN_PULL"
 }
