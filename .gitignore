@@ -31,6 +31,8 @@ secrets/
 picard_api_keys.json
 secrets.json
 secrets.env
+.agents/mcp_config.json
+!.agents/mcp_config.json.example
 *.key
 *.pem
 *.pfx
