@@ -119,7 +119,7 @@ if ($portTestSrv.TcpTestSucceeded) {
 
 # --- 4. HTTP Healthcheck & API Probe ---
 Write-Host "`n[4/5] Probing Tdarr HTTP Endpoints..." -ForegroundColor Yellow
-$code = curl.exe -s -o NUL -w "%{http_code}" --max-time 4 "http://localhost:${Port}/" 2>$null
+$code = curl.exe -s -o NUL -w "%{http_code}" --max-time 4 "http://127.0.0.1:${Port}/" 2>$null
 if ($code -eq "200") {
     Write-Host ("  [OK] Tdarr WebUI -> HTTP {0} (Healthy)" -f $code) -ForegroundColor Green
 } else {
@@ -134,7 +134,7 @@ if ($code -eq "200") {
 
 # --- 5. Ingress & Reverse Proxy Check ---
 Write-Host "`n[5/5] Auditing Ingress Reverse Proxy..." -ForegroundColor Yellow
-$proxyCode = curl.exe -k -s -o NUL -w "%{http_code}" --max-time 3 "https://tdarr.voltairedeux.local/" 2>$null
+$proxyCode = curl.exe -k -s -o NUL -w "%{http_code}" --resolve tdarr.voltairedeux.local:443:127.0.0.1 --max-time 4 "https://tdarr.voltairedeux.local/" 2>$null
 if ($proxyCode -eq "200" -or $proxyCode -eq "301" -or $proxyCode -eq "302") {
     Write-Host ("  [OK] Virtual Host (https://tdarr.voltairedeux.local) -> HTTP {0}" -f $proxyCode) -ForegroundColor Green
 } else {
