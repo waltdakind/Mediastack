@@ -156,7 +156,7 @@ http://voltaireun.local, http://voltaireun.local, http://voltairedeux.local, htt
 }
 
 # Internal Subdomains HTTP Redirection
-http://jellyfin.voltaireun.local, http://jellyfin.voltaireun.local, http://jellyfin.voltairedeux.local, http://jellyfin.mediaserver.local, http://dashboard.voltaireun.local, http://dashboard.voltaireun.local, http://dashboard.voltairedeux.local, http://noc.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltairedeux.local, http://sonarr.voltaireun.local, http://sonarr.voltaireun.local, http://sonarr.voltairedeux.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltairedeux.local, http://requests.voltaireun.local, http://requests.voltairedeux.local, http://issues.voltaireun.local, http://issues.voltairedeux.local, http://prowlarr.voltaireun.local, http://prowlarr.voltaireun.local, http://prowlarr.voltairedeux.local, http://bazarr.voltaireun.local, http://bazarr.voltaireun.local, http://bazarr.voltairedeux.local, http://transmission.voltaireun.local, http://transmission.voltaireun.local, http://transmission.voltairedeux.local, http://tvheadend.voltaireun.local, http://tvheadend.voltaireun.local, http://tvheadend.voltairedeux.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltairedeux.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltairedeux.local, http://db.voltaireun.local, http://db.voltaireun.local, http://db.voltairedeux.local, http://portainer.voltaireun.local, http://portainer.voltairedeux.local, http://tdarr.voltaireun.local, http://tdarr.voltairedeux.local {
+http://jellyfin.voltaireun.local, http://jellyfin.voltairedeux.local, http://jellyfin.mediaserver.local, http://dashboard.voltaireun.local, http://dashboard.voltairedeux.local, http://noc.voltaireun.local, http://radarr.voltaireun.local, http://radarr.voltairedeux.local, http://sonarr.voltaireun.local, http://sonarr.voltairedeux.local, http://jellyseerr.voltaireun.local, http://jellyseerr.voltairedeux.local, http://seerr.voltaireun.local, http://seerr.voltairedeux.local, http://overseerr.voltaireun.local, http://overseerr.voltairedeux.local, http://requests.voltaireun.local, http://requests.voltairedeux.local, http://issues.voltaireun.local, http://issues.voltairedeux.local, http://prowlarr.voltaireun.local, http://prowlarr.voltairedeux.local, http://bazarr.voltaireun.local, http://bazarr.voltairedeux.local, http://transmission.voltaireun.local, http://transmission.voltairedeux.local, http://tvheadend.voltaireun.local, http://tvheadend.voltairedeux.local, http://hdhomerun.voltaireun.local, http://hdhomerun.voltairedeux.local, http://musicbrainz.voltaireun.local, http://musicbrainz.voltairedeux.local, http://db.voltaireun.local, http://db.voltairedeux.local, http://portainer.voltaireun.local, http://portainer.voltairedeux.local, http://tdarr.voltaireun.local, http://tdarr.voltairedeux.local {
     import security_headers
     encode gzip zstd
     redir https://{host}{uri} permanent
@@ -202,8 +202,8 @@ https://diun.voltaireun.local, https://diun.voltaireun.local, https://diun.volta
     }
 }
 
-# --- D. Jellyseerr Media Requests ---
-https://jellyseerr.waltdakind.xubi.org, https://jellyseerr.voltaireun.local, https://jellyseerr.voltaireun.local, https://jellyseerr.voltairedeux.local {
+# --- D. Jellyseerr / Seerr / Overseerr Media Requests ---
+https://jellyseerr.waltdakind.xubi.org, https://seerr.waltdakind.xubi.org, https://jellyseerr.voltaireun.local, https://jellyseerr.voltairedeux.local, https://seerr.voltaireun.local, https://seerr.voltairedeux.local, https://overseerr.voltaireun.local, https://overseerr.voltairedeux.local {
     import security_headers
     import custom_tls
     encode gzip zstd

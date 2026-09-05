@@ -1435,24 +1435,28 @@ app.get('/api/jellywatch/resolve', async (req, res) => {
                 api_endpoint: "/api/jellywatch/requests",
                 search_endpoint: "/api/jellywatch/requests/search",
                 stats_endpoint: "/api/jellywatch/requests/stats",
-                ingress_domain: "requests.voltaireun.local",
+                seerr_url: "http://192.168.4.30:5055",
+                api_key: JELLYSEERR_API_KEY,
+                ingress_domain: "requests.voltairedeux.local",
                 wan_domain: "requests.waltdakind.xubi.org",
-                web_portal: "http://192.168.4.21:80/requests",
+                web_portal: "http://192.168.4.30:5055",
                 status: "ONLINE"
             },
             issues_server: {
                 api_endpoint: "/api/jellywatch/issues",
                 types_endpoint: "/api/jellywatch/issues/types",
                 stats_endpoint: "/api/jellywatch/issues/stats",
-                ingress_domain: "issues.voltaireun.local",
+                seerr_url: "http://192.168.4.30:5055",
+                api_key: JELLYSEERR_API_KEY,
+                ingress_domain: "issues.voltairedeux.local",
                 wan_domain: "issues.waltdakind.xubi.org",
-                web_portal: "http://192.168.4.21:80/issues",
+                web_portal: "http://192.168.4.30:5055",
                 status: "ONLINE"
             },
             discovery_info: {
                 multicast_udp_port: 7359,
                 mdns_udp_port: 5353,
-                mdns_hostname: "voltaireun.local",
+                mdns_hostname: "voltairedeux.local",
                 igmp_snooping_required: true
             },
             timestamp: new Date().toISOString()
@@ -1683,8 +1687,8 @@ app.get('/api/jellywatch/pair/:pin', (req, res) => {
             user_id: row.user_id,
             username: row.username,
             token: row.token,
-            server_url: "http://192.168.4.21:8096",
-            fallback_url: "https://waltdakind.xubi.org",
+            server_url: "http://192.168.4.30:8096",
+            fallback_url: "http://192.168.4.21:8096",
             server_id: JELLYFIN_SERVER_ID,
             license_code: JELLYWATCH_LICENSE_KEY
         });
@@ -1699,22 +1703,26 @@ app.get('/api/jellywatch/config', (req, res) => {
         license_tier: "Premium Activation",
         api_code: JELLYWATCH_LICENSE_KEY,
         server_id: JELLYFIN_SERVER_ID,
-        primary_endpoint: "http://192.168.4.21:8096",
-        failover_endpoint: "http://192.168.4.30:8096",
+        primary_endpoint: "http://192.168.4.30:8096",
+        failover_endpoint: "http://192.168.4.21:8096",
         wan_endpoint: "https://waltdakind.xubi.org",
-        proxy_endpoint: "https://voltaireun.local",
+        proxy_endpoint: "https://voltairedeux.local",
         requests_server: {
-            endpoint: "http://192.168.4.21:3000/api/jellywatch/requests",
-            ingress_url: "https://requests.voltaireun.local",
+            endpoint: "http://192.168.4.30:3000/api/jellywatch/requests",
+            seerr_url: "http://192.168.4.30:5055",
+            api_key: JELLYSEERR_API_KEY,
+            ingress_url: "https://requests.voltairedeux.local",
             wan_url: "https://requests.waltdakind.xubi.org",
-            portal_url: "http://192.168.4.21:80/requests",
+            portal_url: "http://192.168.4.30:5055",
             status: "ACTIVE"
         },
         issues_server: {
-            endpoint: "http://192.168.4.21:3000/api/jellywatch/issues",
-            ingress_url: "https://issues.voltaireun.local",
+            endpoint: "http://192.168.4.30:3000/api/jellywatch/issues",
+            seerr_url: "http://192.168.4.30:5055",
+            api_key: JELLYSEERR_API_KEY,
+            ingress_url: "https://issues.voltairedeux.local",
             wan_url: "https://issues.waltdakind.xubi.org",
-            portal_url: "http://192.168.4.21:80/issues",
+            portal_url: "http://192.168.4.30:5055",
             status: "ACTIVE"
         },
         discovery_udp_port: 7359,
@@ -1724,8 +1732,45 @@ app.get('/api/jellywatch/config', (req, res) => {
 });
 
 // =============================================================================
-// JELLYWATCH REQUESTS SERVER SUBSYSTEM
+// JELLYWATCH RESILIENT JELLYSEERR / SEERR / OVERSEERR CLIENT
 // =============================================================================
+const JELLYSEERR_API_KEY = process.env.JELLYSEERR_API_KEY || 'MTc4NzM2Mjg1OTA4NmE5NWEwYzE1LWM3MDEtNDIwZi05ODhmLTkyNTg5MTNlYjgyNA==';
+const JELLYSEERR_CANDIDATES = [
+    'http://jellyseerr:5055',
+    'http://seerr:5055',
+    'http://192.168.4.21:5055',
+    'http://192.168.4.30:5055',
+    'http://localhost:5055'
+];
+
+async function callJellyseerr(method, endpointPath, data = null, timeout = 3000) {
+    let lastErr = null;
+    for (const base of JELLYSEERR_CANDIDATES) {
+        try {
+            const url = `${base}${endpointPath}`;
+            const config = {
+                method,
+                url,
+                headers: {
+                    'X-Api-Key': JELLYSEERR_API_KEY,
+                    'Content-Type': 'application/json'
+                },
+                timeout
+            };
+            if (data && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
+                config.data = data;
+            }
+            const res = await axios(config);
+            return res.data;
+        } catch (err) {
+            lastErr = err;
+            if (err.response && [400, 404].includes(err.response.status)) {
+                throw err;
+            }
+        }
+    }
+    throw lastErr || new Error('All Jellyseerr/Seerr candidate endpoints failed');
+}
 
 // 8. Search Media for Requests (Jellyseerr / TMDB / Jellyfin fallback)
 app.get(['/api/jellywatch/requests/search', '/api/requests/search'], async (req, res) => {
@@ -1737,11 +1782,9 @@ app.get(['/api/jellywatch/requests/search', '/api/requests/search'], async (req,
     try {
         let results = [];
         try {
-            const jRes = await axios.get(`http://jellyseerr:5055/api/v1/search?query=${encodeURIComponent(query)}`, {
-                timeout: 3000
-            });
-            if (jRes.data && Array.isArray(jRes.data.results)) {
-                results = jRes.data.results.slice(0, 15).map(item => ({
+            const jData = await callJellyseerr('GET', `/api/v1/search?query=${encodeURIComponent(query)}`, null, 3000);
+            if (jData && Array.isArray(jData.results)) {
+                results = jData.results.slice(0, 15).map(item => ({
                     id: item.id ? String(item.id) : null,
                     media_type: item.mediaType || (item.title ? 'movie' : 'tv'),
                     title: item.title || item.name || 'Unknown Title',
@@ -1871,14 +1914,11 @@ app.post(['/api/jellywatch/requests', '/api/requests'], async (req, res) => {
                 jPayload.seasons = 'all';
             }
             if (media_id) {
-                const jRes = await axios.post('http://jellyseerr:5055/api/v1/request', jPayload, {
-                    headers: { 'X-Api-Key': 'MjAyNi0wOC0zMFQxOTowODowMFotSmVsbHlzZWVycg==' },
-                    timeout: 2500
-                });
-                if (jRes.data && jRes.data.id) {
+                const jData = await callJellyseerr('POST', '/api/v1/request', jPayload, 2500);
+                if (jData && jData.id) {
                     upstreamSuccess = true;
-                    upstreamId = String(jRes.data.id);
-                    upstreamStatus = jRes.data.status === 2 ? 'APPROVED' : 'PENDING';
+                    upstreamId = String(jData.id);
+                    upstreamStatus = jData.status === 2 ? 'APPROVED' : 'PENDING';
                 }
             }
         }
@@ -2130,16 +2170,27 @@ app.post(['/api/jellywatch/issues', '/api/issues'], async (req, res) => {
 
     let upstreamIssueId = null;
     try {
-        const jRes = await axios.post('http://jellyseerr:5055/api/v1/issue', {
-            issueType: typeCode === 'AUDIO' ? 1 : (typeCode === 'VIDEO' ? 2 : (typeCode === 'SUBTITLE' ? 3 : 4)),
-            message: `${description || matchedType.title} (Reported from JellyWatch by ${user})`,
-            mediaId: item_id
-        }, {
-            headers: { 'X-Api-Key': 'MjAyNi0wOC0zMFQxOTowODowMFotSmVsbHlzZWVycg==' },
-            timeout: 2000
-        });
-        if (jRes.data && jRes.data.id) {
-            upstreamIssueId = String(jRes.data.id);
+        let targetMediaId = null;
+        if (item_id && !isNaN(item_id)) {
+            try {
+                const mEndpoint = (media_type === 'tv') ? `/api/v1/tv/${item_id}` : `/api/v1/movie/${item_id}`;
+                const mData = await callJellyseerr('GET', mEndpoint);
+                if (mData && mData.mediaInfo && mData.mediaInfo.id) {
+                    targetMediaId = mData.mediaInfo.id;
+                }
+            } catch (mErr) {
+                targetMediaId = parseInt(item_id);
+            }
+        }
+        if (targetMediaId) {
+            const jData = await callJellyseerr('POST', '/api/v1/issue', {
+                issueType: typeCode === 'AUDIO' ? 1 : (typeCode === 'VIDEO' ? 2 : (typeCode === 'SUBTITLE' ? 3 : 4)),
+                message: `${description || matchedType.title} (Reported from JellyWatch by ${user})`,
+                mediaId: targetMediaId
+            }, 2500);
+            if (jData && jData.id) {
+                upstreamIssueId = String(jData.id);
+            }
         }
     } catch (jErr) {
         // Safe offline preservation
@@ -2311,20 +2362,17 @@ async function flushQueuedRequests() {
         for (const reqRow of rows) {
             try {
                 if (reqRow.media_id) {
-                    const jRes = await axios.post('http://jellyseerr:5055/api/v1/request', {
+                    const jData = await callJellyseerr('POST', '/api/v1/request', {
                         mediaType: reqRow.media_type,
                         mediaId: parseInt(reqRow.media_id)
-                    }, {
-                        headers: { 'X-Api-Key': 'MjAyNi0wOC0zMFQxOTowODowMFotSmVsbHlzZWVycg==' },
-                        timeout: 2500
-                    });
+                    }, 2500);
 
-                    if (jRes.data && jRes.data.id) {
+                    if (jData && jData.id) {
                         db.run(`
                             UPDATE jellywatch_requests 
                             SET status = 'APPROVED', upstream_service = 'JELLYSEERR', upstream_request_id = ?, updated_at = CURRENT_TIMESTAMP 
                             WHERE id = ?
-                        `, [String(jRes.data.id), reqRow.id]);
+                        `, [String(jData.id), reqRow.id]);
                         console.log(`[JellyWatch Requests] Auto-flushed queued request for '${reqRow.title}' (ID: ${reqRow.id})`);
                     }
                 }

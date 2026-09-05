@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Publish-VoltaireDeuxUpdates.ps1 - VoltaireDeux Update Publisher, Git Push & Cluster Manifest Engine.
 
@@ -32,7 +32,9 @@
 param(
     [Parameter(Mandatory=$false)][string]$Message = "VoltaireDeux cluster update and synchronization pass",
     [Parameter(Mandatory=$false)][switch]$SkipPortTest,
-    [Parameter(Mandatory=$false)][switch]$DryRun
+    [Parameter(Mandatory=$false)][switch]$DryRun,
+    [Parameter(Mandatory=$false)][switch]$Force,
+    [Parameter(Mandatory=$false)][switch]$NonInteractive
 )
 
 # ==============================================================================
