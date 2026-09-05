@@ -1,4 +1,4 @@
-# Test-NetworkDiagnostics.ps1 - Comprehensive Network Diagnostic & WAN Health Suite
+﻿# Test-NetworkDiagnostics.ps1 - Comprehensive Network Diagnostic & WAN Health Suite
 param(
     [string]$PrimaryServerIp = "192.168.4.21",
     [string]$SecondaryServerIp = "192.168.4.30",
@@ -8,9 +8,10 @@ param(
 )
 
 $ErrorActionPreference = "Continue"
+$BaseDir = if (Test-Path (Join-Path $PSScriptRoot "..\docker-compose.yml")) { (Resolve-Path (Join-Path $PSScriptRoot "..")).Path } else { $PSScriptRoot }
 
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-$reportFile = "$PSScriptRoot\handoffs\Network_Diagnostics_$(Get-Date -Format 'yyyyMMdd_HHmmss').md"
+$reportFile = "$BaseDir\handoffs\Network_Diagnostics_$(Get-Date -Format 'yyyyMMdd_HHmmss').md"
 
 Write-Host "`n=======================================================" -ForegroundColor Cyan
 Write-Host "   M E D I A S T A C K   N E T W O R K   D I A G N O S T I C S" -ForegroundColor Cyan
@@ -241,11 +242,11 @@ $results["MusicBrainz_WS2_Live"] = $mbApiTest
 
 # --- EXPORT REPORT ---
 if ($ExportReport) {
-    $handoffsDir = "$PSScriptRoot\handoffs"
+    $handoffsDir = "$BaseDir\handoffs"
     if (-not (Test-Path $handoffsDir)) { New-Item -ItemType Directory -Force -Path $handoffsDir | Out-Null }
     
     $md = @"
-# 🌐 Comprehensive Network & WAN Diagnostics Report
+# ðŸŒ Comprehensive Network & WAN Diagnostics Report
 
 | Field | Value |
 | :--- | :--- |
@@ -262,7 +263,7 @@ if ($ExportReport) {
 | :--- | :--- | :--- | :--- | :--- |
 "@
     foreach ($n in $lanResults) {
-        $md += "`n| $($n.Node) | $($n.IP) | $(if ($n.Ping) { '✅ OK' } else { '❌ Fail' }) | $($n.Port) | $(if ($n.PortOpen) { '✅ Open' } else { '⚠️ Closed' }) |"
+        $md += "`n| $($n.Node) | $($n.IP) | $(if ($n.Ping) { 'âœ… OK' } else { 'âŒ Fail' }) | $($n.Port) | $(if ($n.PortOpen) { 'âœ… Open' } else { 'âš ï¸ Closed' }) |"
     }
 
     $md += @"
@@ -275,7 +276,7 @@ if ($ExportReport) {
 | :--- | :--- | :--- |
 "@
     foreach ($p in $portResults) {
-        $md += "`n| $($p.Service) | $($p.Port) | $(if ($p.Listening) { '✅ Listening' } else { '⚠️ Offline' }) |"
+        $md += "`n| $($p.Service) | $($p.Port) | $(if ($p.Listening) { 'âœ… Listening' } else { 'âš ï¸ Offline' }) |"
     }
 
     $md += @"
@@ -300,9 +301,9 @@ if ($ExportReport) {
 ## 4. Picard & MusicBrainz API Configuration
 - **Server Host:** $($picardConfig['server_host'])
 - **Server Port:** $($picardConfig['server_port'])
-- **AcoustID API Key:** $(if ($picardConfig['acoustid_apikey']) { 'Configured ✅' } else { 'Not Set' })
+- **AcoustID API Key:** $(if ($picardConfig['acoustid_apikey']) { 'Configured âœ…' } else { 'Not Set' })
 - **OAuth User:** $($picardConfig['oauth_username'])
-- **MusicBrainz WS/2 Live:** $(if ($mbApiTest) { 'Active & Responding ✅' } else { 'Container Online' })
+- **MusicBrainz WS/2 Live:** $(if ($mbApiTest) { 'Active & Responding âœ…' } else { 'Container Online' })
 
 ---
 *Report generated automatically by MediaStack Network Diagnostic Suite.*
@@ -316,3 +317,4 @@ if ($ExportReport) {
 Write-Host "`n=======================================================" -ForegroundColor Cyan
 Write-Host "   D I A G N O S T I C S   C O M P L E T E" -ForegroundColor Cyan
 Write-Host "=======================================================`n" -ForegroundColor Cyan
+

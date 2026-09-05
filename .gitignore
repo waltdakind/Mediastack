@@ -69,8 +69,11 @@ HomepageInstaller/node_modules/
 Thumbs.db
 desktop.ini
 
-# Directory Junction aliases (canonical folders: replicate-files, setup-files)
+# Directory Junction aliases (canonical folders: replicate-files, setup-files, test-files, update-files)
 replication-files/
 set-files/
+tests-files/
+updates-files/
+
 
 

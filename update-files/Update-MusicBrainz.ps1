@@ -5,12 +5,14 @@ param(
     [int]$PacketNumber = 0,
     [switch]$ApplyReplication,
     [switch]$DownloadPacketOnly,
-    [string]$DownloadDir = "$PSScriptRoot\musicbrainz-docker\data\dbdump"
+    [string]$DownloadDir = ""
 )
 
+$BaseDir = if (Test-Path (Join-Path $PSScriptRoot "..\docker-compose.yml")) { (Resolve-Path (Join-Path $PSScriptRoot "..")).Path } else { $PSScriptRoot }
+if (-not $DownloadDir) { $DownloadDir = "$BaseDir\musicbrainz-docker\data\dbdump" }
 $ErrorActionPreference = "Continue"
 
-$mbDir = Join-Path -Path $PSScriptRoot -ChildPath "musicbrainz-docker"
+$mbDir = Join-Path -Path $BaseDir -ChildPath "musicbrainz-docker"
 $secretsDir = Join-Path -Path $mbDir -ChildPath "local\secrets"
 $tokenFile = Join-Path -Path $secretsDir -ChildPath "metabrainz_access_token"
 $configEnv = Join-Path -Path $mbDir -ChildPath ".env"
@@ -134,3 +136,4 @@ Write-Host "     .\Update-MusicBrainz.ps1 -PacketNumber 150000"
 Write-Host "  3. Download and Apply Replication to Database:"
 Write-Host "     .\Update-MusicBrainz.ps1 -ApplyReplication"
 Write-Host "-------------------------------------------------------`n" -ForegroundColor DarkGray
+

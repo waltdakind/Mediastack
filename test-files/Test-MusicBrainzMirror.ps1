@@ -10,10 +10,11 @@ param(
 )
 
 $ErrorActionPreference = "Continue"
+$BaseDir = if (Test-Path (Join-Path $PSScriptRoot "..\docker-compose.yml")) { (Resolve-Path (Join-Path $PSScriptRoot "..")).Path } else { $PSScriptRoot }
 
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 $fileTimestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$reportFile = "$PSScriptRoot\handoffs\MusicBrainz_Mirror_Report_$fileTimestamp.md"
+$reportFile = "$BaseDir\handoffs\MusicBrainz_Mirror_Report_$fileTimestamp.md"
 
 Write-Host "`n=======================================================" -ForegroundColor Cyan
 Write-Host "   M U S I C B R A I N Z   M I R R O R   T E S T E R" -ForegroundColor Cyan
@@ -176,14 +177,15 @@ try {
         $cDet  = $r.Details -replace "'", "''"
         $inserts += "INSERT INTO musicbrainz_health_log (test_timestamp, node_name, host, port, tcp_status, http_root, ws2_code, health_status, details) VALUES ('$timestamp', '$cName', '$($r.Host)', $($r.Port), '$($r.TCPStatus)', '$($r.HTTPRootCode)', '$($r.WS2Code)', '$($r.HealthStatus)', '$cDet'); "
     }
-    docker exec mediastack-db sqlite3 /config/mediastack_backup.db "$sqlInit $inserts" 2>$null
+    $sqlPayload = "$sqlInit $inserts"
+    $sqlPayload | docker exec -i mediastack-db sqlite3 /config/mediastack_backup.db 2>$null
     Write-Host "  [OK] Logged MusicBrainz health metrics into /config/mediastack_backup.db" -ForegroundColor Green
 } catch {
     # Fallback
 }
 
 if (-not $SkipReport) {
-    $handoffsDir = "$PSScriptRoot\handoffs"
+    $handoffsDir = "$BaseDir\handoffs"
     if (-not (Test-Path $handoffsDir)) { New-Item -ItemType Directory -Force -Path $handoffsDir | Out-Null }
 
     $lines = @()
@@ -227,3 +229,4 @@ if (-not $SkipReport) {
 Write-Host "`n=======================================================" -ForegroundColor Cyan
 Write-Host "   M U S I C B R A I N Z   T E S T   C O M P L E T E" -ForegroundColor Cyan
 Write-Host "=======================================================`n" -ForegroundColor Cyan
+

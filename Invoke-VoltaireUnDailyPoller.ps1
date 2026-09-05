@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Invoke-VoltaireUnDailyPoller.ps1 - VoltaireUn Daily Update Poller, Database Sync & Health Sentinel.
 
@@ -40,6 +40,63 @@ param(
     [Parameter(Mandatory=$false)][switch]$Once = $true
 )
 
+# ==============================================================================
+# CLUSTER MACHINE VERIFICATION
+# ==============================================================================
+function Assert-ClusterNodeTarget {
+    param(
+        [Parameter(Mandatory=$true)][string]$ExpectedNode,
+        [switch]$Force,
+        [switch]$NonInteractive
+    )
+    $currentHost = $env:COMPUTERNAME
+    $isMatch = $false
+    if ($ExpectedNode -match "VoltaireDeux") {
+        $isMatch = ($currentHost -match "VoltaireDeux" -or $currentHost -match "Laptop" -or $env:NODE_ROLE -eq "VoltaireDeux")
+    } elseif ($ExpectedNode -match "VoltaireUn") {
+        $isMatch = ($currentHost -match "VoltaireUn" -or $currentHost -match "Ordinateur" -or $currentHost -match "Server" -or $env:NODE_ROLE -eq "VoltaireUn")
+    } else {
+        $isMatch = ($currentHost -like "*$ExpectedNode*")
+    }
+
+    if ($Force -or $env:MEDIASTACK_FORCE_NODE -or $isMatch) { return }
+
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host " [WARNING] CLUSTER MACHINE MISMATCH DETECTED" -ForegroundColor Yellow
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host (" Target Machine Requirement : [{0}]" -f $ExpectedNode) -ForegroundColor Cyan
+    Write-Host (" Current Local Hostname      : [{0}]" -f $currentHost) -ForegroundColor Yellow
+    Write-Host " You are running a script designed specifically for another node in the cluster." -ForegroundColor Red
+    Write-Host " Proceeding on the wrong machine may disrupt cluster synchronization or services." -ForegroundColor DarkYellow
+    Write-Host "--------------------------------------------------------------------------------" -ForegroundColor DarkGray
+
+    $isNonInteractive = $NonInteractive -or ($PSBoundParameters.ContainsKey('NonInteractive') -and $PSBoundParameters['NonInteractive']) -or ($MyInvocation.Line -match '-NonInteractive')
+
+    if ($isNonInteractive) {
+        Write-Host " [ABORT] Non-interactive run on incorrect cluster machine. Exiting." -ForegroundColor Red
+        Write-Host " Use -Force or set $env:MEDIASTACK_FORCE_NODE=1 to bypass.
+" -ForegroundColor DarkGray
+        exit 1
+    }
+
+    Write-Host " Options:" -ForegroundColor White
+    Write-Host "  [C] Cancel and exit immediately (Recommended to protect cluster state)" -ForegroundColor Green
+    Write-Host "  [P] Proceed anyway (Override machine check on current host)" -ForegroundColor DarkYellow
+    Write-Host ""
+    $choice = Read-Host " Enter choice [C/P] (Default: C)"
+    if ($choice -ne "P" -and $choice -ne "p") {
+        Write-Host "
+ [EXITED] Operation cancelled by user.
+" -ForegroundColor DarkGray
+        exit 0
+    }
+    Write-Host "
+ [OVERRIDE] Proceeding on current machine ($currentHost) as requested.
+" -ForegroundColor Yellow
+}
+Assert-ClusterNodeTarget -ExpectedNode "VoltaireUn" -Force:$Force -NonInteractive:$NonInteractive
+
 $ErrorActionPreference = "Continue"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 [System.Console]::InputEncoding  = [System.Text.Encoding]::UTF8
@@ -76,7 +133,7 @@ function Execute-DailyPollPass {
     # A. Check Git Remote
     $hasRemote = (git remote -v 2>$null)
     if ($hasRemote) {
-        Write-Host "  • Fetching remote refs from GitHub (git fetch)..." -ForegroundColor DarkCyan
+        Write-Host "  â€¢ Fetching remote refs from GitHub (git fetch)..." -ForegroundColor DarkCyan
         git fetch origin 2>&1 | Out-Null
         $gitDiff = git log HEAD..origin/main --oneline 2>$null
         if ($gitDiff) {
@@ -122,7 +179,7 @@ function Execute-DailyPollPass {
     Write-Host "`n[STEP 3/6] Applying Cluster Code & Configuration Updates..." -ForegroundColor Yellow
     if ($hasUpdate -and -not $DryRun) {
         if ($hasRemote) {
-            Write-Host "  • Pulling commits from GitHub (git pull origin main)..." -ForegroundColor DarkCyan
+            Write-Host "  â€¢ Pulling commits from GitHub (git pull origin main)..." -ForegroundColor DarkCyan
             $pullOut = git pull origin main 2>&1
             Write-Host ("  [OK] Git pull result: {0}" -f $pullOut) -ForegroundColor Green
         }
@@ -133,7 +190,7 @@ function Execute-DailyPollPass {
             & $mergeScript -PurgeStaleConflictFiles:$true -CreateBackupArchive:$false
         }
     } else {
-        Write-Host "  • No new code pull required. Configurations are up to date." -ForegroundColor DarkGray
+        Write-Host "  â€¢ No new code pull required. Configurations are up to date." -ForegroundColor DarkGray
     }
 
     # --- 4. TWO-WAY DATABASE SYNCHRONIZATION ---
@@ -184,8 +241,8 @@ function Execute-DailyPollPass {
 **Peer AI Node:** $($nodeInfo.PeerHostName) ($($nodeInfo.PeerIP))  
 **Update Found:** $(if ($hasUpdate) { "YES" } else { "NO" })  
 **Update Summary:** $updateDetails  
-**Database Backup Status:** $(if ($backupResult.AllPassed) { "✅ All Snapshots Pristine" } else { "⚠️ Completed with warnings" })  
-**Proxy & Port Health:** $(if ($portDiagPassed) { "✅ 100% Operational" } else { "❌ Port Anomalies Detected" })  
+**Database Backup Status:** $(if ($backupResult.AllPassed) { "âœ… All Snapshots Pristine" } else { "âš ï¸ Completed with warnings" })  
+**Proxy & Port Health:** $(if ($portDiagPassed) { "âœ… 100% Operational" } else { "âŒ Port Anomalies Detected" })  
 
 ---
 
@@ -232,3 +289,7 @@ while ($true) {
     Execute-DailyPollPass
     Start-Sleep -Seconds ($IntervalHours * 3600)
 }
+
+
+
+

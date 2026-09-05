@@ -1,3 +1,4 @@
+﻿$BaseDir = if (Test-Path (Join-Path $PSScriptRoot "..\docker-compose.yml")) { (Resolve-Path (Join-Path $PSScriptRoot "..")).Path } else { $PSScriptRoot }
 $ErrorActionPreference = "Stop";
 
 $global:FailureCounts = @{}
@@ -6,7 +7,7 @@ $global:GracePeriods = @{}
 function Invoke-Autoheal {
     param([string]$Container, [string]$Reason)
     
-    $HandoffsDir = "$PSScriptRoot\handoffs"
+    $HandoffsDir = "$BaseDir\handoffs"
     if (-not (Test-Path $HandoffsDir)) { New-Item -ItemType Directory -Force -Path $HandoffsDir | Out-Null }
     
     $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
@@ -206,7 +207,7 @@ function Show-HealthMonitor {
 
 function New-Directories {
     Write-Host "Creating local volume directories..." -ForegroundColor Yellow;
-    $ScriptDir = "$PSScriptRoot";
+    $ScriptDir = $BaseDir;
     $dirs = @(
         "config\jellyfin", "config\caddy_data", "config\caddy_config",
         "config\sonarr", "config\radarr", "config\bazarr", "config\jackett",
@@ -226,7 +227,7 @@ function New-Directories {
 
 function Initialize-Environment {
     Write-Host "Ensuring base directory exists at $PSScriptRoot" -ForegroundColor Cyan;
-    $ScriptDir = "$PSScriptRoot";
+    $ScriptDir = $BaseDir;
     
     if (-not (Test-Path $ScriptDir)) { New-Item -ItemType Directory -Force -Path $ScriptDir | Out-Null }
     
@@ -251,10 +252,11 @@ function Initialize-Environment {
     }
 }
 
-$ScriptDir = "$PSScriptRoot"
+$ScriptDir = $BaseDir
 Set-Location -Path $ScriptDir
 
 # Always initialize on run to ensure files exist
 Initialize-Environment
+
 
 

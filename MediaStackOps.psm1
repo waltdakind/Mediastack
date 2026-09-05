@@ -108,6 +108,59 @@ function Get-MediaStackClusterNodeInfo {
     }
 }
 
+function Assert-MediaStackClusterNode {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)][string]$ExpectedNode,
+        [Parameter(Mandatory=$false)][switch]$Force,
+        [Parameter(Mandatory=$false)][switch]$NonInteractive
+    )
+
+    $currentHost = $env:COMPUTERNAME
+    $isMatch = $false
+
+    if ($ExpectedNode -match "VoltaireDeux") {
+        $isMatch = ($currentHost -match "VoltaireDeux" -or $currentHost -match "Laptop" -or $env:NODE_ROLE -eq "VoltaireDeux")
+    } elseif ($ExpectedNode -match "VoltaireUn") {
+        $isMatch = ($currentHost -match "VoltaireUn" -or $currentHost -match "Ordinateur" -or $currentHost -match "Server" -or $env:NODE_ROLE -eq "VoltaireUn")
+    } else {
+        $isMatch = ($currentHost -like "*$ExpectedNode*")
+    }
+
+    if ($Force -or $env:MEDIASTACK_FORCE_NODE -or $isMatch) {
+        return $true
+    }
+
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host " [WARNING] CLUSTER MACHINE MISMATCH DETECTED" -ForegroundColor Yellow
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host (" Target Machine Requirement : [{0}]" -f $ExpectedNode) -ForegroundColor Cyan
+    Write-Host (" Current Local Hostname      : [{0}]" -f $currentHost) -ForegroundColor Yellow
+    Write-Host " You are running a script designed specifically for another node in the cluster." -ForegroundColor Red
+    Write-Host " Proceeding on the wrong machine may cause unintended container or routing states." -ForegroundColor DarkYellow
+    Write-Host "--------------------------------------------------------------------------------" -ForegroundColor DarkGray
+
+    if ($NonInteractive -or -not [Environment]::UserInteractive) {
+        Write-Host " [ABORT] Non-interactive run on incorrect cluster machine. Exiting." -ForegroundColor Red
+        Write-Host " (To bypass, pass -Force or set `$env:MEDIASTACK_FORCE_NODE=1)`n" -ForegroundColor DarkGray
+        exit 1
+    }
+
+    Write-Host " Options:" -ForegroundColor White
+    Write-Host "  [C] Cancel and exit immediately (Recommended to protect cluster state)" -ForegroundColor Green
+    Write-Host "  [P] Proceed anyway (Override node check on current host)" -ForegroundColor DarkYellow
+    Write-Host ""
+    $choice = Read-Host " Enter choice [C/P] (Default: C)"
+    if ($choice -ne "P" -and $choice -ne "p") {
+        Write-Host "`n [EXITED] Operation cancelled by user.`n" -ForegroundColor DarkGray
+        exit 0
+    }
+
+    Write-Host "`n [OVERRIDE] Proceeding on current machine ($currentHost) as requested.`n" -ForegroundColor Yellow
+    return $true
+}
+
 # ==============================================================================
 # 2. STRUCTURED TELEMETRY & LOGGING ENGINE
 # ==============================================================================
@@ -1234,6 +1287,7 @@ try {
     if (Get-Command Export-ModuleMember -ErrorAction SilentlyContinue) {
         Export-ModuleMember -Function `
             Get-MediaStackClusterNodeInfo, `
+            Assert-MediaStackClusterNode, `
             Write-MediaStackLog, `
             Test-MediaStackPort, `
             Test-MediaStackHttpRoute, `

@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Test-MediaStackProxyAndPorts.ps1 - Comprehensive Dual-Node Proxy & Port Diagnostic, Root-Cause Analyzer & Auto-Healer.
 
@@ -37,24 +37,25 @@ param(
 )
 
 $ErrorActionPreference = "Continue"
+$BaseDir = if (Test-Path (Join-Path $BaseDir "..\docker-compose.yml")) { (Resolve-Path (Join-Path $BaseDir "..")).Path } else { $BaseDir }
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 [System.Console]::InputEncoding  = [System.Text.Encoding]::UTF8
 
 if ($AuditOnly) { $AutoRepair = $false }
 
 # Import Operations Module
-$modulePath = Join-Path $PSScriptRoot "MediaStackOps.psm1"
+$modulePath = Join-Path $BaseDir "MediaStackOps.psm1"
 if (Test-Path $modulePath) { 
     Import-Module $modulePath -Force 
-} elseif (Test-Path "$PSScriptRoot\MediaStackOps.ps1") {
-    . "$PSScriptRoot\MediaStackOps.ps1"
+} elseif (Test-Path "$BaseDir\MediaStackOps.ps1") {
+    . "$BaseDir\MediaStackOps.ps1"
 }
 
 $nodeInfo = Get-MediaStackClusterNodeInfo
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 $fileTag   = Get-Date -Format "yyyyMMdd_HHmmss"
 
-$HandoffsDir = Join-Path $PSScriptRoot "handoffs"
+$HandoffsDir = Join-Path $BaseDir "handoffs"
 if (-not (Test-Path $HandoffsDir)) { New-Item -ItemType Directory -Force -Path $HandoffsDir | Out-Null }
 
 if (-not $ReportPath) {
@@ -283,3 +284,4 @@ if ($criticalFails -gt 0) {
     Write-Host "`n[SUCCESS] All critical proxies and ports verified operational." -ForegroundColor Green
     exit 0
 }
+

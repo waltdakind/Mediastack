@@ -1,9 +1,66 @@
-# Set-DnsServers.ps1 - Configure Network DNS Nameservers to 8.8.8.8 and 1.1.1.1
+﻿# Set-DnsServers.ps1 - Configure Network DNS Nameservers to 8.8.8.8 and 1.1.1.1
 param(
     [string[]]$DnsServers = @("8.8.8.8", "1.1.1.1"),
     [switch]$ResetToDhcp,
     [switch]$IncludeVirtualAdapters = $false
 )
+
+# ==============================================================================
+# CLUSTER MACHINE VERIFICATION
+# ==============================================================================
+function Assert-ClusterNodeTarget {
+    param(
+        [Parameter(Mandatory=$true)][string]$ExpectedNode,
+        [switch]$Force,
+        [switch]$NonInteractive
+    )
+    $currentHost = $env:COMPUTERNAME
+    $isMatch = $false
+    if ($ExpectedNode -match "VoltaireDeux") {
+        $isMatch = ($currentHost -match "VoltaireDeux" -or $currentHost -match "Laptop" -or $env:NODE_ROLE -eq "VoltaireDeux")
+    } elseif ($ExpectedNode -match "VoltaireUn") {
+        $isMatch = ($currentHost -match "VoltaireUn" -or $currentHost -match "Ordinateur" -or $currentHost -match "Server" -or $env:NODE_ROLE -eq "VoltaireUn")
+    } else {
+        $isMatch = ($currentHost -like "*$ExpectedNode*")
+    }
+
+    if ($Force -or $env:MEDIASTACK_FORCE_NODE -or $isMatch) { return }
+
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host " [WARNING] CLUSTER MACHINE MISMATCH DETECTED" -ForegroundColor Yellow
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host (" Target Machine Requirement : [{0}]" -f $ExpectedNode) -ForegroundColor Cyan
+    Write-Host (" Current Local Hostname      : [{0}]" -f $currentHost) -ForegroundColor Yellow
+    Write-Host " You are running a script designed specifically for another node in the cluster." -ForegroundColor Red
+    Write-Host " Proceeding on the wrong machine may disrupt cluster synchronization or services." -ForegroundColor DarkYellow
+    Write-Host "--------------------------------------------------------------------------------" -ForegroundColor DarkGray
+
+    $isNonInteractive = $NonInteractive -or ($PSBoundParameters.ContainsKey('NonInteractive') -and $PSBoundParameters['NonInteractive']) -or ($MyInvocation.Line -match '-NonInteractive')
+
+    if ($isNonInteractive) {
+        Write-Host " [ABORT] Non-interactive run on incorrect cluster machine. Exiting." -ForegroundColor Red
+        Write-Host " Use -Force or set $env:MEDIASTACK_FORCE_NODE=1 to bypass.
+" -ForegroundColor DarkGray
+        exit 1
+    }
+
+    Write-Host " Options:" -ForegroundColor White
+    Write-Host "  [C] Cancel and exit immediately (Recommended to protect cluster state)" -ForegroundColor Green
+    Write-Host "  [P] Proceed anyway (Override machine check on current host)" -ForegroundColor DarkYellow
+    Write-Host ""
+    $choice = Read-Host " Enter choice [C/P] (Default: C)"
+    if ($choice -ne "P" -and $choice -ne "p") {
+        Write-Host "
+ [EXITED] Operation cancelled by user.
+" -ForegroundColor DarkGray
+        exit 0
+    }
+    Write-Host "
+ [OVERRIDE] Proceeding on current machine ($currentHost) as requested.
+" -ForegroundColor Yellow
+}
+Assert-ClusterNodeTarget -ExpectedNode "VoltaireDeux" -Force:$Force -NonInteractive:$NonInteractive
 
 $ErrorActionPreference = "Continue"
 
@@ -34,7 +91,7 @@ if (-not $adapters) {
 
 Write-Host "Active Adapters Found:" -ForegroundColor Yellow
 foreach ($adapter in $adapters) {
-    Write-Host "  • $($adapter.InterfaceAlias) (Status: $($adapter.Status), Speed: $($adapter.LinkSpeed))" -ForegroundColor DarkCyan
+    Write-Host "  â€¢ $($adapter.InterfaceAlias) (Status: $($adapter.Status), Speed: $($adapter.LinkSpeed))" -ForegroundColor DarkCyan
 }
 
 # 3. Apply DNS Configuration
@@ -88,9 +145,13 @@ foreach ($adapter in $adapters) {
     $alias = $adapter.InterfaceAlias
     $currentDns = Get-DnsClientServerAddress -InterfaceAlias $alias -AddressFamily IPv4 -ErrorAction SilentlyContinue
     $dnsList = if ($currentDns.ServerAddresses) { $currentDns.ServerAddresses -join ", " } else { "Automatic (DHCP)" }
-    Write-Host "  • Adapter '$alias': DNS = $dnsList" -ForegroundColor Green
+    Write-Host "  â€¢ Adapter '$alias': DNS = $dnsList" -ForegroundColor Green
 }
 
 Write-Host "`n=======================================================" -ForegroundColor Cyan
 Write-Host "   D N S   C O N F I G U R A T I O N   C O M P L E T E" -ForegroundColor Cyan
 Write-Host "=======================================================`n" -ForegroundColor Cyan
+
+
+
+

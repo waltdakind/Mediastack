@@ -73,7 +73,7 @@ if ($NetworkShares) {
     return
 }
 if ($Update) {
-    & "$PSScriptRoot\Install-MediaStackUpdate.ps1"
+    & "$PSScriptRoot\update-files\Install-MediaStackUpdate.ps1"
     return
 }
 if ($FullSuite) {
