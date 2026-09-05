@@ -292,7 +292,3 @@ while ($true) {
     Invoke-DailyPollPass
     Start-Sleep -Seconds ($IntervalHours * 3600)
 }
-
-
-
-
