@@ -208,6 +208,7 @@ services:
       - "autoheal=true"
 
   mediastack-db:
+    profiles: ["backend-x64"]
     image: coleifer/sqlite-web
     container_name: mediastack-db
     ports:

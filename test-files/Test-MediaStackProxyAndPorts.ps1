@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Test-MediaStackProxyAndPorts.ps1 - Comprehensive Dual-Node Proxy & Port Diagnostic, Root-Cause Analyzer & Auto-Healer.
 
@@ -37,7 +37,7 @@ param(
 )
 
 $ErrorActionPreference = "Continue"
-$BaseDir = if (Test-Path (Join-Path $BaseDir "..\docker-compose.yml")) { (Resolve-Path (Join-Path $BaseDir "..")).Path } else { $BaseDir }
+$BaseDir = if (Test-Path (Join-Path $PSScriptRoot "..\docker-compose.yml")) { (Resolve-Path (Join-Path $PSScriptRoot "..")).Path } else { $PSScriptRoot }
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 [System.Console]::InputEncoding  = [System.Text.Encoding]::UTF8
 
@@ -84,7 +84,7 @@ $ServiceMatrix = @(
     @{ Name="Transmission Peer TCP"; Port=51413; Container="transmission"; Category="TORRENT";    Critical=$false; Endpoint="" },
     @{ Name="TVHeadend Web UI";      Port=9981;  Container="tvheadend";    Category="LIVETV";     Critical=$true;  Endpoint="http://127.0.0.1:9981/" },
     @{ Name="TVHeadend HTSP Stream"; Port=9982;  Container="tvheadend";    Category="LIVETV";     Critical=$false; Endpoint="" },
-    @{ Name="Mediastack DB GUI";     Port=8080;  Container="mediastack-db";Category="DATABASE";   Critical=$true;  Endpoint="http://127.0.0.1:8080/" },
+    @{ Name="Mediastack DB GUI";     Port=8080;  Container="mediastack-db";Category="DATABASE";   Critical=(-not $nodeInfo.IsVoltaireDeux); Endpoint="http://127.0.0.1:8080/" },
     @{ Name="Syncthing Web GUI";     Port=8384;  Container="syncthing";    Category="SYNC";       Critical=$false; Endpoint="http://127.0.0.1:8384/" },
     @{ Name="Syncthing Peer TCP";    Port=22000; Container="syncthing";    Category="SYNC";       Critical=$false; Endpoint="" },
     @{ Name="MusicBrainz Secondary"; Port=5001;  Container="musicbrainz";  Category="METADATA";   Critical=$false; Endpoint="http://127.0.0.1:5001/" },
