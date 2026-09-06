@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Test-LocalNetworkSwitch.ps1 - Comprehensive Network Switch, Port Blocking & MTU Diagnostic Engine.
 
@@ -187,7 +187,7 @@ $discoveryChecks = @()
 $mdnsSw = [System.Diagnostics.Stopwatch]::StartNew()
 $dnsCheck = try { [System.Net.Dns]::GetHostAddresses("voltaireun.local") } catch { $null }
 $mdnsSw.Stop()
-$mdnsOk = ($dnsCheck -ne $null -and $dnsCheck.Count -gt 0)
+$mdnsOk = ($null -ne $dnsCheck -and $dnsCheck.Count -gt 0)
 
 $mdnsText = if ($mdnsOk) { "[OK] mDNS / Bonjour Active (Switch Allows Multicast 5353)" } else { "[WARN] mDNS Resolution Failed (Switch may have IGMP Snooping drop enabled)" }
 Write-Host ("  â€¢ mDNS Hostname Resolution (voltaireun.local) : {0}" -f $mdnsText) -ForegroundColor $(if ($mdnsOk) { "Green" } else { "Yellow" })

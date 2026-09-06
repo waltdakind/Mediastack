@@ -374,7 +374,6 @@ if (Test-Path $peerShareHandoffs -ErrorAction SilentlyContinue) {
 
 # Generate Executive Report
 $reportFile = Join-Path $HandoffsDir "MediaStack_Reboot_Suite_Report_$fileTag.md"
-$tick = [char]96
 $reportContent = @"
 # MediaStack Full Reboot & AI Sentinel Execution Report
 

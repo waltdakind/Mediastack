@@ -146,6 +146,7 @@ if (Test-Path $certPath) {
         $certDetails["SANs"]          = if ($sans.Count -gt 0) { $sans -join ", " } else { "None" }
         $certDetails["TimeValid"]     = $isTimeValid
         $certDetails["ChainValid"]    = $chainBuilt
+        $certDetails["PrivateKeyPresent"] = (Test-Path $keyPath)
         $certValid = $isTimeValid
 
         Write-Host "  * Subject        : $($cert.Subject)" -ForegroundColor Cyan
@@ -185,7 +186,7 @@ foreach ($tgt in $handshakeTargets) {
         $sslStream = [System.Net.Security.SslStream]::new(
             $tcpClient.GetStream(),
             $false,
-            [System.Net.Security.RemoteCertificateValidationCallback]{ param($sender, $certificate, $chain, $sslPolicyErrors) return $true }
+            [System.Net.Security.RemoteCertificateValidationCallback]{ param($src, $certificate, $chain, $sslPolicyErrors) return $true }
         )
 
         $sslStream.AuthenticateAsClient($tgt.SslName)

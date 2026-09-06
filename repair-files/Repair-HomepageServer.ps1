@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Repair-HomepageServer.ps1 - Homepage Modern Dashboard Diagnostic & Auto-Remediation Engine.
 
@@ -121,7 +121,7 @@ Write-Host "`n[4/4] Probing Homepage Listener Response..." -ForegroundColor Yell
 $code = "000"
 # Probe via docker exec curl or curl localhost if port mapped
 $probeScript = 'docker exec homepage wget --spider -q http://localhost:3000 2>&1'
-$res = Invoke-Expression $probeScript
+$null = Invoke-Expression $probeScript
 if ($LASTEXITCODE -eq 0) {
     $code = "200"
     Write-Host "  [OK] Homepage internal HTTP listener (port 3000) -> HTTP 200 OK" -ForegroundColor Green

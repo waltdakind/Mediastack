@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Invoke-VoltaireUn24hrSentinel.ps1 - VoltaireUn 24/7 Primary Server Sentinel, Route Tester & Auto-Healing Suite.
 
@@ -409,7 +409,8 @@ function Invoke-SentinelPass {
     $reportLines += "- **Local LAN IP:** $($nodeInfo.LocalIP)"
     $reportLines += "- **Peer AI Workstation:** $($nodeInfo.PeerHostName) ($($nodeInfo.PeerIP))"
     $reportLines += "- **Execution Timestamp:** $timestamp"
-    $reportLines += "- **Overall Health Status:** $(if ($anomalies.Count -eq 0) { 'âœ… 100% Operational (Pristine)' } else { 'âš ï¸ Auto-Healed Anomalies' })"
+    $reportLines += "- **Overall Health Status:** $(if ($anomalies.Count -eq 0) { '✅ 100% Operational (Pristine)' } else { '⚠️ Auto-Healed Anomalies' })"
+    $reportLines += "- **Ingress Routes Status:** $(if ($allRoutesHealthy) { 'All Ingress Routes Healthy' } else { 'Service Ingress Route Warnings Detected' })"
     $reportLines += ""
     $reportLines += "---"
     $reportLines += ""

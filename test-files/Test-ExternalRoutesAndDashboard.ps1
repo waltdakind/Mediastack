@@ -41,7 +41,6 @@ try {
     Write-Host ("  [!] DNS Resolution Failed: {0}" -f $_.Exception.Message) -ForegroundColor Red
 }
 
-$targetIp = if ($resolvedIps.Count -gt 0) { $resolvedIps[0] } else { "None" }
 Write-Host ("  * Target Domain        : {0}" -f $Domain) -ForegroundColor White
 Write-Host ("  * Resolved IP(s)       : {0}" -f ($resolvedIps -join ", ")) -ForegroundColor $(if ($resolvedIps.Count -gt 0) { 'Green' } else { 'Red' })
 
@@ -135,7 +134,6 @@ foreach ($rt in $routesToTest) {
     $testUrl = "https://${Domain}$($rt.Path)"
     $sw = [System.Diagnostics.Stopwatch]::StartNew()
     $httpCode = 0
-    $respTitle = ""
     $reqErr = ""
 
     try {
@@ -202,7 +200,8 @@ try {
 $sw.Stop()
 
 $fallbackOk = ($fallbackCode -ge 200 -and $fallbackCode -lt 500)
-Write-Host ("  * Fallback HTTPS (:444)      : {0} -> HTTP {1} ({2}ms)" -f $fallbackUrl, $fallbackCode, $sw.ElapsedMilliseconds) -ForegroundColor $(if ($fallbackOk) { 'Green' } else { 'Yellow' })
+$fallbackMsg = if ($fallbackOk) { "HTTP $fallbackCode" } else { "HTTP $fallbackCode (FAIL: $fallbackErr)" }
+Write-Host ("  * Fallback HTTPS (:444)      : {0} -> {1} ({2}ms)" -f $fallbackUrl, $fallbackMsg, $sw.ElapsedMilliseconds) -ForegroundColor $(if ($fallbackOk) { 'Green' } else { 'Yellow' })
 
 # -----------------------------------------------------------------------------
 # 5. GENERATE COMPREHENSIVE MARKDOWN AUDIT REPORT

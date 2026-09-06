@@ -216,7 +216,7 @@ $coreDatabases = @(
 # Graceful Exit Handling
 $global:KeepRunning = $true
 $cancelHandler = [ConsoleCancelEventHandler]{
-    param($sender, $e)
+    param($source, $e)
     $e.Cancel = $true
     $global:KeepRunning = $false
     Write-Host "`n`n[SHUTDOWN SIGNAL RECEIVED] Gracefully terminating autonomous collaborator..." -ForegroundColor Yellow
@@ -448,7 +448,7 @@ try {
                 $mdLines.Add("| **Incident ID** | `INCIDENT_$fileTag` |")
                 $mdLines.Add("| **Timestamp** | $timestamp |")
                 $mdLines.Add("| **Source Node** | **$($nodeInfo.LocalHostName)** ($($nodeInfo.LocalIP)) |")
-                $mdLines.Add("| **Jellyfin Server ID** | `$jellyfinServerId` ($jellyfinServerName v$jellyfinVersion) |")
+                $mdLines.Add("| **Jellyfin Server ID** | ``$($jellyfinServerId)`` ($jellyfinServerName v$jellyfinVersion) |")
                 $mdLines.Add("| **Status** | **REQUIRES IMMEDIATE AI REMEDIATION** |")
                 $mdLines.Add("| **Mission Control UI** | [https://${nodeIp}/dashboard/](https://${nodeIp}/dashboard/) |")
                 $mdLines.Add("| **Fallback HTTPS UI** | [https://${nodeIp}:444/dashboard/](https://${nodeIp}:444/dashboard/) |")

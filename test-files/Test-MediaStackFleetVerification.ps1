@@ -97,8 +97,8 @@ $dockerInfo = docker info --format '{{.ServerVersion}}' 2>$null
 Assert-Verification -Category "Runtime" -Item "Docker Engine Daemon" -Condition ($null -ne $dockerInfo) -Details "Version $dockerInfo" -Weight 2
 
 $seerrTarget = if (docker inspect seerr 2>$null) { "seerr" } else { "jellyseerr" }
-$hasTdarr = (docker inspect tdarr 2>$null) -ne $null
-$hasQbit = (docker inspect qbittorrent 2>$null) -ne $null
+$hasTdarr = $null -ne (docker inspect tdarr 2>$null)
+$hasQbit = $null -ne (docker inspect qbittorrent 2>$null)
 $targetContainers = @("caddy", "jellyfin", "sonarr", "radarr", "prowlarr", "bazarr", $seerrTarget, "syncthing", "transmission", "mediastack-db")
 if ($hasTdarr) { $targetContainers += "tdarr" }
 if ($hasQbit) { $targetContainers += "qbittorrent" }
