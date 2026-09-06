@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Start-VoltaireUnMainExecution.ps1 - Main Orchestration, Self-Healing & Error Remediation for VoltaireUn.
 
@@ -139,6 +139,16 @@ foreach ($dir in $coreDirs) {
         New-Item -ItemType Directory -Force -Path $p | Out-Null
     }
 }
+
+# Resolve & configure node-specific Python path (x64 vs ARM64)
+$pyResolverScript = Join-Path $PSScriptRoot "Resolve-MediaStackPythonPath.ps1"
+if (-not (Test-Path $pyResolverScript)) {
+    $pyResolverScript = Join-Path (Split-Path $PSScriptRoot -Parent) "Resolve-MediaStackPythonPath.ps1"
+}
+if (Test-Path $pyResolverScript) {
+    & $pyResolverScript -SetEnvironment $true -Quiet
+}
+
 
 # ==============================================================================
 # STAGE 2: DATABASE WAL CONCURRENCY & B-TREE LOCK REMEDIATION

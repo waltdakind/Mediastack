@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Start-VoltaireDeuxMainExecution.ps1 - Main Orchestration & AI Execution Suite for VoltaireDeux.
 
@@ -123,6 +123,15 @@ $dirs = @("config", "certs", "dashboard", "handoffs", "cache")
 foreach ($d in $dirs) {
     $p = Join-Path $PSScriptRoot $d
     if (-not (Test-Path $p)) { New-Item -ItemType Directory -Force -Path $p | Out-Null }
+}
+
+# Resolve & configure node-specific Python path (ARM64 vs x64)
+$pyResolverScript = Join-Path $PSScriptRoot "Resolve-MediaStackPythonPath.ps1"
+if (-not (Test-Path $pyResolverScript)) {
+    $pyResolverScript = Join-Path (Split-Path $PSScriptRoot -Parent) "Resolve-MediaStackPythonPath.ps1"
+}
+if (Test-Path $pyResolverScript) {
+    & $pyResolverScript -SetEnvironment $true -Quiet
 }
 
 # ==============================================================================
