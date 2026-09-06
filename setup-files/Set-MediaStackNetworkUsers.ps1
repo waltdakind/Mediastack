@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Set-MediaStackNetworkUsers.ps1 - Multi-Node Network User Accounts & Reciprocal Read-Write SMB Share Provisioner.
 
@@ -173,7 +173,13 @@ if (-not (Test-Path $MediaBasePath)) {
 $folderStatusTable = @()
 
 foreach ($folder in $SharedFolders) {
-    $fPath = Join-Path $MediaBasePath $folder
+    $fPath = if ($folder -eq "Music" -and $env:MUSIC_ROOT -and (Test-Path $env:MUSIC_ROOT)) {
+        $env:MUSIC_ROOT
+    } elseif ($folder -eq "Music" -and (Test-Path (Join-Path (Split-Path $MediaBasePath -Parent) "Music"))) {
+        (Resolve-Path (Join-Path (Split-Path $MediaBasePath -Parent) "Music")).Path
+    } else {
+        Join-Path $MediaBasePath $folder
+    }
     $folderExists = Test-Path $fPath
 
     if (-not $folderExists) {
@@ -216,7 +222,13 @@ $shareStatusTable = @()
 
 foreach ($folder in $SharedFolders) {
     $shareName = "$SharePrefix$folder"
-    $fPath = Join-Path $MediaBasePath $folder
+    $fPath = if ($folder -eq "Music" -and $env:MUSIC_ROOT -and (Test-Path $env:MUSIC_ROOT)) {
+        $env:MUSIC_ROOT
+    } elseif ($folder -eq "Music" -and (Test-Path (Join-Path (Split-Path $MediaBasePath -Parent) "Music"))) {
+        (Resolve-Path (Join-Path (Split-Path $MediaBasePath -Parent) "Music")).Path
+    } else {
+        Join-Path $MediaBasePath $folder
+    }
     $shareExists = ($existingShares -and $existingShares.Name -contains $shareName)
 
     if ($CheckOnly) {

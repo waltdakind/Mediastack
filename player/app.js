@@ -234,7 +234,7 @@ async function fetchLibrary() {
         } else if (activeCategory === 'Downloads') {
             itemTypes = 'Movie,Series,Video,Episode';
         } else if (activeCategory === 'Music') {
-            itemTypes = 'MusicAlbum,Audio';
+            itemTypes = 'MusicAlbum';
         }
 
         const queryParams = new URLSearchParams({
@@ -242,10 +242,11 @@ async function fetchLibrary() {
             IncludeItemTypes: itemTypes,
             Fields: 'PrimaryImageAspectRatio,Overview,Path,MediaSources',
             SortBy: 'SortName',
-            SortOrder: 'Ascending'
+            SortOrder: 'Ascending',
+            Limit: '300'
         });
         
-        const response = await fetch(`/jellyfin/Users/${userId}/Items?${queryParams.toString()}`, {
+        let response = await fetch(`/jellyfin/Users/${userId}/Items?${queryParams.toString()}`, {
             headers: {
                 'X-Emby-Token': accessToken
             }
@@ -253,8 +254,27 @@ async function fetchLibrary() {
         
         if (!response.ok) throw new Error('Failed to retrieve items');
         
-        const data = await response.json();
+        let data = await response.json();
         let items = data.Items || [];
+
+        // Fallback for Music if library has standalone audio tracks without albums
+        if (activeCategory === 'Music' && items.length === 0) {
+            const trackParams = new URLSearchParams({
+                Recursive: 'true',
+                IncludeItemTypes: 'Audio',
+                Fields: 'PrimaryImageAspectRatio,Overview,Path,MediaSources',
+                SortBy: 'SortName',
+                SortOrder: 'Ascending',
+                Limit: '100'
+            });
+            const trackResp = await fetch(`/jellyfin/Users/${userId}/Items?${trackParams.toString()}`, {
+                headers: { 'X-Emby-Token': accessToken }
+            });
+            if (trackResp.ok) {
+                const trackData = await trackResp.json();
+                items = trackData.Items || [];
+            }
+        }
 
         // Category-specific client filtering if needed
         if (activeCategory === 'Video') {

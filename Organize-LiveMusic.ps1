@@ -1,5 +1,5 @@
 param(
-    [string]$SourceDir = "C:\Users\waltd\OneDrive\Mediastack\music",
+    [string]$SourceDir = $(if ($env:MUSIC_ROOT -and (Test-Path $env:MUSIC_ROOT)) { $env:MUSIC_ROOT } elseif (Test-Path "C:\Users\waltd\OneDrive\Music") { "C:\Users\waltd\OneDrive\Music" } else { "C:\Users\waltd\OneDrive\Mediastack\music" }),
     [switch]$DryRun,
     [switch]$Restore,
     [string]$Timestamp

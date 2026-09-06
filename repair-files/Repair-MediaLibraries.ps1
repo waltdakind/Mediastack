@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Repair-MediaLibraries.ps1 - Master Self-Healing & Media Library Recovery Engine.
 
@@ -54,12 +54,20 @@ $userAudit = @()
 # -----------------------------------------------------------------------------
 Write-Host "`n[PHASE 1/6] Scanning Physical Media Directories on Disk..." -ForegroundColor Yellow
 
+$externalMusic = if ($env:MUSIC_ROOT -and (Test-Path $env:MUSIC_ROOT)) {
+    $env:MUSIC_ROOT
+} elseif (Test-Path (Join-Path (Split-Path $BaseDir -Parent) "Music")) {
+    (Resolve-Path (Join-Path (Split-Path $BaseDir -Parent) "Music")).Path
+} else {
+    Join-Path $BaseDir "music"
+}
+
 $mediaPaths = @(
     @{ Name = "Movies"; HostPath = Join-Path $BaseDir "movies"; ContainerPath = "/data/movies"; Extensions = @("*.mp4","*.mkv","*.avi","*.mov") },
     @{ Name = "Shows";  HostPath = Join-Path $BaseDir "Shows";  ContainerPath = "/data/Shows";  Extensions = @("*.mp4","*.mkv","*.avi","*.mov") },
     @{ Name = "TV";     HostPath = Join-Path $BaseDir "TV";     ContainerPath = "/data/TV";     Extensions = @("*.mp4","*.mkv","*.avi","*.mov") },
     @{ Name = "Videos"; HostPath = Join-Path $BaseDir "Videos"; ContainerPath = "/data/Videos"; Extensions = @("*.mp4","*.mkv","*.avi","*.mov") },
-    @{ Name = "Music";  HostPath = Join-Path $BaseDir "music";  ContainerPath = "/data/music";  Extensions = @("*.flac","*.mp3","*.m4a","*.ogg") }
+    @{ Name = "Music";  HostPath = $externalMusic;              ContainerPath = "/data/music";  Extensions = @("*.flac","*.mp3","*.m4a","*.ogg") }
 )
 
 $totalFilesFound = 0
@@ -322,19 +330,21 @@ $verifiedVideos = @()
 try {
     $users = Invoke-RestMethod -Uri "http://localhost:8096/Users" -Headers @{"X-Emby-Token" = $jellyfinKey}
     foreach ($u in $users) {
-        $uMedia = Invoke-RestMethod -Uri "http://localhost:8096/Users/$($u.Id)/Items?Recursive=true&IncludeItemTypes=Movie,Series,Episode,Video" -Headers @{"X-Emby-Token" = $jellyfinKey}
+        $uMedia = Invoke-RestMethod -Uri "http://localhost:8096/Users/$($u.Id)/Items?Recursive=true&IncludeItemTypes=Movie,Series,Episode,Video,MusicAlbum" -Headers @{"X-Emby-Token" = $jellyfinKey}
         $mCount = @($uMedia.Items | Where-Object { $_.Type -eq "Movie" }).Count
         $sCount = @($uMedia.Items | Where-Object { $_.Type -eq "Series" }).Count
         $eCount = @($uMedia.Items | Where-Object { $_.Type -eq "Episode" }).Count
         $vCount = @($uMedia.Items | Where-Object { $_.Type -eq "Video" }).Count
+        $aCount = @($uMedia.Items | Where-Object { $_.Type -eq "MusicAlbum" }).Count
 
-        Write-Host ("  * User '{0,-10}' -> Movies: {1} | Series: {2} | Episodes: {3} | Videos: {4}" -f $u.Name, $mCount, $sCount, $eCount, $vCount) -ForegroundColor Green
+        Write-Host ("  * User '{0,-10}' -> Movies: {1} | Series: {2} | Episodes: {3} | Videos: {4} | Music Albums: {5}" -f $u.Name, $mCount, $sCount, $eCount, $vCount, $aCount) -ForegroundColor Green
         $userAudit += [PSCustomObject]@{
             Username = $u.Name
             Movies = $mCount
             Series = $sCount
             Episodes = $eCount
             Videos = $vCount
+            MusicAlbums = $aCount
         }
     }
 
