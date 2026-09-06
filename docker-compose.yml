@@ -53,7 +53,9 @@ services:
     volumes:
       - ./config/jellyfin:/config
       - ./certs:/certs:ro
-      - ${MEDIA_DIR}:/data
+      - ${MEDIA_DIR:-C:/Media}:/data
+      - ${MUSIC_ROOT:-C:/Media/Music}:/data/music
+      - ${MUSIC_ROOT:-C:/Media/Music}:/music
     ports:
       - "8096:8096"
       - "8920:8920"
