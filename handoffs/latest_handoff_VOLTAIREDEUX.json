@@ -1,18 +1,8 @@
-﻿{
+{
     "author_node":  "VOLTAIREDEUX",
-    "timestamp":  "2026-09-06 10:52:06",
-    "overall_status":  "DEGRADED",
-    "requires_remediation":  true,
-    "active_incident":  "INCIDENT_20260906_105206",
-    "service_anomalies":  [
-                              {
-                                  "Service":  "Mediastack DB GUI",
-                                  "Port":  8080,
-                                  "Fallback":  8081,
-                                  "Container":  "mediastack-db",
-                                  "Path":  "/db/",
-                                  "Reason":  "Both Primary Port :8080 and Fallback Port :8081 Unreachable",
-                                  "Severity":  "CRITICAL"
-                              }
-                          ]
+    "timestamp":  "2026-09-06 17:35:00",
+    "overall_status":  "HEALTHY",
+    "requires_remediation":  false,
+    "active_incident":  null,
+    "service_anomalies":  []
 }
