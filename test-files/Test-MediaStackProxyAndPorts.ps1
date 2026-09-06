@@ -117,7 +117,6 @@ foreach ($svc in $ServiceMatrix) {
     $targetHost = if ($svc.Container -eq "remote") { $nodeInfo.PrimaryServerIP } else { "127.0.0.1" }
     $probe = Test-MediaStackPort -Hostname $targetHost -Port $svc.Port -TimeoutMs $TimeoutMs
     
-    $statusStr = if ($probe.IsOpen) { "ONLINE" } else { "FAILED" }
     $color     = if ($probe.IsOpen) { "Green" } elseif ($svc.Critical) { "Red" } else { "DarkGray" }
     $analysis  = ""
 
