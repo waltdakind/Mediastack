@@ -288,8 +288,8 @@ try {
         if (Test-Path $nexusPath) {
             try {
                 $liveNexus = Get-Content $nexusPath -Raw -Encoding UTF8 | ConvertFrom-Json
-                if ($liveNexus.session_state -in @("CONCLUDED", "EXIT_REQUESTED") -or $liveNexus.session_active -eq $false) {
-                    if ($liveNexus.concluded_by -and $liveNexus.concluded_by -ne $nodeInfo.LocalHostName) {
+                if ($liveNexus.session_state -in @("CONCLUDED", "EXIT_REQUESTED") -or $liveNexus.session_active -eq $false -or $liveNexus.status -eq "DO_NOT_DISTURB_ACTIVE") {
+                    if ($liveNexus.concluded_by -and ($liveNexus.concluded_by -ne $nodeInfo.LocalHostName -or $liveNexus.status -eq "DO_NOT_DISTURB_ACTIVE")) {
                         Write-Host "`n================================================================================" -ForegroundColor Yellow
                         Write-Host "   [PEER COLLABORATOR EXITED] HARDENED SPRINT CONCLUDED" -ForegroundColor Magenta
                         Write-Host ("   Peer node [{0}] concluded the AI collaboration session." -f $liveNexus.concluded_by) -ForegroundColor White

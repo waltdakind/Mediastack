@@ -121,6 +121,23 @@ function Invoke-DailyPollPass {
     Write-Host ("   Timestamp: {0} | ForceSync: {1}" -f $timestamp, $ForceSync) -ForegroundColor DarkGray
     Write-Host "================================================================================" -ForegroundColor DarkCyan
 
+    # --- 0. DO NOT DISTURB / MEDIA STREAMING FOCUS CHECK ---
+    $dndPath = Join-Path $HandoffsDir "do_not_disturb_active.json"
+    if (Test-Path $dndPath) {
+        try {
+            $dnd = Get-Content $dndPath -Raw -Encoding UTF8 | ConvertFrom-Json
+            if ($dnd.status -eq "ACTIVE" -and -not $ForceSync) {
+                Write-Host "`n================================================================================" -ForegroundColor Cyan
+                Write-Host "   [DO NOT DISTURB ACTIVE] MEDIA STREAMING FOCUS MODE ENGAGED" -ForegroundColor Yellow
+                Write-Host "   Cluster media streaming focus is active. All background synchronization, polling," -ForegroundColor DarkGray
+                Write-Host "   and AI sprints are paused to guarantee zero playback stutter or interference." -ForegroundColor DarkGray
+                Write-Host ("   Initiated By: {0} | Active Since: {1}" -f $dnd.node, $dnd.enabled_at) -ForegroundColor DarkGray
+                Write-Host "================================================================================`n" -ForegroundColor Cyan
+                return
+            }
+        } catch { }
+    }
+
     # --- 1. CHECK FOR NEW COMMITS & MANIFESTS ---
     Write-Host "`n[STEP 1/6] Polling GitHub & OneDrive for Updates from VoltaireDeux..." -ForegroundColor Yellow
 

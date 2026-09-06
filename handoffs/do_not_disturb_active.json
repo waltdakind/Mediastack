@@ -1,0 +1,7 @@
+﻿{
+    "status":  "INACTIVE",
+    "mode":  "STANDARD_PRODUCTION",
+    "node":  "VOLTAIREDEUX",
+    "disabled_at":  "2026-09-06 14:31:13",
+    "reason":  "Operator concluded media streaming session; full operations resumed"
+}
