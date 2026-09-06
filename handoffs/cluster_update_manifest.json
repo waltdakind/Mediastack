@@ -1,18 +1,16 @@
-{
-    "manifest_version": "2.0.0",
-    "update_id": "VOLTAIREDEUX_REL_20260906_141445",
-    "publisher_node": "VOLTAIREDEUX",
-    "publisher_role": "VoltaireDeux (AI Acceleration & Push Node)",
-    "publisher_ip": "192.168.4.30",
-    "target_node": "VOLTAIREUN",
-    "target_role": "VoltaireUn (Main 24/7 Server Node)",
-    "target_ip": "192.168.4.21",
-    "published_at": "2026-09-06 14:14:45",
-    "commit_sha": "a7fb98a",
-    "commit_message": "Decouple media files from git repo, externalize volume mounts, sanitize paths, and add cyberpunk neon theme",
-    "git_branch": "main",
-    "requires_db_sync": true,
-    "status": "READY_FOR_VOLTAIREUN_PULL",
-    "action_directive": "git fetch origin && git pull origin main",
-    "ai_corrective_guidance_ref": "handoffs/VOLTAIREDEUX_CORRECTIVE_GUIDANCE_AND_AI_ADVISORY.md"
+﻿{
+    "manifest_version":  "2.0.0",
+    "update_id":  "VOLTAIREDEUX_REL_20260906_164640",
+    "publisher_node":  "VOLTAIREDEUX",
+    "publisher_role":  "VoltaireDeux (AI Acceleration \u0026 Push Node)",
+    "publisher_ip":  "192.168.4.30",
+    "target_node":  "VOLTAIREUN",
+    "target_role":  "VoltaireUn (Main 24/7 Server Node)",
+    "target_ip":  "fe80::2c3c:b2c6:ab71:6c09%7",
+    "published_at":  "2026-09-06 16:46:40",
+    "commit_sha":  "a6d1feb7aacb2cf6c872d9d9d5f34122c7c4f76c",
+    "commit_message":  "fix(music): optimize player query and realign OneDrive music path",
+    "git_branch":  "main",
+    "requires_db_sync":  true,
+    "status":  "READY_FOR_VOLTAIREUN_PULL"
 }

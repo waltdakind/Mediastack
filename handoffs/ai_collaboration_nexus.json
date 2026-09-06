@@ -1,13 +1,14 @@
 {
-    "last_session_timestamp": "2026-09-06 14:19:30",
+    "last_session_timestamp": "2026-09-06 16:46:40",
     "last_session_node": "VOLTAIREDEUX",
     "local_ip": "192.168.4.30",
     "peer_node": "VOLTAIREUN",
     "peer_ip": "192.168.4.21",
     "databases_healthy": true,
     "anomalies_detected": 0,
-    "remediations_applied": 35,
+    "remediations_applied": 36,
     "latest_report_path": "handoffs/VOLTAIREDEUX_CORRECTIVE_GUIDANCE_AND_AI_ADVISORY.md",
-    "status": "VOLTAIREDEUX_AI_GUIDANCE_EMITTED",
-    "active_git_commit": "a7fb98a"
+    "status": "READY_FOR_VOLTAIREUN_PULL",
+    "active_git_commit": "a6d1feb",
+    "update_id": "VOLTAIREDEUX_REL_20260906_164640"
 }

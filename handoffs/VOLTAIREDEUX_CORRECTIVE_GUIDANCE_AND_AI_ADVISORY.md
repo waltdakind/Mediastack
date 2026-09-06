@@ -2,9 +2,9 @@
 
 **Publishing Node**: VoltaireDeux (`192.168.4.30` | Windows ARM64)  
 **Target Node**: VoltaireUn (`192.168.4.21` | Windows x64 Main Server)  
-**Target Git Commit**: `a7fb98a` (Branch: `main` on `origin`)  
-**Timestamp**: 2026-09-06 14:14:45  
-**Cluster Manifest ID**: `VOLTAIREDEUX_REL_20260906_141445`  
+**Target Git Commit**: `a6d1feb` (Branch: `main` on `origin`)  
+**Timestamp**: 2026-09-06 16:46:40  
+**Cluster Manifest ID**: `VOLTAIREDEUX_REL_20260906_164640`  
 
 ---
 
