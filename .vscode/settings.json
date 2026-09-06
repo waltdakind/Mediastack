@@ -12,5 +12,6 @@
     "r.sessionWatcher": false,
     "python.terminal.activateEnvironment": false,
     "terminal.integrated.environmentChangesIndicator": "off",
-    "powershell.integratedConsole.showOnStartup": false
+    "powershell.integratedConsole.showOnStartup": false,
+    "r.rpath.windows": "C:\\Program Files (x86)\\R\\R-4.6.1\\bin\\x64\\R.exe"
 }
