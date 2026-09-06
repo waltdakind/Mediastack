@@ -250,6 +250,28 @@ services:
     container_name: musicbrainz-docker-musicbrainz-1
     ports:
       - "5000:5000"
+    volumes:
+      - musicbrainz_dbdump:/media/dbdump
+      - musicbrainz_solrdump:/var/cache/musicbrainz/solr-backups:ro
+    restart: unless-stopped
+    env_file:
+      - ./musicbrainz-docker/default/postgres.env
+    environment:
+      - MUSICBRAINZ_BASE_FTP_URL=${MUSICBRAINZ_BASE_FTP_URL:-}
+      - MUSICBRAINZ_BASE_DOWNLOAD_URL=${MUSICBRAINZ_BASE_DOWNLOAD_URL:-https://data.metabrainz.org/pub/musicbrainz}
+      - MUSICBRAINZ_SERVER_PROCESSES=${MUSICBRAINZ_SERVER_PROCESSES:-10}
+      - MUSICBRAINZ_USE_PROXY=1
+      - MUSICBRAINZ_WEB_SERVER_HOST=${MUSICBRAINZ_WEB_SERVER_HOST:-localhost}
+      - MUSICBRAINZ_WEB_SERVER_PORT=5000
+    depends_on:
+      - musicbrainz-db
+      - musicbrainz-search
+      - musicbrainz-valkey
+
+  musicbrainz-secondary:
+    image: musicbrainz-docker-musicbrainz:latest
+    container_name: musicbrainz-docker-musicbrainz-2
+    ports:
       - "5001:5000"
     volumes:
       - musicbrainz_dbdump:/media/dbdump
@@ -281,6 +303,10 @@ services:
       - musicbrainz_pgdata:/var/lib/postgresql
     expose:
       - "5432"
+    networks:
+      default:
+        aliases:
+          - db
 
   musicbrainz-search:
     image: musicbrainz-docker_search:4.1.0
@@ -296,6 +322,10 @@ services:
       - musicbrainz_dbdump:/media/dbdump:ro
       - musicbrainz_solrdata:/var/solr
       - musicbrainz_solrdump:/var/cache/musicbrainz/solr-backups
+    networks:
+      default:
+        aliases:
+          - search
 
   musicbrainz-indexer:
     image: musicbrainz-docker-indexer
@@ -315,6 +345,10 @@ services:
     restart: unless-stopped
     expose:
       - "6379"
+    networks:
+      default:
+        aliases:
+          - valkey
 
 volumes:
   musicbrainz_pgdata:

@@ -51,7 +51,8 @@ Write-Host "==========================================================" -Foregro
 Write-Host "`n[1/5] Auditing MusicBrainz Docker Containers..." -ForegroundColor Yellow
 
 $mbContainers = @(
-    @{ Service="Web / REST API"; Container="musicbrainz-docker-musicbrainz-1"; ExpectedPort=5000 },
+    @{ Service="Web / REST API (Primary 5000)"; Container="musicbrainz-docker-musicbrainz-1"; ExpectedPort=5000 },
+    @{ Service="Web / REST API (Sec 5001)";     Container="musicbrainz-docker-musicbrainz-2"; ExpectedPort=5001 },
     @{ Service="Postgres DB";    Container="musicbrainz-docker-db-1";          ExpectedPort=5432 },
     @{ Service="Solr Search";    Container="musicbrainz-docker-search-1";      ExpectedPort=8983 },
     @{ Service="Indexer";        Container="musicbrainz-docker-indexer-1";     ExpectedPort=0 },
