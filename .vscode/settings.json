@@ -9,5 +9,8 @@
         ".Renviron": "r"
     },
     "powershell.scriptAnalysis.enable": true,
-    "r.sessionWatcher": false
+    "r.sessionWatcher": false,
+    "python.terminal.activateEnvironment": false,
+    "terminal.integrated.environmentChangesIndicator": "off",
+    "powershell.integratedConsole.showOnStartup": false
 }
