@@ -27,8 +27,13 @@ param(
 )
 
 if (-not $MediaBasePath) {
-    $MediaBasePath = $PSScriptRoot
-    if (-not $MediaBasePath) { $MediaBasePath = (Get-Location).Path }
+    if (Test-Path (Join-Path $PSScriptRoot "..\docker-compose.yml")) {
+        $MediaBasePath = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+    } elseif ($PSScriptRoot) {
+        $MediaBasePath = $PSScriptRoot
+    } else {
+        $MediaBasePath = (Get-Location).Path
+    }
 }
 
 $ErrorActionPreference = "Continue"
@@ -52,10 +57,18 @@ Write-Host "   Target Root: $MediaBasePath" -ForegroundColor White
 Write-Host "   Mode: $(if ($CheckOnly) { 'Audit / CheckOnly' } else { 'Active Provisioning' })" -ForegroundColor DarkGray
 Write-Host "================================================================================" -ForegroundColor Cyan
 
+$externalMusic = if ($env:MUSIC_ROOT -and (Test-Path $env:MUSIC_ROOT)) {
+    $env:MUSIC_ROOT
+} elseif (Test-Path (Join-Path (Split-Path $MediaBasePath -Parent) "Music")) {
+    (Resolve-Path (Join-Path (Split-Path $MediaBasePath -Parent) "Music")).Path
+} else {
+    $null
+}
+
 $SharedFolders = @(
     @{ Name = "MediaStack-Movies";    Sub = "Movies" },
     @{ Name = "MediaStack-Shows";     Sub = "Shows" },
-    @{ Name = "MediaStack-Music";     Sub = "Music" },
+    @{ Name = "MediaStack-Music";     ExplicitPath = $externalMusic; Sub = "Music" },
     @{ Name = "MediaStack-TV";        Sub = "TV" },
     @{ Name = "MediaStack-Videos";    Sub = "Videos" },
     @{ Name = "MediaStack-Radio";     Sub = "Radio" },
@@ -97,7 +110,7 @@ $summaryTable = @()
 foreach ($item in $SharedFolders) {
     $shareName = $item.Name
     $subDir    = $item.Sub
-    $targetPath = Join-Path $MediaBasePath $subDir
+    $targetPath = if ($item.ExplicitPath) { $item.ExplicitPath } else { Join-Path $MediaBasePath $subDir }
 
     if (-not (Test-Path $targetPath)) {
         if (-not $CheckOnly) {
