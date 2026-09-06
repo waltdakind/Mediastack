@@ -2,9 +2,9 @@
 
 **Publishing Node**: VoltaireDeux (`192.168.4.30` | Windows ARM64)  
 **Target Node**: VoltaireUn (`192.168.4.21` | Windows x64 Main Server)  
-**Target Git Commit**: `a6d1feb` (Branch: `main` on `origin`)  
-**Timestamp**: 2026-09-06 16:46:40  
-**Cluster Manifest ID**: `VOLTAIREDEUX_REL_20260906_164640`  
+**Target Git Commit**: `691cea9` (Branch: `main` on `origin`)  
+**Timestamp**: 2026-09-06 17:59:00  
+**Cluster Manifest ID**: `VOLTAIREDEUX_REL_20260906_175900`  
 
 ---
 
@@ -59,7 +59,21 @@ VoltaireDeux has deployed a high-performance Cyberpunk Neon custom stylesheet (`
 
 ---
 
-## 5. Verification & Fleet Health Check
+## 5. Live TV & HDHomeRun ATSC Lineup Integration
+
+1. **HDHomeRun FLEX QUATRO (`192.168.4.45`)**:
+   - Hardware online with 4 active ATSC tuners and 1 TB attached DVR storage.
+   - Full frequency sweep completed: 49 over-the-air broadcast channels discovered (WCBS, WNBC, WNYW, WWOR, ION, WNJU, WNJB, etc.).
+   - Total channels in Jellyfin: 56 channels.
+2. **User Profile Permissions**:
+   - All 4 primary profiles (`walter`, `moops`, `bobby`, `waltdakind`) verified active with Live TV permissions enabled.
+   - `bobby` and `waltdakind` accounts were un-disabled, lockout counters cleared, and passwords aligned.
+3. **Shortcut Path Modernization**:
+   - `s-v1.ps1`, `s-v2.ps1`, `s-v1.cmd`, `s-v2.cmd` now correctly resolve targets located under `start-files\`.
+
+---
+
+## 6. Verification & Fleet Health Check
 
 After pulling changes and reconciling, verify all services:
 ```powershell
