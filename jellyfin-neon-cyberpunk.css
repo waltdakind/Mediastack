@@ -1,0 +1,770 @@
+/**
+ * ==============================================================================
+ *  JELLYFIN THEME: CYBERPUNK NEON DRIFT (Electric Blue & Neon Yellow Edition)
+ * ==============================================================================
+ *  Palette: Neon Cyan/Blue (#00f0ff, #0072ff) & Neon Yellow (#ffe600, #fff238)
+ *  Aesthetics: High-tech glassmorphism, glowing accents, electric gradients,
+ *              sleek cards, cyber scrollbars & futuristic UI components.
+ * 
+ *  Installation:
+ *    1. Open Jellyfin Web -> Settings (Gear Icon) -> Dashboard
+ *    2. Navigate to "General" (or "Branding" depending on Jellyfin version)
+ *    3. Paste this entire CSS stylesheet into the "Custom CSS" textarea
+ *    4. Click "Save" at the bottom of the page
+ * ==============================================================================
+ */
+
+/* ==========================================================================
+   1. GLOBAL VARIABLES & THEMING ENGINE
+   ========================================================================== */
+:root {
+    /* Neon Color Palette */
+    --neon-blue: #00f0ff;
+    --neon-blue-bright: #38f9d7;
+    --neon-blue-deep: #0066ff;
+    --neon-blue-glow: rgba(0, 240, 255, 0.45);
+    --neon-blue-dim: rgba(0, 240, 255, 0.12);
+
+    --neon-yellow: #ffe600;
+    --neon-yellow-bright: #fff35c;
+    --neon-yellow-deep: #ffb700;
+    --neon-yellow-glow: rgba(255, 230, 0, 0.45);
+    --neon-yellow-dim: rgba(255, 230, 0, 0.12);
+
+    /* Electric Gradients */
+    --grad-neon-main: linear-gradient(135deg, #00f0ff 0%, #0072ff 45%, #ffe600 100%);
+    --grad-neon-accent: linear-gradient(90deg, #00f0ff 0%, #ffe600 100%);
+    --grad-neon-reverse: linear-gradient(90deg, #ffe600 0%, #00f0ff 100%);
+    --grad-neon-soft: linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(255, 230, 0, 0.15) 100%);
+    --grad-neon-button: linear-gradient(135deg, #00f0ff 0%, #0051ff 60%, #ffe600 120%);
+    --grad-neon-button-hover: linear-gradient(135deg, #ffe600 0%, #ff9500 50%, #00f0ff 100%);
+
+    /* Dark Surfaces & Frosted Glass */
+    --bg-void: #05070e;
+    --bg-ambient: radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.08) 0%, transparent 45%),
+                  radial-gradient(circle at 85% 85%, rgba(255, 230, 0, 0.06) 0%, transparent 45%),
+                  #070a14;
+    --bg-glass-card: rgba(13, 18, 36, 0.72);
+    --bg-glass-elevated: rgba(18, 25, 48, 0.85);
+    --bg-glass-modal: rgba(10, 14, 28, 0.92);
+
+    /* Borders & Shadows */
+    --border-glass-cyan: 1px solid rgba(0, 240, 255, 0.22);
+    --border-glass-yellow: 1px solid rgba(255, 230, 0, 0.45);
+    --glow-cyan: 0 0 16px rgba(0, 240, 255, 0.4);
+    --glow-yellow: 0 0 16px rgba(255, 230, 0, 0.4);
+    --glow-card-hover: 0 12px 35px -5px rgba(0, 240, 255, 0.35), 0 0 15px rgba(255, 230, 0, 0.25);
+
+    /* Radii & Timing */
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-pill: 9999px;
+    --transition-snappy: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Text & Contrasts */
+    --text-high: #f0f7ff;
+    --text-med: #96b0cf;
+    --text-low: #58718e;
+
+    /* Native Jellyfin Variables Override */
+    --theme-primary-color: var(--neon-blue);
+    --theme-accent-text-color: var(--neon-yellow);
+    --theme-accent-color: var(--neon-blue);
+    --theme-icon-color: var(--neon-blue);
+}
+
+/* ==========================================================================
+   2. BASE STYLING & AMBIENT BACKGROUND
+   ========================================================================== */
+html, body {
+    background-color: var(--bg-void) !important;
+    background-image: var(--bg-ambient) !important;
+    background-attachment: fixed !important;
+    color: var(--text-high) !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    letter-spacing: 0.02em;
+}
+
+.backgroundContainer,
+.backgroundContainer.withBackdrop {
+    background: transparent !important;
+}
+
+/* Backdrop Image with Dark Cyber Overlay */
+.backdropImage {
+    filter: blur(18px) brightness(40%) contrast(110%) saturate(120%) !important;
+    opacity: 0.45 !important;
+    transform: scale(1.04);
+}
+
+/* ==========================================================================
+   3. CUSTOM CYBER SCROLLBARS
+   ========================================================================== */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(5, 7, 14, 0.85);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--neon-blue) 0%, var(--neon-yellow) 100%);
+    border-radius: var(--radius-pill);
+    border: 2px solid #05070e;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--neon-yellow) 0%, var(--neon-blue) 100%);
+    box-shadow: 0 0 16px rgba(255, 230, 0, 0.8);
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--neon-blue) rgba(5, 7, 14, 0.85);
+}
+
+/* ==========================================================================
+   4. TOP NAVIGATION HEADER (FROSTED GLASS & NEON BOTTOM BORDER)
+   ========================================================================== */
+.skinHeader,
+.skinHeader-withBackground,
+.skinHeader.semiTransparent {
+    background: rgba(8, 11, 24, 0.75) !important;
+    backdrop-filter: blur(24px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+    border-bottom: 1px solid transparent !important;
+    border-image: var(--grad-neon-accent) 1 !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 240, 255, 0.15) !important;
+    transition: var(--transition-smooth);
+}
+
+/* Logo & Page Title with Radiant Gradient */
+.pageTitleWithDefaultLogo,
+.pageTitleWithLogo,
+.pageTitle {
+    font-weight: 800 !important;
+    letter-spacing: 0.04em !important;
+}
+
+.headerLogo {
+    filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.7)) drop-shadow(0 0 20px rgba(255, 230, 0, 0.4)) !important;
+}
+
+/* Header Buttons */
+.headerButton {
+    color: var(--text-med) !important;
+    transition: var(--transition-snappy) !important;
+    border-radius: var(--radius-sm) !important;
+}
+
+.headerButton:hover,
+.headerButton:focus {
+    color: var(--neon-yellow) !important;
+    background: var(--neon-blue-dim) !important;
+    filter: drop-shadow(0 0 8px var(--neon-yellow-glow)) !important;
+    transform: translateY(-1px) scale(1.05);
+}
+
+.headerButton.headerButtonActive {
+    color: var(--neon-blue) !important;
+    filter: drop-shadow(0 0 10px var(--neon-blue-glow)) !important;
+}
+
+/* Section Tabs (Library Tabs) */
+.headerTabs.sectionTabs {
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+}
+
+.emby-tab-button {
+    color: var(--text-med) !important;
+    font-weight: 600 !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 0.55em 1.2em !important;
+    margin: 0 4px !important;
+    transition: var(--transition-snappy) !important;
+    position: relative;
+}
+
+.emby-tab-button:hover {
+    color: var(--neon-yellow) !important;
+    background: rgba(255, 230, 0, 0.08) !important;
+    text-shadow: 0 0 10px var(--neon-yellow-glow);
+}
+
+.emby-tab-button-active {
+    color: #050811 !important;
+    background: var(--grad-neon-accent) !important;
+    font-weight: 700 !important;
+    box-shadow: 0 0 16px var(--neon-blue-glow), 0 0 8px var(--neon-yellow-glow) !important;
+}
+
+/* ==========================================================================
+   5. NAVIGATION DRAWER (SIDEBAR MENU)
+   ========================================================================== */
+.mainDrawer,
+.mainDrawer-scrollContainer {
+    background: var(--bg-glass-modal) !important;
+    backdrop-filter: blur(28px) !important;
+    -webkit-backdrop-filter: blur(28px) !important;
+    border-right: 1px solid rgba(0, 240, 255, 0.25) !important;
+    box-shadow: 10px 0 40px rgba(0, 0, 0, 0.8), 2px 0 15px rgba(0, 240, 255, 0.1) !important;
+}
+
+.mainDrawer .navMenuOption {
+    border-radius: var(--radius-sm) !important;
+    margin: 4px 12px !important;
+    padding: 10px 16px !important;
+    color: var(--text-high) !important;
+    font-weight: 500 !important;
+    border-left: 3px solid transparent !important;
+    transition: var(--transition-snappy) !important;
+}
+
+.mainDrawer .navMenuOption:hover {
+    background: rgba(0, 240, 255, 0.08) !important;
+    border-left: 3px solid var(--neon-yellow) !important;
+    color: var(--neon-yellow) !important;
+    transform: translateX(4px);
+    box-shadow: inset 4px 0 12px -2px rgba(255, 230, 0, 0.3) !important;
+}
+
+.mainDrawer .navMenuOption-selected {
+    background: linear-gradient(90deg, rgba(0, 240, 255, 0.2) 0%, rgba(255, 230, 0, 0.05) 100%) !important;
+    border-left: 3px solid var(--neon-blue) !important;
+    color: var(--neon-blue) !important;
+    font-weight: 700 !important;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.2) !important;
+}
+
+.mainDrawer .navMenuOptionIcon {
+    color: var(--neon-blue) !important;
+    filter: drop-shadow(0 0 6px var(--neon-blue-glow));
+    transition: var(--transition-snappy);
+}
+
+.mainDrawer .navMenuOption:hover .navMenuOptionIcon {
+    color: var(--neon-yellow) !important;
+    filter: drop-shadow(0 0 8px var(--neon-yellow-glow));
+    transform: scale(1.1);
+}
+
+/* ==========================================================================
+   6. MEDIA CARDS & POSTERS (FROSTED GLASS + DUAL NEON HOVER GLOW)
+   ========================================================================== */
+.card {
+    transition: var(--transition-smooth) !important;
+}
+
+.cardBox {
+    background: var(--bg-glass-card) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border-radius: var(--radius-md) !important;
+    border: var(--border-glass-cyan) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55) !important;
+    overflow: hidden !important;
+    transition: var(--transition-smooth) !important;
+}
+
+/* Card Scalable Container */
+.cardScalable {
+    border-radius: var(--radius-md) !important;
+    overflow: hidden !important;
+    position: relative !important;
+}
+
+/* Fancy Hover State on Cards */
+.card:hover .cardBox,
+.card:focus-visible .cardBox {
+    transform: translateY(-7px) scale(1.02) !important;
+    border: 1px solid var(--neon-yellow) !important;
+    box-shadow: var(--glow-card-hover) !important;
+}
+
+.card:hover .cardImageContainer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0, 240, 255, 0.25) 0%, transparent 60%);
+    pointer-events: none;
+    transition: var(--transition-snappy);
+}
+
+/* Card Titles and Subtitles */
+.cardText {
+    padding: 2px 4px !important;
+}
+
+.cardText-first {
+    font-weight: 700 !important;
+    color: var(--text-high) !important;
+    letter-spacing: 0.015em;
+    transition: var(--transition-snappy);
+}
+
+.card:hover .cardText-first {
+    color: var(--neon-yellow) !important;
+    text-shadow: 0 0 10px var(--neon-yellow-glow);
+}
+
+.cardText-secondary {
+    color: var(--text-med) !important;
+    font-size: 0.85em !important;
+}
+
+/* Card Hover Floating Play Button */
+.cardOverlayButton {
+    background: rgba(7, 10, 22, 0.88) !important;
+    border: 2px solid var(--neon-blue) !important;
+    border-radius: 50% !important;
+    box-shadow: 0 0 18px var(--neon-blue-glow) !important;
+    transition: var(--transition-snappy) !important;
+}
+
+.cardOverlayButton:hover {
+    background: var(--neon-yellow) !important;
+    border-color: var(--neon-yellow-bright) !important;
+    transform: scale(1.15) !important;
+    box-shadow: 0 0 25px var(--neon-yellow-glow) !important;
+}
+
+.cardOverlayButton .material-icons,
+.cardOverlayButtonIcon {
+    color: var(--neon-blue) !important;
+    transition: var(--transition-snappy) !important;
+}
+
+.cardOverlayButton:hover .material-icons,
+.cardOverlayButton:hover .cardOverlayButtonIcon {
+    color: #050811 !important;
+}
+
+/* Card Overlay Play Icon on Banner */
+.cardOverlayFab-primary {
+    background: var(--grad-neon-accent) !important;
+    color: #050811 !important;
+    box-shadow: 0 0 20px var(--neon-blue-glow), 0 0 10px var(--neon-yellow-glow) !important;
+}
+
+/* Indicators & Count Badges */
+.countIndicator,
+.playedIndicator {
+    background: linear-gradient(135deg, var(--neon-yellow) 0%, var(--neon-yellow-deep) 100%) !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    border-radius: var(--radius-pill) !important;
+    box-shadow: 0 0 12px var(--neon-yellow-glow) !important;
+    padding: 3px 8px !important;
+    border: 1px solid #ffffff !important;
+}
+
+/* Watched checkmark indicator */
+.indicator.playedIndicator {
+    background: var(--neon-blue) !important;
+    color: #050811 !important;
+    box-shadow: 0 0 12px var(--neon-blue-glow) !important;
+}
+
+/* In-Progress Watched Progress Bar */
+.itemProgressBar {
+    background: rgba(10, 14, 30, 0.85) !important;
+    height: 5px !important;
+    border-radius: var(--radius-pill) !important;
+    overflow: hidden;
+    margin: 0 6px 6px 6px !important;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+}
+
+.itemProgressBarForeground {
+    background: var(--grad-neon-accent) !important;
+    box-shadow: 0 0 10px var(--neon-blue), 0 0 5px var(--neon-yellow) !important;
+    border-radius: var(--radius-pill) !important;
+}
+
+/* ==========================================================================
+   7. BUTTONS, CHIPS & INTERACTIVE CONTROLS
+   ========================================================================== */
+/* Main Accent & Submit Buttons */
+.button-accent,
+.button-submit,
+.raised.emby-button {
+    background: var(--grad-neon-button) !important;
+    color: #050811 !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.03em !important;
+    border: none !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: 0 4px 18px rgba(0, 240, 255, 0.45) !important;
+    transition: var(--transition-snappy) !important;
+    text-transform: uppercase;
+}
+
+.button-accent:hover,
+.button-submit:hover,
+.raised.emby-button:hover {
+    background: var(--grad-neon-button-hover) !important;
+    color: #000000 !important;
+    box-shadow: 0 4px 26px rgba(255, 230, 0, 0.65), 0 0 12px rgba(0, 240, 255, 0.4) !important;
+    transform: translateY(-2px);
+}
+
+.button-flat {
+    color: var(--neon-blue) !important;
+    border-radius: var(--radius-sm) !important;
+    transition: var(--transition-snappy) !important;
+}
+
+.button-flat:hover {
+    color: var(--neon-yellow) !important;
+    background: rgba(255, 230, 0, 0.08) !important;
+    text-shadow: 0 0 8px var(--neon-yellow-glow);
+}
+
+/* Detail Play Button */
+.btnPlay,
+.btnPlay.emby-button {
+    background: var(--grad-neon-accent) !important;
+    color: #050811 !important;
+    font-weight: 800 !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 0.7em 2em !important;
+    box-shadow: 0 0 24px var(--neon-blue-glow), 0 0 12px var(--neon-yellow-glow) !important;
+    transition: var(--transition-snappy) !important;
+}
+
+.btnPlay:hover {
+    background: var(--grad-neon-reverse) !important;
+    box-shadow: 0 0 32px var(--neon-yellow-glow), 0 0 16px var(--neon-blue-glow) !important;
+    transform: scale(1.04);
+}
+
+/* Detail Action Buttons */
+.detailButton {
+    border-radius: var(--radius-sm) !important;
+    background: rgba(14, 18, 38, 0.6) !important;
+    border: 1px solid rgba(0, 240, 255, 0.25) !important;
+    color: var(--text-high) !important;
+    transition: var(--transition-snappy) !important;
+}
+
+.detailButton:hover {
+    background: rgba(255, 230, 0, 0.12) !important;
+    border-color: var(--neon-yellow) !important;
+    color: var(--neon-yellow) !important;
+    box-shadow: 0 0 14px var(--neon-yellow-glow) !important;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   8. INPUTS, FORMS, DROPDOWNS & CHECKBOXES
+   ========================================================================== */
+.emby-input,
+.emby-textarea,
+.emby-select {
+    background: rgba(10, 14, 30, 0.8) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(0, 240, 255, 0.3) !important;
+    border-radius: var(--radius-sm) !important;
+    color: var(--text-high) !important;
+    padding: 10px 14px !important;
+    transition: var(--transition-snappy) !important;
+}
+
+.emby-input:focus,
+.emby-textarea:focus,
+.emby-select:focus {
+    border-color: var(--neon-yellow) !important;
+    box-shadow: 0 0 16px var(--neon-yellow-glow), inset 0 0 8px rgba(255, 230, 0, 0.15) !important;
+    outline: none !important;
+    background: rgba(14, 20, 42, 0.9) !important;
+}
+
+/* Checkboxes & Radio */
+.emby-checkbox:checked + span + .checkboxOutline {
+    border-color: var(--neon-blue) !important;
+    background-color: var(--neon-blue) !important;
+    box-shadow: 0 0 10px var(--neon-blue-glow) !important;
+}
+
+.checkboxOutline {
+    border: 2px solid rgba(0, 240, 255, 0.4) !important;
+    border-radius: 4px !important;
+}
+
+/* ==========================================================================
+   9. MEDIA DETAIL PAGE & METADATA PILLS
+   ========================================================================== */
+.detailPageWrapperContainer {
+    background: transparent !important;
+}
+
+.detailSectionContent {
+    background: rgba(11, 15, 30, 0.5) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-radius: var(--radius-lg) !important;
+    border: 1px solid rgba(0, 240, 255, 0.15) !important;
+    padding: 24px !important;
+    margin-top: 20px !important;
+}
+
+/* Section Titles with Electric Neon Underline */
+.sectionTitle {
+    font-weight: 800 !important;
+    letter-spacing: 0.04em !important;
+    color: var(--text-high) !important;
+    position: relative;
+    display: inline-block;
+    margin-bottom: 18px !important;
+}
+
+.sectionTitle::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 3px;
+    margin-top: 6px;
+    background: var(--grad-neon-accent);
+    border-radius: var(--radius-pill);
+    box-shadow: 0 0 10px var(--neon-blue);
+}
+
+/* Metadata Badges & Genre Pills */
+.mediaInfoItem,
+.tag,
+.genreItem,
+.itemMiscInfo-primary .mediaInfoItem {
+    background: rgba(0, 240, 255, 0.08) !important;
+    border: 1px solid rgba(0, 240, 255, 0.35) !important;
+    color: var(--neon-blue-bright) !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 4px 12px !important;
+    margin: 2px 4px !important;
+    transition: var(--transition-snappy) !important;
+}
+
+.mediaInfoItem:hover,
+.genreItem:hover {
+    background: rgba(255, 230, 0, 0.15) !important;
+    border-color: var(--neon-yellow) !important;
+    color: var(--neon-yellow) !important;
+    box-shadow: 0 0 12px var(--neon-yellow-glow) !important;
+    transform: translateY(-2px);
+}
+
+/* Star Rating Glow */
+.starIcon {
+    color: var(--neon-yellow) !important;
+    filter: drop-shadow(0 0 6px var(--neon-yellow-glow));
+}
+
+/* ==========================================================================
+   10. VIDEO & AUDIO PLAYER (OSD & NOW PLAYING BAR)
+   ========================================================================== */
+/* Now Playing Bar (Bottom Music Player) */
+.nowPlayingBar {
+    background: rgba(7, 10, 22, 0.9) !important;
+    backdrop-filter: blur(28px) !important;
+    -webkit-backdrop-filter: blur(28px) !important;
+    border-top: 1px solid transparent !important;
+    border-image: var(--grad-neon-accent) 1 !important;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.8), 0 -2px 15px rgba(0, 240, 255, 0.15) !important;
+}
+
+/* Video On-Screen Display (OSD) Bar */
+.videoOsdBottom,
+.videoOsdBottom-main {
+    background: linear-gradient(180deg, transparent 0%, rgba(5, 7, 16, 0.95) 90%) !important;
+}
+
+/* Progress Slider Bars */
+.sliderBubble {
+    background: var(--bg-glass-elevated) !important;
+    border: 1px solid var(--neon-yellow) !important;
+    color: var(--neon-yellow) !important;
+    font-weight: 700 !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: 0 0 12px var(--neon-yellow-glow) !important;
+}
+
+/* Lower Played Track */
+.mdl-slider-background-lower {
+    background: var(--grad-neon-accent) !important;
+    box-shadow: 0 0 12px var(--neon-blue), 0 0 6px var(--neon-yellow) !important;
+}
+
+/* Unplayed Track */
+.mdl-slider-background-upper {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Slider Thumb Handle */
+.sliderThumb,
+.mdl-slider::-webkit-slider-thumb {
+    background: var(--neon-yellow) !important;
+    border: 2px solid #000000 !important;
+    box-shadow: 0 0 16px var(--neon-yellow-glow), 0 0 24px var(--neon-blue-glow) !important;
+    transform: scale(1.1);
+    transition: var(--transition-snappy);
+}
+
+.sliderThumb:hover,
+.mdl-slider:hover::-webkit-slider-thumb {
+    transform: scale(1.35) !important;
+    box-shadow: 0 0 24px var(--neon-yellow), 0 0 35px var(--neon-blue) !important;
+}
+
+/* Player Button Controls */
+.videoOsdBottom .paper-icon-button-light,
+.nowPlayingBar .paper-icon-button-light {
+    color: var(--text-high) !important;
+    transition: var(--transition-snappy) !important;
+}
+
+.videoOsdBottom .paper-icon-button-light:hover,
+.nowPlayingBar .paper-icon-button-light:hover {
+    color: var(--neon-yellow) !important;
+    filter: drop-shadow(0 0 10px var(--neon-yellow-glow)) !important;
+    transform: scale(1.12);
+}
+
+/* Keep Subtitles Completely Clean & Legible (Critical for UX) */
+.videoSubtitles {
+    text-shadow: 0 0 4px #000000, 0 0 8px #000000 !important;
+    filter: none !important;
+}
+
+/* ==========================================================================
+   11. MODALS, POPUPS, DIALOGS & CONTEXT MENUS
+   ========================================================================== */
+.dialog,
+.dialogContainer .smoothScrollY,
+.actionSheet {
+    background: var(--bg-glass-modal) !important;
+    backdrop-filter: blur(28px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+    border: 1px solid rgba(0, 240, 255, 0.3) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 240, 255, 0.18) !important;
+}
+
+.dialogHeader {
+    border-bottom: 1px solid rgba(0, 240, 255, 0.18) !important;
+    color: var(--neon-blue) !important;
+    font-weight: 700 !important;
+}
+
+.actionSheetMenuItem {
+    transition: var(--transition-snappy) !important;
+    border-radius: var(--radius-sm) !important;
+    margin: 2px 6px !important;
+}
+
+.actionSheetMenuItem:hover {
+    background: rgba(0, 240, 255, 0.1) !important;
+    color: var(--neon-yellow) !important;
+    padding-left: 1.5em !important;
+}
+
+/* ==========================================================================
+   12. LOGIN SCREEN & SPLASH
+   ========================================================================== */
+.manualLoginForm,
+.visualLoginForm {
+    background: var(--bg-glass-card) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(0, 240, 255, 0.25) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 240, 255, 0.15) !important;
+    padding: 30px !important;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Glowing Top Accent Line on Login Form */
+.manualLoginForm::before,
+.visualLoginForm::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--grad-neon-accent);
+    box-shadow: 0 0 15px var(--neon-blue);
+}
+
+/* ==========================================================================
+   13. JELLYFIN DASHBOARD & ADMIN AREA POLISH
+   ========================================================================== */
+.dashboardSection {
+    background: rgba(12, 16, 32, 0.6) !important;
+    backdrop-filter: blur(14px) !important;
+    border: 1px solid rgba(0, 240, 255, 0.15) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 20px !important;
+    margin-bottom: 24px !important;
+}
+
+/* Activity Log Items */
+.activityLogCard {
+    border-left: 3px solid var(--neon-blue) !important;
+    background: rgba(15, 20, 40, 0.5) !important;
+    margin-bottom: 8px !important;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
+    transition: var(--transition-snappy) !important;
+}
+
+.activityLogCard:hover {
+    border-left-color: var(--neon-yellow) !important;
+    box-shadow: 0 0 15px rgba(255, 230, 0, 0.2) !important;
+    transform: translateX(4px);
+}
+
+/* Table Enhancements in Dashboard */
+.detailTable {
+    border-collapse: separate !important;
+    border-spacing: 0 6px !important;
+}
+
+.detailTable tr {
+    background: rgba(14, 19, 38, 0.5) !important;
+    transition: var(--transition-snappy);
+}
+
+.detailTable tr:hover {
+    background: rgba(0, 240, 255, 0.08) !important;
+}
+
+.detailTable th {
+    color: var(--neon-yellow) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--neon-blue) !important;
+}
+
+/* ==========================================================================
+   14. SUBTLE NEON PULSE ANIMATIONS & KEYFRAMES
+   ========================================================================== */
+@keyframes neon-ambient-glow {
+    0%, 100% {
+        filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.5));
+    }
+    50% {
+        filter: drop-shadow(0 0 14px rgba(255, 230, 0, 0.6));
+    }
+}
+
+.focuscontainer:focus-within .sectionTitle::after {
+    animation: neon-ambient-glow 3s infinite ease-in-out;
+}
