@@ -1,11 +1,13 @@
-﻿{
-    "last_session_timestamp":  "2026-09-06 10:52:06",
-    "last_session_node":  "VOLTAIREDEUX",
-    "local_ip":  "192.168.4.30",
-    "peer_node":  "VOLTAIREUN",
-    "peer_ip":  "fe80::2c3c:b2c6:ab71:6c09%7",
-    "databases_healthy":  false,
-    "anomalies_detected":  1,
-    "remediations_applied":  30,
-    "latest_report_path":  "C:\\Users\\waltd\\OneDrive\\Mediastack\\handoffs\\AI_Remediation_Execution_Report_20260906_105206.md"
+{
+    "last_session_timestamp": "2026-09-06 14:19:30",
+    "last_session_node": "VOLTAIREDEUX",
+    "local_ip": "192.168.4.30",
+    "peer_node": "VOLTAIREUN",
+    "peer_ip": "192.168.4.21",
+    "databases_healthy": true,
+    "anomalies_detected": 0,
+    "remediations_applied": 35,
+    "latest_report_path": "handoffs/VOLTAIREDEUX_CORRECTIVE_GUIDANCE_AND_AI_ADVISORY.md",
+    "status": "VOLTAIREDEUX_AI_GUIDANCE_EMITTED",
+    "active_git_commit": "a7fb98a"
 }
