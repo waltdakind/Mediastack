@@ -92,7 +92,8 @@ function Add-PortEvent {
 }
 
 # --- PROBE FUNCTION (Multi-Vector Socket + Gateway Probe) ---
-function Probe-SinglePort {
+function Test-SinglePort {
+    [Alias("Probe-SinglePort")]
     param($stateObj, [int]$Timeout)
 
     $def = $stateObj.Def
@@ -189,7 +190,8 @@ function Probe-SinglePort {
 }
 
 # --- RENDER DASHBOARD UI ---
-function Render-Dashboard {
+function Show-Dashboard {
+    [Alias("Render-Dashboard")]
     $nowStr = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     
     $totalMonitored = $MonitoredPorts.Count
@@ -336,10 +338,10 @@ try {
     do {
         # Parallel Execution across all ports
         foreach ($k in $global:PortState.Keys) {
-            Probe-SinglePort -stateObj $global:PortState[$k] -Timeout $TimeoutMs | Out-Null
+            Test-SinglePort -stateObj $global:PortState[$k] -Timeout $TimeoutMs | Out-Null
         }
 
-        Render-Dashboard
+        Show-Dashboard
 
         # Auto-Repair Check if enabled
         if ($AutoRepair) {
