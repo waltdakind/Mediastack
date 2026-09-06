@@ -34,7 +34,7 @@ $ErrorActionPreference = "Continue"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 [System.Console]::InputEncoding  = [System.Text.Encoding]::UTF8
 
-$BaseDir = $PSScriptRoot
+$BaseDir = if (Test-Path (Join-Path $PSScriptRoot "..\docker-compose.yml")) { (Resolve-Path (Join-Path $PSScriptRoot "..")).Path } else { $PSScriptRoot }
 $HandoffsDir = Join-Path $BaseDir "handoffs"
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 $fileTag   = Get-Date -Format "yyyyMMdd_HHmmss"
