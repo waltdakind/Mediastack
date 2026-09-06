@@ -131,7 +131,7 @@ if (-not (Test-Path $pyResolverScript)) {
     $pyResolverScript = Join-Path (Split-Path $PSScriptRoot -Parent) "Resolve-MediaStackPythonPath.ps1"
 }
 if (Test-Path $pyResolverScript) {
-    & $pyResolverScript -SetEnvironment $true -Quiet
+    & $pyResolverScript -Quiet
 }
 
 # ==============================================================================

@@ -23,7 +23,8 @@
 
 [CmdletBinding()]
 param(
-    [bool]$SetEnvironment = $true,
+    [switch]$SkipEnvironment,
+    [switch]$SetEnvironment,
     [switch]$ExportSystem,
     [switch]$Quiet
 )
@@ -31,10 +32,13 @@ param(
 function Resolve-MediaStackPythonPath {
     [CmdletBinding()]
     param(
-        [bool]$SetEnvironment = $true,
+        [switch]$SkipEnvironment,
+        [switch]$SetEnvironment,
         [switch]$ExportSystem,
         [switch]$Quiet
     )
+
+    $shouldSetEnv = -not $SkipEnvironment
 
     $currentHost = $env:COMPUTERNAME
     $procArch = [System.Environment]::GetEnvironmentVariable("PROCESSOR_ARCHITECTURE")
@@ -127,7 +131,7 @@ function Resolve-MediaStackPythonPath {
             $pyVersion = "Python (Detected)"
         }
 
-        if ($SetEnvironment) {
+        if ($shouldSetEnv) {
             $pathParts = [System.Collections.Generic.List[string]]::new(($env:PATH -split ';'))
             
             # Ensure PythonDir is in PATH
@@ -193,4 +197,4 @@ function Resolve-MediaStackPythonPath {
 }
 
 # Execute if run as a script directly
-Resolve-MediaStackPythonPath -SetEnvironment:$SetEnvironment -ExportSystem:$ExportSystem -Quiet:$Quiet
+Resolve-MediaStackPythonPath -SkipEnvironment:$SkipEnvironment -SetEnvironment:$SetEnvironment -ExportSystem:$ExportSystem -Quiet:$Quiet
