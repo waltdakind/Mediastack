@@ -54,12 +54,29 @@ config/
 !config/secrets/*.example.*
 data/
 downloads/
+Downloads/
 media/
+Media/
 movies/
+Movies/
+shows/
 Shows/
+tv/
 TV/
+video/
+Video/
+videos/
 Videos/
 music/
+Music/
+livestream/
+LiveStream/
+pictures/
+Pictures/
+podcasts/
+Podcasts/
+radio/
+Radio/
 torrents/
 watch/
 tmp/
@@ -70,7 +87,7 @@ node_modules/
 api-gateway/node_modules/
 HomepageInstaller/node_modules/
 
-# Media & archive file extensions
+# Media & archive file extensions (Audio, Video, Containers)
 *.mkv
 *.mp4
 *.avi
@@ -80,6 +97,18 @@ HomepageInstaller/node_modules/
 *.flv
 *.webm
 *.iso
+*.mp3
+*.flac
+*.wav
+*.m4a
+*.aac
+*.ogg
+*.opus
+*.alac
+*.aiff
+*.wma
+*.ape
+*.cue
 *.zip
 *.tar.gz
 *.7z
@@ -99,6 +128,8 @@ tests-files/
 updates-files/
 syncs-files/
 starts-files/
+scratch/
+
 invokes-files/
 
 
