@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     s-v2.ps1 - Instant Shortcut Launcher for VoltaireDeux (AI Acceleration & Workstation Node).
 
@@ -21,9 +21,16 @@ param(
     [Parameter(Mandatory = $false)][switch]$SkipAiWatcher
 )
 
-$targetScript = Join-Path $PSScriptRoot "Start-VoltaireDeuxMainExecution.ps1"
+$targetScript = if (Test-Path (Join-Path $PSScriptRoot "start-files\Start-VoltaireDeuxMainExecution.ps1")) {
+    Join-Path $PSScriptRoot "start-files\Start-VoltaireDeuxMainExecution.ps1"
+} elseif (Test-Path (Join-Path $PSScriptRoot "Start-VoltaireDeuxMainExecution.ps1")) {
+    Join-Path $PSScriptRoot "Start-VoltaireDeuxMainExecution.ps1"
+} else {
+    Join-Path $PSScriptRoot "start-files\Start-VoltaireDeuxMainExecution.ps1"
+}
+
 if (Test-Path $targetScript) {
     & $targetScript -ExternalDomain $ExternalDomain -LocalIP $LocalIP -PrimaryIP $PrimaryIP -NonInteractive:$NonInteractive -SkipAiWatcher:$SkipAiWatcher
 } else {
-    Write-Error "Start-VoltaireDeuxMainExecution.ps1 not found in $PSScriptRoot"
+    Write-Error "Start-VoltaireDeuxMainExecution.ps1 not found in $PSScriptRoot or $PSScriptRoot\start-files"
 }

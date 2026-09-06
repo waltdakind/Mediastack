@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     s-v1.ps1 - Instant Shortcut Launcher for VoltaireUn (Main 24/7 Media Server Node).
 
@@ -22,9 +22,16 @@ param(
     [Parameter(Mandatory = $false)][switch]$BenchmarkOnly
 )
 
-$targetScript = Join-Path $PSScriptRoot "Start-VoltaireUnMainExecution.ps1"
+$targetScript = if (Test-Path (Join-Path $PSScriptRoot "start-files\Start-VoltaireUnMainExecution.ps1")) {
+    Join-Path $PSScriptRoot "start-files\Start-VoltaireUnMainExecution.ps1"
+} elseif (Test-Path (Join-Path $PSScriptRoot "Start-VoltaireUnMainExecution.ps1")) {
+    Join-Path $PSScriptRoot "Start-VoltaireUnMainExecution.ps1"
+} else {
+    Join-Path $PSScriptRoot "start-files\Start-VoltaireUnMainExecution.ps1"
+}
+
 if (Test-Path $targetScript) {
     & $targetScript -ExternalDomain $ExternalDomain -PrimaryIP $PrimaryIP -SecondaryIP $SecondaryIP -NonInteractive:$NonInteractive -SkipSentinel:$SkipSentinel -BenchmarkOnly:$BenchmarkOnly
 } else {
-    Write-Error "Start-VoltaireUnMainExecution.ps1 not found in $PSScriptRoot"
+    Write-Error "Start-VoltaireUnMainExecution.ps1 not found in $PSScriptRoot or $PSScriptRoot\start-files"
 }

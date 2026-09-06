@@ -312,8 +312,13 @@ function Invoke-AutoRepairFailingPorts {
 
 # --- CLUSTER UPDATE & HANDOFF DISPATCHER ---
 function Invoke-MonitorClusterHandoff {
-    Write-Host "`n[CLUSTER UPDATES] Triggering cluster update check and generating system status handoff..." -ForegroundColor Cyan
-    $handoffScript = Join-Path $PSScriptRoot "Invoke-MediaStackClusterHandoff.ps1"
+    $handoffScript = if (Test-Path (Join-Path $PSScriptRoot "invoke-files\Invoke-MediaStackClusterHandoff.ps1")) {
+        Join-Path $PSScriptRoot "invoke-files\Invoke-MediaStackClusterHandoff.ps1"
+    } elseif (Test-Path (Join-Path $PSScriptRoot "Invoke-MediaStackClusterHandoff.ps1")) {
+        Join-Path $PSScriptRoot "Invoke-MediaStackClusterHandoff.ps1"
+    } else {
+        Join-Path $PSScriptRoot "invoke-files\Invoke-MediaStackClusterHandoff.ps1"
+    }
     if (Test-Path $handoffScript) {
         & $handoffScript -NonInteractive
     } else {
