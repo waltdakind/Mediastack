@@ -10,6 +10,8 @@
     },
     "powershell.scriptAnalysis.enable": true,
     "r.sessionWatcher": false,
+    "python.envFile": "${workspaceFolder}/.env",
+    "python.terminal.useEnvFile": true,
     "python.terminal.activateEnvironment": false,
     "terminal.integrated.environmentChangesIndicator": "off",
     "powershell.integratedConsole.showOnStartup": false,

@@ -239,7 +239,7 @@ $frontendRoutes = @(
 # Graceful Exit Handling
 $global:SessionActive = $true
 $cancelHandler = [ConsoleCancelEventHandler]{
-    param($sender, $e)
+    param($source, $e)
     $e.Cancel = $true
     $global:SessionActive = $false
     Write-Host "`n`n[INTERRUPT DETECTED] Gracefully concluding collaborative AI session..." -ForegroundColor Yellow
@@ -317,7 +317,7 @@ try {
             if ($p) { $peerLatency = $p.ResponseTime }
         } catch { }
 
-        $peerLinkStatus = if ($peerLatency -ne $null) { "$peerLatency ms (OK)" } else { "LAN Standby" }
+        $peerLinkStatus = if ($null -ne $peerLatency) { "$peerLatency ms (OK)" } else { "LAN Standby" }
         Write-Host ("  • Peer Node Link ({0} @ {1}): {2}" -f $nodeInfo.PeerHostName, $nodeInfo.PeerIP, $peerLinkStatus) -ForegroundColor DarkCyan
 
         # Read latest peer advice markdown
@@ -560,7 +560,11 @@ try {
             $remediationHistory.last_watermark = (Get-Date -Format "o")
             Save-SessionRemediationHistory $remediationHistory
 
-            Write-Host ("  [SUCCESS] Code execution completed in {0}ms with ExitCode: 0" -f $execSw.ElapsedMilliseconds) -ForegroundColor Green
+            if ($repairSuccess) {
+                Write-Host ("  [SUCCESS] Code execution completed successfully in {0}ms." -f $execSw.ElapsedMilliseconds) -ForegroundColor Green
+            } else {
+                Write-Host ("  [WARN] Code execution completed with warnings in {0}ms." -f $execSw.ElapsedMilliseconds) -ForegroundColor Yellow
+            }
         } else {
             Write-Host "  • All incoming peer code packages up-to-date and applied." -ForegroundColor Green
         }
@@ -640,9 +644,10 @@ try {
         try { [System.IO.File]::WriteAllText($nexusPath, ($nexusData | ConvertTo-Json -Depth 5), [System.Text.Encoding]::UTF8) } catch { }
 
         # --- SPRINT SUMMARY HUD ---
+        $iterDuration = [math]::Round(([DateTime]::UtcNow - $iterStartTime).TotalSeconds, 1)
         $scoreColor = if ($currentScore -ge 95) { "Green" } elseif ($currentScore -ge 80) { "Cyan" } else { "Yellow" }
         Write-Host "`n================================================================================" -ForegroundColor Cyan
-        Write-Host ("   SPRINT #{0} RESULT: HARDENING INDEX = {1}% [{2}]" -f $iteration, $currentScore, $grade) -ForegroundColor $scoreColor
+        Write-Host ("   SPRINT #{0} RESULT: HARDENING INDEX = {1}% [{2}] ({3}s)" -f $iteration, $currentScore, $grade, $iterDuration) -ForegroundColor $scoreColor
         Write-Host ("   Services: {0}/{1} | DBs: {2}/{3} | Frontend: {4}/{5} | Repairs Applied: {6}" -f `
             $onlineServicesCount, $coreServices.Count, ($coreDatabases.Count - $corruptDbs.Count), $coreDatabases.Count, $frontendSuccessCount, $frontendRoutes.Count, $totalRepairsExecuted) -ForegroundColor White
         Write-Host ("   Report Emitted: {0}" -f $sprintReportPath) -ForegroundColor DarkCyan
