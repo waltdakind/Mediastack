@@ -47,6 +47,8 @@ param(
     [Parameter(Mandatory = $false)][int]$IntervalSeconds = 15,
     [Parameter(Mandatory = $false)][bool]$Interactive = $true,
     [Parameter(Mandatory = $false)][switch]$NonInteractive,
+    [Parameter(Mandatory = $false)][Alias("Stop", "Exit", "Conclude")][switch]$ExitSession,
+    [Parameter(Mandatory = $false)][string]$ExitReason = "Operator requested collaboration exit",
     [Parameter(Mandatory = $false)][switch]$DryRun
 )
 
@@ -56,6 +58,14 @@ if ($NonInteractive -or $Continuous) { $Interactive = $false }
 [System.Console]::InputEncoding = [System.Text.Encoding]::UTF8
 
 $BaseDir = $PSScriptRoot
+if (-not $BaseDir -or -not (Test-Path (Join-Path $BaseDir "MediaStackOps.psm1"))) {
+    $parent = Split-Path $PSScriptRoot -Parent
+    if ($parent -and (Test-Path (Join-Path $parent "MediaStackOps.psm1"))) {
+        $BaseDir = $parent
+    } else {
+        $BaseDir = "c:\Users\waltd\OneDrive\Mediastack"
+    }
+}
 $HandoffsDir = Join-Path $BaseDir "handoffs"
 if (-not (Test-Path $HandoffsDir)) { New-Item -ItemType Directory -Force -Path $HandoffsDir | Out-Null }
 
@@ -71,6 +81,65 @@ else {
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 $fileTag = Get-Date -Format "yyyyMMdd_HHmmss"
 $nodeInfo = Get-MediaStackClusterNodeInfo
+
+# ==============================================================================
+# FAST-PATH: AI COLLABORATION EXIT BROADCAST
+# ==============================================================================
+if ($ExitSession) {
+    $nexusJsonPath = Join-Path $HandoffsDir "ai_collaboration_nexus.json"
+    $currentNexus = @{}
+    if (Test-Path $nexusJsonPath) {
+        try { $currentNexus = Get-Content $nexusJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json } catch { }
+    }
+
+    $exitReportPath = Join-Path $HandoffsDir "AI_Collaboration_Session_Exit_$($nodeInfo.LocalHostName)_${fileTag}.md"
+    $exitMd = @"
+# MediaStack AI Collaboration Session Concluded
+
+- **Concluded By Node:** $($nodeInfo.LocalHostName) ($($nodeInfo.LocalIP))
+- **Peer Node:** $($nodeInfo.PeerHostName) ($($nodeInfo.PeerIP))
+- **Timestamp:** $timestamp
+- **Exit Reason:** $ExitReason
+- **Session State:** CONCLUDED
+- **Session Active:** false
+
+---
+*Notice broadcast to cluster to terminate frequent collaborator polling loops.*
+"@
+    try { Set-Content -Path $exitReportPath -Value $exitMd -Encoding UTF8 } catch { }
+
+    $nexusObj = [ordered]@{
+        session_state          = "CONCLUDED"
+        session_active         = $false
+        concluded_by           = $nodeInfo.LocalHostName
+        concluded_at           = $timestamp
+        exit_reason            = $ExitReason
+        peer_acknowledged_exit = $false
+        last_session_timestamp = $timestamp
+        last_session_node      = $nodeInfo.LocalHostName
+        local_ip               = $nodeInfo.LocalIP
+        peer_node              = $nodeInfo.PeerHostName
+        peer_ip                = $nodeInfo.PeerIP
+        peer_latency_ms        = $(if ($currentNexus.peer_latency_ms) { $currentNexus.peer_latency_ms } else { 0 })
+        databases_healthy      = $(if ($null -ne $currentNexus.databases_healthy) { $currentNexus.databases_healthy } else { $true })
+        anomalies_detected     = 0
+        remediations_applied   = $(if ($currentNexus.remediations_applied) { $currentNexus.remediations_applied } else { 0 })
+        active_action_plan     = @()
+        latest_report_path     = $exitReportPath
+    }
+    [System.IO.File]::WriteAllText($nexusJsonPath, ($nexusObj | ConvertTo-Json -Depth 5), [System.Text.Encoding]::UTF8)
+
+    Write-Host "`n================================================================================" -ForegroundColor Cyan
+    Write-Host "   [AI COLLABORATION EXIT BROADCAST] SESSION CONCLUDED" -ForegroundColor Yellow
+    Write-Host ("   Concluded By : {0} ({1})" -f $nodeInfo.LocalHostName, $nodeInfo.LocalIP) -ForegroundColor Green
+    Write-Host ("   Peer Target  : {0} ({1})" -f $nodeInfo.PeerHostName, $nodeInfo.PeerIP) -ForegroundColor DarkCyan
+    Write-Host ("   Timestamp    : {0}" -f $timestamp) -ForegroundColor White
+    Write-Host ("   Exit Reason  : {0}" -f $ExitReason) -ForegroundColor DarkYellow
+    Write-Host "   Broadcast updated -> handoffs/ai_collaboration_nexus.json" -ForegroundColor DarkCyan
+    Write-Host "   Frequent polling signals halted across cluster." -ForegroundColor Green
+    Write-Host "================================================================================`n" -ForegroundColor Cyan
+    return
+}
 
 # ==============================================================================
 # HERO BANNER & COLLABORATION MATRIX
@@ -469,6 +538,13 @@ Set-Content -Path $reportPath -Value $mdReport -Encoding UTF8
 
 # Update Persistent Knowledge Nexus Manifest
 $nexusObj = [ordered]@{
+    session_state          = "ACTIVE"
+    session_active         = $true
+    session_id             = "COLLAB_${fileTag}_$($nodeInfo.LocalHostName)"
+    concluded_by           = $null
+    concluded_at           = $null
+    exit_reason            = $null
+    peer_acknowledged_exit = $false
     last_session_timestamp = $timestamp
     last_session_node      = $nodeInfo.LocalHostName
     local_ip               = $nodeInfo.LocalIP
@@ -481,18 +557,64 @@ $nexusObj = [ordered]@{
     active_action_plan     = $aiActionPlan
     latest_report_path     = $reportPath
 }
-$nexusObj | ConvertTo-Json -Depth 5 | Set-Content -Path $nexusJsonPath -Encoding UTF8
+[System.IO.File]::WriteAllText($nexusJsonPath, ($nexusObj | ConvertTo-Json -Depth 5), [System.Text.Encoding]::UTF8)
 
 Write-Host ("`n[COLLABORATION SESSION COMPLETE] Markdown Report -> {0}" -f $reportPath) -ForegroundColor Green
 Write-Host ("  Persistent AI Knowledge Nexus updated -> {0}" -f $nexusJsonPath) -ForegroundColor DarkCyan
 
 if ($Continuous) {
-    Write-Host "`n[CONTINUOUS SENTINEL ACTIVE] Polling for VoltaireUn updates every ${IntervalSeconds}s (Press Ctrl+C to stop)..." -ForegroundColor Cyan
+    Write-Host "`n[CONTINUOUS SENTINEL ACTIVE] Polling for VoltaireUn updates every ${IntervalSeconds}s (Press 'Q', 'X' or Ctrl+C to stop)..." -ForegroundColor Cyan
     $lastReportTime = [DateTime]::UtcNow
     while ($true) {
         $hbTs = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-        Write-Host "[$hbTs] [AI COLLABORATION HUB] Heartbeat: Peer (192.168.4.21) Synchronized. Watching handoffs/ for peer telemetry..." -ForegroundColor DarkGray
-        Start-Sleep -Seconds $IntervalSeconds
+        Write-Host "[$hbTs] [AI COLLABORATION HUB] Heartbeat: Peer ($($nodeInfo.PeerIP)) Synchronized. Watching handoffs/ for peer telemetry..." -ForegroundColor DarkGray
+
+        # 1. Check for Peer Exit Signal in ai_collaboration_nexus.json
+        if (Test-Path $nexusJsonPath) {
+            try {
+                $liveNexus = Get-Content $nexusJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+                if ($liveNexus.session_state -in @("CONCLUDED", "EXIT_REQUESTED") -or $liveNexus.session_active -eq $false) {
+                    if ($liveNexus.concluded_by -and $liveNexus.concluded_by -ne $nodeInfo.LocalHostName) {
+                        Write-Host "`n================================================================================" -ForegroundColor Yellow
+                        Write-Host "   [PEER COLLABORATOR EXITED] COLLABORATION SESSION CONCLUDED" -ForegroundColor Magenta
+                        Write-Host ("   Peer node [{0}] concluded the AI collaboration session." -f $liveNexus.concluded_by) -ForegroundColor White
+                        Write-Host ("   Conclusion Timestamp : {0}" -f $liveNexus.concluded_at) -ForegroundColor DarkCyan
+                        Write-Host ("   Exit Reason          : {0}" -f $liveNexus.exit_reason) -ForegroundColor DarkGray
+                        Write-Host "   Ending session and terminating frequent polling loops." -ForegroundColor Green
+                        Write-Host "================================================================================" -ForegroundColor Yellow
+
+                        try {
+                            $liveNexus.peer_acknowledged_exit = $true
+                            $liveNexus.peer_acknowledged_at = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+                            [System.IO.File]::WriteAllText($nexusJsonPath, ($liveNexus | ConvertTo-Json -Depth 5), [System.Text.Encoding]::UTF8)
+                        } catch { }
+
+                        break
+                    }
+                }
+            } catch { }
+        }
+
+        # 2. Responsive Sleep with Keyboard Exit Check
+        $sleepSteps = [math]::Max(1, $IntervalSeconds * 2)
+        $stopRequested = $false
+        for ($s = 0; $s -lt $sleepSteps; $s++) {
+            try {
+                if ([System.Environment]::UserInteractive -and [Console]::KeyAvailable) {
+                    $key = [Console]::ReadKey($true)
+                    if ($key.Key -in @([System.ConsoleKey]::Q, [System.ConsoleKey]::X, [System.ConsoleKey]::Escape)) {
+                        Write-Host "`n[EXIT KEY DETECTED] Gracefully concluding AI collaboration session..." -ForegroundColor Yellow
+                        & $PSCommandPath -ExitSession -ExitReason "Operator pressed '$($key.Key)' in console"
+                        $stopRequested = $true
+                        break
+                    }
+                }
+            } catch { }
+            Start-Sleep -Milliseconds 500
+        }
+        if ($stopRequested) { break }
+
+        # 3. Check for fresh reports from peer
         $newReports = Get-ChildItem -Path $HandoffsDir -Filter "VoltaireUn_*.md" -ErrorAction SilentlyContinue |
             Where-Object { $_.LastWriteTimeUtc -gt $lastReportTime } |
             Sort-Object LastWriteTimeUtc -Descending |

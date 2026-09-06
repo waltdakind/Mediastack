@@ -59,6 +59,8 @@ param(
     [Parameter(Mandatory=$false)][int]$MaxIterations = 30,
     [Parameter(Mandatory=$false)][int]$PollIntervalSeconds = 8,
     [Parameter(Mandatory=$false)][bool]$AutoRepair = $true,
+    [Parameter(Mandatory=$false)][Alias("Stop", "Exit", "Conclude")][switch]$ExitSession,
+    [Parameter(Mandatory=$false)][string]$ExitReason = "Operator concluded hardened AI collaboration session",
     [Parameter(Mandatory=$false)][switch]$Continuous
 )
 
@@ -67,7 +69,14 @@ $ErrorActionPreference = "Continue"
 [System.Console]::InputEncoding  = [System.Text.Encoding]::UTF8
 
 $BaseDir = $PSScriptRoot
-if (-not $BaseDir) { $BaseDir = "c:\Users\waltd\OneDrive\Mediastack" }
+if (-not $BaseDir -or -not (Test-Path (Join-Path $BaseDir "MediaStackOps.psm1"))) {
+    $parent = Split-Path $PSScriptRoot -Parent
+    if ($parent -and (Test-Path (Join-Path $parent "MediaStackOps.psm1"))) {
+        $BaseDir = $parent
+    } else {
+        $BaseDir = "c:\Users\waltd\OneDrive\Mediastack"
+    }
+}
 $HandoffsDir = Join-Path $BaseDir "handoffs"
 if (-not (Test-Path $HandoffsDir)) { New-Item -ItemType Directory -Force -Path $HandoffsDir | Out-Null }
 
@@ -81,6 +90,67 @@ if (Test-Path $opsModule) {
 
 $nodeInfo = Get-MediaStackClusterNodeInfo
 $historyFile = Join-Path $HandoffsDir ".remediation_history.json"
+$nexusPath = Join-Path $HandoffsDir "ai_collaboration_nexus.json"
+
+# ==============================================================================
+# FAST-PATH: AI COLLABORATION EXIT BROADCAST
+# ==============================================================================
+if ($ExitSession) {
+    $currentNexus = @{}
+    if (Test-Path $nexusPath) {
+        try { $currentNexus = Get-Content $nexusPath -Raw -Encoding UTF8 | ConvertFrom-Json } catch { }
+    }
+    $ts = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $ft = Get-Date -Format "yyyyMMdd_HHmmss"
+    $exitReportPath = Join-Path $HandoffsDir "Hardened_AI_Session_Exit_$($nodeInfo.LocalHostName)_${ft}.md"
+    $exitMd = @"
+# MediaStack Hardened AI Collaboration Session Concluded
+
+- **Host Node:** $($nodeInfo.LocalHostName) ($($nodeInfo.LocalIP))
+- **Peer Node:** $($nodeInfo.PeerHostName) ($($nodeInfo.PeerIP))
+- **Conclusion Timestamp:** $ts
+- **Exit Reason:** $ExitReason
+- **Session State:** CONCLUDED
+- **Session Active:** false
+
+---
+*Notice emitted to cluster to conclude active sprints and terminate frequent polling.*
+"@
+    try { [System.IO.File]::WriteAllText($exitReportPath, $exitMd, [System.Text.Encoding]::UTF8) } catch { }
+
+    $nexusData = [ordered]@{
+        session_state          = "CONCLUDED"
+        session_active         = $false
+        concluded_by           = $nodeInfo.LocalHostName
+        concluded_at           = $ts
+        exit_reason            = $ExitReason
+        peer_acknowledged_exit = $false
+        last_session_timestamp = $ts
+        last_session_node      = $nodeInfo.LocalHostName
+        local_ip               = $nodeInfo.LocalIP
+        peer_node              = $nodeInfo.PeerHostName
+        peer_ip                = $nodeInfo.PeerIP
+        hardening_score        = $(if ($currentNexus.hardening_score) { $currentNexus.hardening_score } else { 100 })
+        hardening_grade        = $(if ($currentNexus.hardening_grade) { $currentNexus.hardening_grade } else { "OPTIMAL (A+)" })
+        databases_healthy      = $(if ($null -ne $currentNexus.databases_healthy) { $currentNexus.databases_healthy } else { $true })
+        services_online        = $(if ($currentNexus.services_online) { $currentNexus.services_online } else { "13/13" })
+        frontend_routes_ok     = $(if ($currentNexus.frontend_routes_ok) { $currentNexus.frontend_routes_ok } else { "8/8" })
+        total_repairs_applied  = $(if ($currentNexus.total_repairs_applied) { $currentNexus.total_repairs_applied } else { 0 })
+        latest_report_path     = $exitReportPath
+    }
+    try { [System.IO.File]::WriteAllText($nexusPath, ($nexusData | ConvertTo-Json -Depth 5), [System.Text.Encoding]::UTF8) } catch { }
+
+    Write-Host "`n================================================================================" -ForegroundColor Cyan
+    Write-Host "   [HARDENED AI COLLABORATION EXIT BROADCAST] SPRINT CONCLUDED" -ForegroundColor Yellow
+    Write-Host ("   Concluded By : {0} ({1})" -f $nodeInfo.LocalHostName, $nodeInfo.LocalIP) -ForegroundColor Green
+    Write-Host ("   Peer Node    : {0} ({1})" -f $nodeInfo.PeerHostName, $nodeInfo.PeerIP) -ForegroundColor DarkCyan
+    Write-Host ("   Timestamp    : {0}" -f $ts) -ForegroundColor White
+    Write-Host ("   Exit Reason  : {0}" -f $ExitReason) -ForegroundColor DarkYellow
+    Write-Host "   Nexus updated -> handoffs/ai_collaboration_nexus.json" -ForegroundColor DarkCyan
+    Write-Host "   Frequent sprint polling terminated." -ForegroundColor Green
+    Write-Host "================================================================================`n" -ForegroundColor Cyan
+    return
+}
 
 # Remediation History Helpers
 function Get-SessionRemediationHistory {
@@ -213,6 +283,33 @@ try {
         # STAGE 1: INGEST PEER AI TELEMETRY & ADVICE FROM VOLTAIREDEUX
         # ======================================================================
         Write-Host "[STAGE 1/6] Ingesting Telemetry & Directives from VoltaireDeux..." -ForegroundColor Yellow
+
+        # 1. Check for Peer Exit Signal in ai_collaboration_nexus.json
+        if (Test-Path $nexusPath) {
+            try {
+                $liveNexus = Get-Content $nexusPath -Raw -Encoding UTF8 | ConvertFrom-Json
+                if ($liveNexus.session_state -in @("CONCLUDED", "EXIT_REQUESTED") -or $liveNexus.session_active -eq $false) {
+                    if ($liveNexus.concluded_by -and $liveNexus.concluded_by -ne $nodeInfo.LocalHostName) {
+                        Write-Host "`n================================================================================" -ForegroundColor Yellow
+                        Write-Host "   [PEER COLLABORATOR EXITED] HARDENED SPRINT CONCLUDED" -ForegroundColor Magenta
+                        Write-Host ("   Peer node [{0}] concluded the AI collaboration session." -f $liveNexus.concluded_by) -ForegroundColor White
+                        Write-Host ("   Conclusion Timestamp : {0}" -f $liveNexus.concluded_at) -ForegroundColor DarkCyan
+                        Write-Host ("   Exit Reason          : {0}" -f $liveNexus.exit_reason) -ForegroundColor DarkGray
+                        Write-Host "   Ending sprint and terminating frequent polling loops." -ForegroundColor Green
+                        Write-Host "================================================================================" -ForegroundColor Yellow
+
+                        try {
+                            $liveNexus.peer_acknowledged_exit = $true
+                            $liveNexus.peer_acknowledged_at = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+                            $liveNexus | ConvertTo-Json -Depth 5 | Set-Content -Path $nexusPath -Encoding UTF8
+                        } catch { }
+
+                        $global:SessionActive = $false
+                        break
+                    }
+                }
+            } catch { }
+        }
 
         $peerLatency = $null
         try {
@@ -520,6 +617,13 @@ try {
         # Update Persistent AI Nexus
         $nexusPath = Join-Path $HandoffsDir "ai_collaboration_nexus.json"
         $nexusData = [ordered]@{
+            session_state          = "ACTIVE"
+            session_active         = $true
+            session_id             = "HARDENED_${fileTag}_$($nodeInfo.LocalHostName)"
+            concluded_by           = $null
+            concluded_at           = $null
+            exit_reason            = $null
+            peer_acknowledged_exit = $false
             last_session_timestamp = $timestamp
             last_session_node      = $nodeInfo.LocalHostName
             local_ip               = $nodeInfo.LocalIP
@@ -557,16 +661,48 @@ try {
         }
 
         # Responsive Sleep Countdown
-        Write-Host "Next sprint cycle in $PollIntervalSeconds seconds (Press Ctrl+C to stop)..." -ForegroundColor DarkGray
+        Write-Host "Next sprint cycle in $PollIntervalSeconds seconds (Press 'Q', 'X' or Ctrl+C to stop)..." -ForegroundColor DarkGray
         $sleepSteps = [math]::Max(1, $PollIntervalSeconds * 2)
+        $stopRequested = $false
         for ($s = 0; $s -lt $sleepSteps; $s++) {
             if (-not $global:SessionActive) { break }
+            try {
+                if ([System.Environment]::UserInteractive -and [Console]::KeyAvailable) {
+                    $k = [Console]::ReadKey($true)
+                    if ($k.Key -in @([System.ConsoleKey]::Q, [System.ConsoleKey]::X, [System.ConsoleKey]::Escape)) {
+                        Write-Host "`n[EXIT KEY DETECTED] Concluding hardened collaborative sprint..." -ForegroundColor Yellow
+                        $global:SessionActive = $false
+                        $stopRequested = $true
+                        break
+                    }
+                }
+            } catch { }
             Start-Sleep -Milliseconds 500
         }
+        if ($stopRequested) { break }
     }
 }
 finally {
     $totalDuration = [math]::Round(([DateTime]::UtcNow - $sessionStartTime).TotalSeconds, 1)
+
+    # Ensure concluded state is recorded in nexus if session is no longer active
+    if (-not $global:SessionActive) {
+        try {
+            $endNexus = @{}
+            if (Test-Path $nexusPath) {
+                $endNexus = Get-Content $nexusPath -Raw -Encoding UTF8 | ConvertFrom-Json
+            }
+            if ($endNexus.session_state -ne "CONCLUDED") {
+                $endNexus.session_state = "CONCLUDED"
+                $endNexus.session_active = $false
+                $endNexus.concluded_by = $nodeInfo.LocalHostName
+                $endNexus.concluded_at = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+                $endNexus.exit_reason = "Sprint completed or exited gracefully"
+                $endNexus | ConvertTo-Json -Depth 5 | Set-Content -Path $nexusPath -Encoding UTF8
+            }
+        } catch { }
+    }
+
     Write-Host "`n================================================================================" -ForegroundColor Cyan
     Write-Host "   A I   C O L L A B O R A T I O N   S P R I N T   C O N C L U D E D" -ForegroundColor Yellow
     Write-Host ("   Total Sprints: {0} | Peak Health Index: {1}% | Duration: {2}s" -f $iteration, $highestScore, $totalDuration) -ForegroundColor White

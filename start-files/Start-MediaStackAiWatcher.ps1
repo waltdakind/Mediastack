@@ -18,8 +18,20 @@
 
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory=$false)][int]$IntervalSeconds = 15
+    [Parameter(Mandatory=$false)][int]$IntervalSeconds = 15,
+    [Parameter(Mandatory=$false)][Alias("Stop", "Exit", "Conclude")][switch]$ExitSession,
+    [Parameter(Mandatory=$false)][string]$ExitReason = "Operator requested collaboration exit via AI Watcher"
 )
 
-$scriptPath = Join-Path $PSScriptRoot "Invoke-MediaStackAiCollaboration.ps1"
+$baseDir = Split-Path $PSScriptRoot -Parent
+$scriptPath = Join-Path $baseDir "invoke-files\Invoke-MediaStackAiCollaboration.ps1"
+if (-not (Test-Path $scriptPath)) {
+    $scriptPath = Join-Path $PSScriptRoot "Invoke-MediaStackAiCollaboration.ps1"
+}
+
+if ($ExitSession) {
+    & $scriptPath -ExitSession -ExitReason $ExitReason
+    return
+}
+
 & $scriptPath -Continuous -IntervalSeconds $IntervalSeconds -AutoRepair -NonInteractive

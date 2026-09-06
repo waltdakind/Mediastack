@@ -10,16 +10,17 @@ param(
     [Alias("n", "9", "shares")][switch]$NetworkShares,
     [Alias("0", "upgrade")][switch]$Update,
     [Alias("f", "full", "reboot")][switch]$FullSuite,
-    [Alias("rp", "repairfleet")][switch]$RepairFleet,
-    [Alias("bk", "backupfleet")][switch]$BackupFleet,
-    [Alias("chk", "checkfleet", "connectivity")][switch]$CheckFleet,
-    [Alias("rep", "syncfleet", "replicate")][switch]$SyncFleet,
-    [Alias("v", "verifyfleet")][switch]$VerifyFleet,
-    [Alias("da", "deepanalysis", "handoffs")][switch]$DeepAnalysis,
-    [Alias("i", "install", "newnode")][switch]$InstallNode,
-    [Alias("t", "ssl", "cert", "tls")][switch]$Ssl,
-    [Alias("rpssl", "repairssl")][switch]$RepairSsl,
-    [Alias("o", "orchestrate", "master")][switch]$Orchestrator,
+    [Alias("rp")][switch]$RepairFleet,
+    [Alias("bk")][switch]$BackupFleet,
+    [Alias("chk", "connectivity")][switch]$CheckFleet,
+    [Alias("rep", "replicate")][switch]$SyncFleet,
+    [Alias("v")][switch]$VerifyFleet,
+    [Alias("da", "handoffs")][switch]$DeepAnalysis,
+    [Alias("i", "newnode")][switch]$InstallNode,
+    [Alias("t", "cert", "tls")][switch]$Ssl,
+    [Alias("rpssl")][switch]$RepairSsl,
+    [Alias("o", "master")][switch]$Orchestrator,
+    [Alias("stopcollab", "x")][switch]$ExitCollab,
     [Parameter(Mandatory = $false)][switch]$NonInteractive
 )
 
@@ -36,6 +37,10 @@ $ErrorActionPreference = "Continue"
 [System.Console]::InputEncoding  = [System.Text.Encoding]::UTF8
 
 # Direct flag dispatch
+if ($ExitCollab) {
+    & "$PSScriptRoot\invoke-files\Invoke-MediaStackAiCollaboration.ps1" -ExitSession -ExitReason "Operator exited via s.ps1 shortcut"
+    return
+}
 if ($Orchestrator) {
     & "$PSScriptRoot\Start-MediaStackOrchestrator.ps1" -NonInteractive:$NonInteractive
     return
@@ -186,10 +191,13 @@ Write-Host "Primary Deep Analysis & Expert Handoffs Generator -> Shortcut: .\s.p
 Write-Host "  [I] " -NoNewline -ForegroundColor Yellow
 Write-Host "Install / Replicate New Node on Voltaire Network -> Shortcut: .\s.ps1 -i" -ForegroundColor Green
 
+Write-Host "  [X] " -NoNewline -ForegroundColor Yellow
+Write-Host "Exit AI Collaboration Session & Stop Frequent Polling -> Shortcut: .\s.ps1 -x" -ForegroundColor Red
+
 Write-Host "  [Q] " -NoNewline -ForegroundColor DarkGray
 Write-Host "Quit" -ForegroundColor DarkGray
 
-Write-Host "`nSelect an option [0-9, O, F, T, R, B, C, S, V, D, I, Q]: " -NoNewline -ForegroundColor Yellow
+Write-Host "`nSelect an option [0-9, O, F, T, R, B, C, S, V, D, I, X, Q]: " -NoNewline -ForegroundColor Yellow
 
 if ($NonInteractive) {
     Write-Host "3 (Default NonInteractive: Dual-Node LCP)" -ForegroundColor Cyan
@@ -229,6 +237,7 @@ switch ($key.ToString().ToUpper()) {
     "V" { & "$PSScriptRoot\Test-MediaStackFleetVerification.ps1" -All }
     "D" { & "$PSScriptRoot\Invoke-MediaStackDeepAnalysis.ps1" }
     "I" { & "$PSScriptRoot\Install-VoltaireNode.ps1" }
+    "X" { & "$PSScriptRoot\invoke-files\Invoke-MediaStackAiCollaboration.ps1" -ExitSession -ExitReason "Operator pressed 'X' in s.ps1 HUD"; return }
     "Q" { Write-Host "Exited." -ForegroundColor DarkGray; return }
     default {
         Write-Host "Executing default: Dual-Node LCP and Performance Optimization..." -ForegroundColor Cyan

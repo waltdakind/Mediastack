@@ -48,6 +48,10 @@ param(
     [Parameter(Mandatory=$false)][int]$PollIntervalSeconds = 15,
     [Parameter(Mandatory=$false)][int]$FullAuditIntervalSeconds = 120,
     [Parameter(Mandatory=$false)][bool]$AutoExecuteRepairs = $true,
+    [Parameter(Mandatory=$false)][Alias("Stop", "Exit", "Conclude")][switch]$ExitSession,
+    [Parameter(Mandatory=$false)][string]$ExitReason = "Operator concluded autonomous AI collaboration",
+    [Parameter(Mandatory=$false)][switch]$ExitOnPeerExit,
+    [Parameter(Mandatory=$false)][int]$StandbyIntervalSeconds = 300,
     [Parameter(Mandatory=$false)][switch]$SinglePass
 )
 
@@ -56,7 +60,14 @@ $ErrorActionPreference = "Continue"
 [System.Console]::InputEncoding  = [System.Text.Encoding]::UTF8
 
 $BaseDir = $PSScriptRoot
-if (-not $BaseDir) { $BaseDir = "c:\Users\waltd\OneDrive\Mediastack" }
+if (-not $BaseDir -or -not (Test-Path (Join-Path $BaseDir "MediaStackOps.psm1"))) {
+    $parent = Split-Path $PSScriptRoot -Parent
+    if ($parent -and (Test-Path (Join-Path $parent "MediaStackOps.psm1"))) {
+        $BaseDir = $parent
+    } else {
+        $BaseDir = "c:\Users\waltd\OneDrive\Mediastack"
+    }
+}
 $HandoffsDir = Join-Path $BaseDir "handoffs"
 if (-not (Test-Path $HandoffsDir)) { New-Item -ItemType Directory -Force -Path $HandoffsDir | Out-Null }
 
@@ -72,6 +83,63 @@ $nodeInfo = Get-MediaStackClusterNodeInfo
 $historyFile = Join-Path $HandoffsDir ".remediation_history.json"
 $nexusPath = Join-Path $HandoffsDir "ai_collaboration_nexus.json"
 $manifestPath = Join-Path $HandoffsDir "cluster_update_manifest.json"
+
+# ==============================================================================
+# FAST-PATH: AI COLLABORATION EXIT BROADCAST
+# ==============================================================================
+if ($ExitSession) {
+    $currentNexus = @{}
+    if (Test-Path $nexusPath) {
+        try { $currentNexus = Get-Content $nexusPath -Raw -Encoding UTF8 | ConvertFrom-Json } catch { }
+    }
+    $ts = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $ft = Get-Date -Format "yyyyMMdd_HHmmss"
+    $exitReportPath = Join-Path $HandoffsDir "Autonomous_Collab_Exit_$($nodeInfo.LocalHostName)_${ft}.md"
+    $exitMd = @"
+# MediaStack Autonomous Collaboration Concluded
+
+- **Host Node:** $($nodeInfo.LocalHostName) ($($nodeInfo.LocalIP))
+- **Peer Node:** $($nodeInfo.PeerHostName) ($($nodeInfo.PeerIP))
+- **Conclusion Timestamp:** $ts
+- **Exit Reason:** $ExitReason
+- **Session State:** CONCLUDED
+- **Session Active:** false
+
+---
+*Notice emitted to cluster to conclude active autonomous collaboration and terminate frequent polling.*
+"@
+    try { [System.IO.File]::WriteAllText($exitReportPath, $exitMd, [System.Text.Encoding]::UTF8) } catch { }
+
+    $nexusData = [ordered]@{
+        session_state          = "CONCLUDED"
+        session_active         = $false
+        concluded_by           = $nodeInfo.LocalHostName
+        concluded_at           = $ts
+        exit_reason            = $ExitReason
+        peer_acknowledged_exit = $false
+        last_session_timestamp = $ts
+        last_session_node      = $nodeInfo.LocalHostName
+        local_ip               = $nodeInfo.LocalIP
+        peer_node              = $nodeInfo.PeerHostName
+        peer_ip                = $nodeInfo.PeerIP
+        databases_healthy      = $(if ($null -ne $currentNexus.databases_healthy) { $currentNexus.databases_healthy } else { $true })
+        anomalies_detected     = 0
+        remediations_applied   = $(if ($currentNexus.remediations_applied) { $currentNexus.remediations_applied } else { 0 })
+        latest_report_path     = $exitReportPath
+    }
+    try { [System.IO.File]::WriteAllText($nexusPath, ($nexusData | ConvertTo-Json -Depth 5), [System.Text.Encoding]::UTF8) } catch { }
+
+    Write-Host "`n================================================================================" -ForegroundColor Cyan
+    Write-Host "   [AUTONOMOUS COLLABORATOR EXIT BROADCAST] SESSION CONCLUDED" -ForegroundColor Yellow
+    Write-Host ("   Concluded By : {0} ({1})" -f $nodeInfo.LocalHostName, $nodeInfo.LocalIP) -ForegroundColor Green
+    Write-Host ("   Peer Node    : {0} ({1})" -f $nodeInfo.PeerHostName, $nodeInfo.PeerIP) -ForegroundColor DarkCyan
+    Write-Host ("   Timestamp    : {0}" -f $ts) -ForegroundColor White
+    Write-Host ("   Exit Reason  : {0}" -f $ExitReason) -ForegroundColor DarkYellow
+    Write-Host "   Nexus updated -> handoffs/ai_collaboration_nexus.json" -ForegroundColor DarkCyan
+    Write-Host "   Frequent polling signals halted across cluster." -ForegroundColor Green
+    Write-Host "================================================================================`n" -ForegroundColor Cyan
+    return
+}
 
 # Initialize or Load Remediation History
 function Get-RemediationHistory {
@@ -183,6 +251,31 @@ try {
         $cycleStartTime = [DateTime]::UtcNow
         $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
         $fileTag   = Get-Date -Format "yyyyMMdd_HHmmss"
+
+        # --- STEP 0: COLLABORATION SESSION STATE & PEER EXIT AWARENESS ---
+        $currentWaitSeconds = $PollIntervalSeconds
+        if (Test-Path $nexusPath) {
+            try {
+                $liveNexus = Get-Content $nexusPath -Raw -Encoding UTF8 | ConvertFrom-Json
+                if ($liveNexus.session_state -in @("CONCLUDED", "EXIT_REQUESTED") -or $liveNexus.session_active -eq $false) {
+                    if ($liveNexus.concluded_by -and $liveNexus.concluded_by -ne $nodeInfo.LocalHostName) {
+                        if ($ExitOnPeerExit) {
+                            Write-Host "`n================================================================================" -ForegroundColor Yellow
+                            Write-Host "   [PEER COLLABORATOR EXITED] AUTONOMOUS COLLABORATION CONCLUDED" -ForegroundColor Magenta
+                            Write-Host ("   Peer node [{0}] concluded session at {1}." -f $liveNexus.concluded_by, $liveNexus.concluded_at) -ForegroundColor White
+                            Write-Host ("   Exit Reason: {0}" -f $liveNexus.exit_reason) -ForegroundColor DarkGray
+                            Write-Host "   Exiting autonomous collaborator as requested (-ExitOnPeerExit)." -ForegroundColor Green
+                            Write-Host "================================================================================" -ForegroundColor Yellow
+                            $global:KeepRunning = $false
+                            break
+                        } else {
+                            $currentWaitSeconds = $StandbyIntervalSeconds
+                            Write-Host ("[{0}] [STANDBY] Peer node ({1}) concluded collaboration session. Polling throttled to {2}s standby." -f (Get-Date -Format "HH:mm:ss"), $liveNexus.concluded_by, $StandbyIntervalSeconds) -ForegroundColor DarkYellow
+                        }
+                    }
+                }
+            } catch { }
+        }
 
         # --- STEP 1: FAST TELEMETRY & HEALTH PROBING ---
         $serviceAnomalies = @()
@@ -608,11 +701,24 @@ try {
         }
 
         # Sleep with sub-second responsive cancellation check
-        $sleepSteps = [math]::Max(1, $PollIntervalSeconds * 2)
+        $sleepSteps = [math]::Max(1, $currentWaitSeconds * 2)
+        $stopRequested = $false
         for ($s = 0; $s -lt $sleepSteps; $s++) {
             if (-not $global:KeepRunning) { break }
+            try {
+                if ([System.Environment]::UserInteractive -and [Console]::KeyAvailable) {
+                    $k = [Console]::ReadKey($true)
+                    if ($k.Key -in @([System.ConsoleKey]::Q, [System.ConsoleKey]::X, [System.ConsoleKey]::Escape)) {
+                        Write-Host "`n[EXIT KEY DETECTED] Gracefully stopping autonomous collaborator..." -ForegroundColor Yellow
+                        $global:KeepRunning = $false
+                        $stopRequested = $true
+                        break
+                    }
+                }
+            } catch { }
             Start-Sleep -Milliseconds 500
         }
+        if ($stopRequested) { break }
     }
 }
 finally {

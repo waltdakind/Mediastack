@@ -73,6 +73,7 @@ $InvokeCatalog["DailyPoller"]        = @{ Script="Invoke-VoltaireUnDailyPoller.p
 $InvokeCatalog["AutoRepair"]         = @{ Script="Invoke-StackAutoRepair.ps1";                  Name="Automated Self-Healing Stack Repair" }
 $InvokeCatalog["JellyWatch"]         = @{ Script="Invoke-JellyWatchHandler.ps1";                Name="JellyWatch Notification & Issue Handler" }
 $InvokeCatalog["ClusterHandoff"]     = @{ Script="Invoke-MediaStackClusterHandoff.ps1";        Name="Cluster Priority Handoff Synchronizer" }
+$InvokeCatalog["StopCollab"]         = @{ Script="Stop-MediaStackAiCollaboration.ps1";          Name="AI Collaboration Session Exit & Sentinel Termination" }
 
 # Interactive Selection Menu
 if (-not $Task -and -not $All -and -not $NonInteractive) {
@@ -100,9 +101,11 @@ if (-not $Task -and -not $All -and -not $NonInteractive) {
     Write-Host "   [12] Run Stack Self-Healing Auto-Repair (Invoke-StackAutoRepair.ps1)" -ForegroundColor Green
     Write-Host "   [13] Trigger JellyWatch Event Handler (Invoke-JellyWatchHandler.ps1)" -ForegroundColor Yellow
     Write-Host "   [14] Execute Cluster Priority Handoff Sync (Invoke-MediaStackClusterHandoff.ps1)" -ForegroundColor Yellow
+    Write-Host "   `n   [COLLABORATION SESSION MANAGEMENT]" -ForegroundColor Yellow
+    Write-Host "   [15] Conclude AI Collaboration Session & Stop Frequent Polling (Stop-MediaStackAiCollaboration.ps1)" -ForegroundColor Red
     Write-Host "   `n   [0]  Exit" -ForegroundColor DarkGray
     Write-Host "--------------------------------------------------------------------------------" -ForegroundColor DarkGray
-    $choice = Read-Host "   Enter selection [1-14, 0]"
+    $choice = Read-Host "   Enter selection [1-15, 0]"
 
     switch ($choice.ToString().Trim()) {
         "1"  { $Task = "Lifecycle" }
@@ -119,6 +122,7 @@ if (-not $Task -and -not $All -and -not $NonInteractive) {
         "12" { $Task = "AutoRepair" }
         "13" { $Task = "JellyWatch" }
         "14" { $Task = "ClusterHandoff" }
+        "15" { $Task = "StopCollab" }
         default {
             Write-Host "`nExiting Execution Suite.`n" -ForegroundColor DarkGray
             return
