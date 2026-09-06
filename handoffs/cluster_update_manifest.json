@@ -1,16 +1,16 @@
-﻿{
+{
     "manifest_version":  "2.0.0",
-    "update_id":  "VOLTAIREDEUX_REL_20260905_161008",
+    "update_id":  "VOLTAIREDEUX_REL_20260906_101645",
     "publisher_node":  "VOLTAIREDEUX",
-    "publisher_role":  "VoltaireDeux (AI Acceleration \u0026 Push Node)",
+    "publisher_role":  "VoltaireDeux (AI Acceleration & Push Node)",
     "publisher_ip":  "192.168.4.30",
     "target_node":  "VOLTAIREUN",
     "target_role":  "VoltaireUn (Main 24/7 Server Node)",
-    "target_ip":  "fe80::2c3c:b2c6:ab71:6c09%7",
-    "published_at":  "2026-09-05 16:10:08",
-    "commit_sha":  "177fdcce017a49ebc769c3a6d674e872e7c8cdf5",
-    "commit_message":  "deploy JellyWatch remote HTTPS profiles, resilient Seerr Watch Pass endpoints, and sync cluster manifest",
+    "target_ip":  "192.168.4.21",
+    "published_at":  "2026-09-06 10:16:45",
+    "commit_sha":  "34f883e5a5ee03223011400d3d5fba2657e2bb76",
+    "commit_message":  "publish dedicated MusicBrainz ports (5000 and 5001) for dual instances and update container auditing",
     "git_branch":  "main",
-    "requires_db_sync":  true,
+    "requires_db_sync":  false,
     "status":  "READY_FOR_VOLTAIREUN_PULL"
 }
