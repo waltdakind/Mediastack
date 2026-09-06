@@ -11,6 +11,7 @@ services:
       - ./api-gateway/index.js:/app/index.js:ro
       - ./certs:/certs:ro
     restart: unless-stopped
+    mem_limit: 256m
     labels:
       - "autoheal=true"
 
@@ -19,17 +20,7 @@ services:
     container_name: caddy
     ports:
       - "80:80"
-      - "81:81"
       - "443:443"
-      - "444:444"
-      - "8097:8097"
-      - "8990:8990"
-      - "7879:7879"
-      - "9697:9697"
-      - "6768:6768"
-      - "5056:5056"
-      - "9092:9092"
-      - "8081:8081"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./certs:/etc/caddy/certs:ro
@@ -37,6 +28,7 @@ services:
       - ./config/caddy_config:/config
       - ./dashboard:/var/www/dashboard
     restart: unless-stopped
+    mem_limit: 256m
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80"]
       interval: 30s
@@ -66,6 +58,7 @@ services:
       - "8096:8096"
       - "8920:8920"
     restart: unless-stopped
+    mem_limit: 1024m
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
       interval: 30s
@@ -85,6 +78,7 @@ services:
     ports:
       - "5055:5055"
     restart: unless-stopped
+    mem_limit: 512m
     labels:
       - "autoheal=true"
     networks:
@@ -106,6 +100,7 @@ services:
     ports:
       - "8989:8989"
     restart: unless-stopped
+    mem_limit: 384m
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8989/ping"]
       interval: 30s
@@ -128,6 +123,7 @@ services:
     ports:
       - "7878:7878"
     restart: unless-stopped
+    mem_limit: 384m
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7878/ping"]
       interval: 30s
@@ -149,6 +145,7 @@ services:
     ports:
       - "9696:9696"
     restart: unless-stopped
+    mem_limit: 256m
     labels:
       - "autoheal=true"
 
@@ -165,6 +162,7 @@ services:
     ports:
       - "6767:6767"
     restart: unless-stopped
+    mem_limit: 256m
     labels:
       - "autoheal=true"
 
@@ -183,10 +181,12 @@ services:
       - "51413:51413"
       - "51413:51413/udp"
     restart: unless-stopped
+    mem_limit: 256m
     labels:
       - "autoheal=true"
 
   qbittorrent:
+    profiles: ["alt-torrent"]
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     environment:
@@ -203,6 +203,7 @@ services:
       - "6881:6881"
       - "6881:6881/udp"
     restart: unless-stopped
+    mem_limit: 256m
     labels:
       - "autoheal=true"
 
@@ -222,6 +223,7 @@ services:
       - ./db-backup:/db-backup
     command: sqlite_web -H 0.0.0.0 -p 8080 /config/mediastack_backup.db
     restart: unless-stopped
+    mem_limit: 256m
     labels:
       - "autoheal=true"
 
@@ -239,6 +241,7 @@ services:
       - "9981:9981"
       - "9982:9982"
     restart: unless-stopped
+    mem_limit: 256m
     labels:
       - "autoheal=true"
 
@@ -260,8 +263,10 @@ services:
     ports:
       - "9090:9090"
     restart: unless-stopped
+    mem_limit: 128m
 
   homepage:
+    profiles: ["gethomepage"]
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     environment:
@@ -272,6 +277,7 @@ services:
       - ./config/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped
+    mem_limit: 256m
 
   portainer:
     image: portainer/portainer-ce:latest
@@ -283,6 +289,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./config/portainer:/data
     restart: unless-stopped
+    mem_limit: 256m
 
   tdarr:
     image: ghcr.io/haveagitgat/tdarr:latest
@@ -306,6 +313,7 @@ services:
       - ./config/tdarr/logs:/app/logs
       - ${MEDIA_DIR}:/data
       - ./config/tdarr/cache:/temp
+    mem_limit: 512m
     labels:
       - "autoheal=true"
 
@@ -331,6 +339,7 @@ services:
       - musicbrainz_dbdump:/media/dbdump
       - musicbrainz_solrdump:/var/cache/musicbrainz/solr-backups:ro
     restart: unless-stopped
+    mem_limit: 512m
     env_file:
       - ./musicbrainz-docker/default/postgres.env
     environment:
@@ -340,9 +349,10 @@ services:
       - MUSICBRAINZ_USE_PROXY=1
       - MUSICBRAINZ_WEB_SERVER_HOST=${MUSICBRAINZ_WEB_SERVER_HOST:-localhost}
       - MUSICBRAINZ_WEB_SERVER_PORT=${MUSICBRAINZ_WEB_SERVER_PORT:-5000}
+      - MUSICBRAINZ_POSTGRES_SERVER=${MUSICBRAINZ_POSTGRES_SERVER:-192.168.4.21}
+      - MUSICBRAINZ_POSTGRES_READONLY_SERVER=${MUSICBRAINZ_POSTGRES_READONLY_SERVER:-192.168.4.21}
+      - MUSICBRAINZ_SEARCH_SERVER=${MUSICBRAINZ_SEARCH_SERVER:-192.168.4.21:8983/solr}
     depends_on:
-      - musicbrainz-db
-      - musicbrainz-search
       - musicbrainz-valkey
 
   musicbrainz-secondary:
@@ -359,6 +369,7 @@ services:
       - musicbrainz_dbdump:/media/dbdump
       - musicbrainz_solrdump:/var/cache/musicbrainz/solr-backups:ro
     restart: unless-stopped
+    mem_limit: 512m
     env_file:
       - ./musicbrainz-docker/default/postgres.env
     environment:
@@ -368,12 +379,14 @@ services:
       - MUSICBRAINZ_USE_PROXY=1
       - MUSICBRAINZ_WEB_SERVER_HOST=${MUSICBRAINZ_WEB_SERVER_HOST:-localhost}
       - MUSICBRAINZ_WEB_SERVER_PORT=5000
+      - MUSICBRAINZ_POSTGRES_SERVER=${MUSICBRAINZ_POSTGRES_SERVER:-192.168.4.21}
+      - MUSICBRAINZ_POSTGRES_READONLY_SERVER=${MUSICBRAINZ_POSTGRES_READONLY_SERVER:-192.168.4.21}
+      - MUSICBRAINZ_SEARCH_SERVER=${MUSICBRAINZ_SEARCH_SERVER:-192.168.4.21:8983/solr}
     depends_on:
-      - musicbrainz-db
-      - musicbrainz-search
       - musicbrainz-valkey
 
   musicbrainz-db:
+    profiles: ["backend-x64"]
     platform: linux/amd64
     build:
       context: ./musicbrainz-docker/build/postgres-prebuilt
@@ -401,6 +414,7 @@ services:
           - db
 
   musicbrainz-indexer:
+    profiles: ["backend-x64"]
     platform: linux/amd64
     build:
       context: ./musicbrainz-docker/build/sir
@@ -421,6 +435,7 @@ services:
       - musicbrainz-search
 
   musicbrainz-search:
+    profiles: ["backend-x64"]
     platform: linux/amd64
     build:
       context: ./musicbrainz-docker/build/solr
@@ -460,6 +475,7 @@ services:
         max-size: "10m"
         max-file: "10"
     restart: unless-stopped
+    mem_limit: 256m
     ports:
       - "6379:6379"
     expose:
