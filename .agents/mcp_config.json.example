@@ -4,7 +4,7 @@
       "serverUrl": "http://localhost:3000/mcp/sse"
     },
     "gemini": {
-      "command": "npx",
+      "command": "npx.cmd",
       "args": [
         "-y",
         "@houtini/gemini-mcp"
@@ -14,7 +14,7 @@
       }
     },
     "chrome-devtools": {
-      "command": "npx",
+      "command": "npx.cmd",
       "args": [
         "-y",
         "chrome-devtools-mcp@latest"
