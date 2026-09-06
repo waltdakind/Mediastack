@@ -8,5 +8,6 @@
         ".Rprofile": "r",
         ".Renviron": "r"
     },
-    "powershell.scriptAnalysis.enable": true
+    "powershell.scriptAnalysis.enable": true,
+    "r.sessionWatcher": false
 }
